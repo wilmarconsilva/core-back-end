@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentatio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web.API.REST", "Presentation\Web\Web.API.REST\Web.API.REST.csproj", "{1D8CEBB3-1FE8-4D8A-B07A-C8DCE04F15B6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +78,10 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{1D8CEBB3-1FE8-4D8A-B07A-C8DCE04F15B6} = {06CFFD70-14AA-A959-A3BA-1B15D094E3B1}
+		{1D8CEBB3-1FE8-4D8A-B07A-C8DCE04F15B6} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {06CFFD70-14AA-A959-A3BA-1B15D094E3B1}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E56488ED-07EA-42A4-AFCF-40C5296BBA17}
 	EndGlobalSection
 EndGlobal
