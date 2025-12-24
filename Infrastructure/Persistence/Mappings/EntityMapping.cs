@@ -8,6 +8,8 @@ namespace Infrastructure.Persistence.Mappings
     {
         public virtual void Configure(EntityTypeBuilder<T> builder)
         {
+            builder.ToTable(GetTableName());
+
             builder.HasKey(e => e.Id);
 
             builder.Property(e => e.Id)
@@ -23,5 +25,7 @@ namespace Infrastructure.Persistence.Mappings
                 .HasColumnName("description")
                 .IsRequired();
         }
+
+        protected abstract string GetTableName();
     }
 }

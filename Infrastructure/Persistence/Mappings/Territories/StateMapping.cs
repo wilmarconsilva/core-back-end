@@ -11,7 +11,12 @@ namespace Infrastructure.Persistence.Mappings.Territories
                 .HasOne(s => s.Country)
                 .WithMany()
                 .HasForeignKey("countryId")
-                .IsRequired();
+                .OnDelete(Microsoft.EntityFrameworkCore.DeleteBehavior.Restrict);
+        }
+
+        protected override string GetTableName()
+        {
+            return "states";
         }
     }
 }

@@ -12,7 +12,12 @@ namespace Infrastructure.Persistence.Mappings.Territories
                 .HasOne(s => s.State)
                 .WithMany()
                 .HasForeignKey("stateId")
-                .IsRequired();
+                .OnDelete(Microsoft.EntityFrameworkCore.DeleteBehavior.Restrict);
+        }
+
+        protected override string GetTableName()
+        {
+            return "localities";
         }
     }
 }

@@ -1,5 +1,5 @@
 using System.Text;
-using Domain.Entities.Persons.Territories;
+using Domain.Entities.Territories;
 
 namespace Domain.Entities.Persons.Customers
 {

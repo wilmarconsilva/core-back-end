@@ -10,8 +10,6 @@ namespace Infrastructure.Persistence.Mappings.Persons
         {
             base.Configure(builder);
 
-            builder.ToTable("customers");
-
             builder.Property(c => c.Name)
                 .HasColumnName("name")
                 .IsRequired();
@@ -41,6 +39,11 @@ namespace Infrastructure.Persistence.Mappings.Persons
         protected override void MapDescription(EntityTypeBuilder<Customer> builder)
         {
             builder.Ignore(e => e.Description);
+        }
+
+        protected override string GetTableName()
+        {
+            return "customers";
         }
     }
 }
