@@ -2,23 +2,26 @@ using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-public abstract class EntityMapping<T> : IEntityTypeConfiguration<T> where T : Entity
+namespace Infrastructure.Persistence.Mappings
 {
-    public virtual void Configure(EntityTypeBuilder<T> builder)
+    public abstract class EntityMapping<T> : IEntityTypeConfiguration<T> where T : Entity
     {
-        builder.HasKey(e => e.Id);
+        public virtual void Configure(EntityTypeBuilder<T> builder)
+        {
+            builder.HasKey(e => e.Id);
 
-        builder.Property(e => e.Id)
-            .HasColumnName("id")
-            .IsRequired();
+            builder.Property(e => e.Id)
+                .HasColumnName("id")
+                .IsRequired();
 
-        ConfigureDescription(builder);
-    }
+            MapDescription(builder);
+        }
 
-    public virtual void ConfigureDescription(EntityTypeBuilder<T> builder)
-    {
-        builder.Property(e => e.Description)
-            .HasColumnName("description")
-            .IsRequired();;
+        protected virtual void MapDescription(EntityTypeBuilder<T> builder)
+        {
+            builder.Property(e => e.Description)
+                .HasColumnName("description")
+                .IsRequired();
+        }
     }
 }

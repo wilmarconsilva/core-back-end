@@ -2,7 +2,7 @@ using Domain.Entities.Persons.Customers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Persistece.Mappings
+namespace Infrastructure.Persistence.Mappings.Persons
 {
     public class CustomerMapping : EntityMapping<Customer>
     {
@@ -38,7 +38,7 @@ namespace Infrastructure.Persistece.Mappings
                 .HasMaxLength(14);
         }
 
-        public override void ConfigureDescription(EntityTypeBuilder<Customer> builder)
+        protected override void MapDescription(EntityTypeBuilder<Customer> builder)
         {
             builder.Ignore(e => e.Description);
         }
