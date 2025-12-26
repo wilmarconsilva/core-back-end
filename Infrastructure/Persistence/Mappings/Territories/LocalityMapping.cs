@@ -11,7 +11,7 @@ namespace Infrastructure.Persistence.Mappings.Territories
             builder
                 .HasOne(s => s.State)
                 .WithMany()
-                .HasForeignKey("stateId")
+                .HasForeignKey("state_id")
                 .OnDelete(Microsoft.EntityFrameworkCore.DeleteBehavior.Restrict);
         }
 

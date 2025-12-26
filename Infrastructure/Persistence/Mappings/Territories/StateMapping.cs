@@ -10,7 +10,7 @@ namespace Infrastructure.Persistence.Mappings.Territories
             builder
                 .HasOne(s => s.Country)
                 .WithMany()
-                .HasForeignKey("countryId")
+                .HasForeignKey("country_id")
                 .OnDelete(Microsoft.EntityFrameworkCore.DeleteBehavior.Restrict);
         }
 
