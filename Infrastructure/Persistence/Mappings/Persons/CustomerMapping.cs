@@ -2,15 +2,13 @@ using Domain.Entities.Persons.Customers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Persistece.Mappings
+namespace Infrastructure.Persistence.Mappings.Persons
 {
     public class CustomerMapping : EntityMapping<Customer>
     {
         public override void Configure(EntityTypeBuilder<Customer> builder)
         {
             base.Configure(builder);
-
-            builder.ToTable("customers");
 
             builder.Property(c => c.Name)
                 .HasColumnName("name")
@@ -38,9 +36,14 @@ namespace Infrastructure.Persistece.Mappings
                 .HasMaxLength(14);
         }
 
-        public override void ConfigureDescription(EntityTypeBuilder<Customer> builder)
+        protected override void MapDescription(EntityTypeBuilder<Customer> builder)
         {
             builder.Ignore(e => e.Description);
+        }
+
+        protected override string GetTableName()
+        {
+            return "customers";
         }
     }
 }

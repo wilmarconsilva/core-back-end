@@ -21,7 +21,7 @@ namespace Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Entities.Persons.Customers", b =>
+            modelBuilder.Entity("Domain.Entities.Persons.Customers.Customer", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -62,6 +62,105 @@ namespace Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("customers", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Territories.Country", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Acronym")
+                        .IsRequired()
+                        .HasMaxLength(4)
+                        .HasColumnType("character varying(4)")
+                        .HasColumnName("acronym");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("countries", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Territories.Locality", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<long?>("state_id")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("state_id");
+
+                    b.ToTable("localities", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Territories.State", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Acronym")
+                        .IsRequired()
+                        .HasMaxLength(4)
+                        .HasColumnType("character varying(4)")
+                        .HasColumnName("acronym");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<long?>("country_id")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("country_id");
+
+                    b.ToTable("states", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Territories.Locality", b =>
+                {
+                    b.HasOne("Domain.Entities.Territories.State", "State")
+                        .WithMany()
+                        .HasForeignKey("state_id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("State");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Territories.State", b =>
+                {
+                    b.HasOne("Domain.Entities.Territories.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("country_id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Country");
                 });
 #pragma warning restore 612, 618
         }
