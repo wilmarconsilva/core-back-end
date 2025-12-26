@@ -1,4 +1,4 @@
-namespace Domain.Entities.Persons.Localities
+namespace Domain.Entities.Territories
 {
     public class Country : Territory
     {
