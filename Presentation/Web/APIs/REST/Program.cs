@@ -4,7 +4,7 @@ using Application.Services.Persons;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
 using Infrastructure.Persistece;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Persons.Customers;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -37,13 +37,17 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddAutoMapper(typeof(CustomerProfile));
 
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<ICustomerAddressService, CustomerAddressService>();
+
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICustomerAddressRepository, CustomerAddressRepository>();
+
+builder.Services.AddAutoMapper(typeof(CustomerProfile));
 
 WebApplication app = builder.Build();
 

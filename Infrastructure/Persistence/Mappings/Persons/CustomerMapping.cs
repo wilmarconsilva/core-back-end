@@ -28,12 +28,10 @@ namespace Infrastructure.Persistence.Mappings.Persons
                 .IsRequired();
 
             builder.Property(c => c.Email)
-                .HasColumnName("email")
-                .HasMaxLength(320);
+                .HasColumnName("email");
 
             builder.Property(c => c.StateRegistration)
-                .HasColumnName("state_registration")
-                .HasMaxLength(14);
+                .HasColumnName("state_registration");
         }
 
         protected override void MapDescription(EntityTypeBuilder<Customer> builder)

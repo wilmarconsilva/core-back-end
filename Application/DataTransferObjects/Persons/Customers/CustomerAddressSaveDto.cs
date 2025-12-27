@@ -6,10 +6,10 @@ namespace Application.DataTransferObjects.Persons.Customers
 
         public required string Street { get; set; }
 
-        public required int LocalityId { get; set; }
+        public required long LocalityId { get; set; }
 
         [System.Text.Json.Serialization.JsonIgnore]
-        public int CustomerId { get; set; }
+        public long CustomerId { get; set; }
 
         public string? Complement { get; set; }
 

@@ -2,7 +2,7 @@ using Domain.Entities;
 
 namespace Domain.Interfaces.Repositories
 {
-    public interface IRepositoryCrud<TEntity> where TEntity : Entity
+    public interface IRepositoryCrud<TEntity> : IRepository<TEntity> where TEntity : Entity
     {
         Task AddAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken);
 

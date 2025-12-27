@@ -5,13 +5,13 @@ namespace Domain.Entities.Persons.Customers
 {
     public class CustomerAddress : EntityWithoutDescription
     {
-        public required string Neighborhood { get; set; }
-
-        public required string Street { get; set; }
-
         public required Locality Locality { get; set; }
 
         public required Customer Customer { get; set; }
+
+        public required string Neighborhood { get; set; }
+
+        public required string Street { get; set; }
 
         public string? Complement { get; set; }
 

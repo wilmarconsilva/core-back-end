@@ -13,10 +13,12 @@ namespace Application.Services
     {
         #region Attributes
 
-        private readonly IRepositoryCrud<TEntity> _repository;
+        protected readonly IRepositoryCrud<TEntity> _repository;
+
         private readonly IUnitOfWork _unitOfWork;
-        private readonly bool _hasExternalTransactionActive;
         private readonly IMapper _mapper;
+
+        private readonly bool _hasExternalTransactionActive;
 
         #endregion Attributes
 
@@ -38,7 +40,7 @@ namespace Application.Services
         {
             ValidateDtos(dtos);
 
-            return SaveEntities(dtos, cancellationToken, OperationType.Create);
+            return SaveAsync(dtos, cancellationToken);
         }
 
         public async Task<Entity> CreateAsync(TEntitySaveDto dto, CancellationToken cancellationToken)
@@ -64,7 +66,7 @@ namespace Application.Services
 
             await ValidateIds(dtosIds, cancellationToken);
 
-            await SaveEntities(dtos, cancellationToken, OperationType.Update);
+            await SaveAsync(dtos, cancellationToken);
         }
 
         public Task UpdateAsync(long id, TEntitySaveDto dto, CancellationToken cancellationToken)
@@ -117,11 +119,7 @@ namespace Application.Services
             return Task.FromResult<string?>(null);
         }
 
-        #endregion Protected methods
-
-        #region Private methods
-
-        private async Task<IEnumerable<Entity>> SaveEntities(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken, OperationType operationType)
+        protected async Task<IEnumerable<Entity>> SaveAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
         {
             EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos = TransformToEntity(dtos);
 
@@ -131,12 +129,9 @@ namespace Application.Services
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            if (operationType == OperationType.Update)
-                await _repository.UpdateAsync(entities, cancellationToken);
-            else if (operationType == OperationType.Create)
-                await _repository.AddAsync(entities, cancellationToken);
-            else
-                throw new InvalidOperationException($"Invalid operation type for saving entities. Operation type: {operationType}");
+            await _repository.UpdateAsync(entities.Where(e => e.Id > 0), cancellationToken);
+
+            await _repository.AddAsync(entities.Where(e => e.Id == 0), cancellationToken);
 
             await _unitOfWork.FlushAsync(cancellationToken);
 
@@ -147,11 +142,9 @@ namespace Application.Services
             return entities;
         }
 
-        private void ValidateDtos(IEnumerable<TEntitySaveDto> dtos)
-        {
-            if (dtos == null || !dtos.Any())
-                throw new BusinessRuleException("Nenhuma informação foi fornecida para executar a operação.");
-        }
+        #endregion Protected methods
+
+        #region Private methods
 
         private async Task SaveRelatedEntities(EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos, CancellationToken cancellationToken)
         {
@@ -208,6 +201,12 @@ namespace Application.Services
         private static void ThrowNotFoundException(long id)
         {
             ThrowNotFoundException([id]);
+        }
+
+        private static void ValidateDtos(IEnumerable<TEntitySaveDto> dtos)
+        {
+            if (dtos == null || !dtos.Any())
+                throw new BusinessRuleException("Nenhuma informação foi fornecida para executar a operação.");
         }
 
         #endregion Private static methods

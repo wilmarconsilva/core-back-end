@@ -4,6 +4,9 @@ namespace Application.DataTransferObjects.Persons.Customers
 {
     public class CustomerSaveDto : EntitySaveDto
     {
+        [System.Text.Json.Serialization.JsonIgnore]
+        public override long Id { get; set; }
+
         public required string Name { get; set; }
         
         public required PersonType PersonType { get; set; }

@@ -10,9 +10,11 @@ namespace Application.Services.Persons
 {
     public class CustomerService : CrudService<Customer, CustomerSaveDto>, ICustomerService
     {
-        public CustomerService(ICustomerRepository repository, IUnitOfWork unitOfWork, IMapper mapper) : base(repository, unitOfWork, mapper)
-        {
+        private readonly ICustomerAddressService _customerAddressService;
 
+        public CustomerService(ICustomerRepository repository, IUnitOfWork unitOfWork, IMapper mapper, ICustomerAddressService customerAddressService) : base(repository, unitOfWork, mapper)
+        {
+            _customerAddressService = customerAddressService;
         }
 
         protected override Task<string?> ValidateBusinessRulesForSaveAsync(EntityDto<Customer, CustomerSaveDto> entityDto, CancellationToken cancellationToken)
@@ -23,6 +25,11 @@ namespace Application.Services.Persons
                 message = $"É obrigatório informar ao menos um endereço para o Cliente: {entityDto.Entity.Description}.";
 
             return Task.FromResult(message);
+        }
+
+        protected override async Task SaveDependentEntitiesAsync(IEnumerable<EntityDto<Customer, CustomerSaveDto>> entitiesDtos, CancellationToken cancellationToken)
+        {
+            await _customerAddressService.SaveByCustomersAsync(entitiesDtos, cancellationToken);
         }
     }
 }
