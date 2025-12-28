@@ -5,9 +5,13 @@ namespace Domain.Entities.Persons.Customers
 {
     public class CustomerAddress : EntityWithoutDescription
     {
-        public required Locality Locality { get; set; }
+        public Locality? Locality { get; set; }
 
-        public required Customer Customer { get; set; }
+        public required long LocalityId { get; set; }
+
+        public Customer? Customer { get; set; }
+
+        public required long CustomerId { get; set; }
 
         public required string Neighborhood { get; set; }
 
@@ -36,7 +40,7 @@ namespace Domain.Entities.Persons.Customers
             if (!string.IsNullOrWhiteSpace(PostalCode))
                 description.Append($" {PostalCode}.");
 
-            return description.Append('.').ToString();
+            return description.ToString();
         }
 
         #endregion Protected methods

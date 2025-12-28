@@ -2,7 +2,7 @@ using Domain.Entities.Persons.Customers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Persistence.Mappings.Persons
+namespace Infrastructure.Persistence.Mappings.Persons.Customers
 {
     public class CustomerAddressMapping : EntityMapping<CustomerAddress>
     {
@@ -10,17 +10,25 @@ namespace Infrastructure.Persistence.Mappings.Persons
         {
             base.Configure(builder);
 
-            builder
-                .HasOne(s => s.Customer)
-                .WithMany()
-                .HasForeignKey("customer_id")
-                .OnDelete(Microsoft.EntityFrameworkCore.DeleteBehavior.Cascade);
+            builder.Property(c => c.CustomerId)
+                   .HasColumnName("customer_id")
+                   .IsRequired();
+
+            builder.Property(c => c.LocalityId)
+                   .HasColumnName("locality_id")
+                   .IsRequired();
 
             builder
-                .HasOne(s => s.Locality)
+                .HasOne(c => c.Customer)
                 .WithMany()
-                .HasForeignKey("locality_id")
-                .OnDelete(Microsoft.EntityFrameworkCore.DeleteBehavior.Restrict);
+                .HasForeignKey(c => c.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder
+                .HasOne(c => c.Locality)
+                .WithMany()
+                .HasForeignKey(c => c.LocalityId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(c => c.Neighborhood)
                 .HasColumnName("neighborhood")

@@ -2,7 +2,7 @@ using Domain.Entities.Persons.Customers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Persistence.Mappings.Persons
+namespace Infrastructure.Persistence.Mappings.Persons.Customers
 {
     public class CustomerMapping : EntityMapping<Customer>
     {
@@ -20,7 +20,6 @@ namespace Infrastructure.Persistence.Mappings.Persons
 
             builder.Property(c => c.Document)
                 .HasColumnName("document")
-                .HasMaxLength(14)
                 .IsRequired();
 
             builder.Property(c => c.DocumentType)

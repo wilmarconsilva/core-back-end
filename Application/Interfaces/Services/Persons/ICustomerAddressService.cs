@@ -4,8 +4,8 @@ using Domain.Entities.Persons.Customers;
 
 namespace Application.Interfaces.Services.Persons
 {
-    public interface ICustomerAddressService : ICrudService<CustomerAddressSaveDto>
+    public interface ICustomerAddressService : ICrudService<CustomerAddress,CustomerAddressSaveDto>
     {
-        Task SaveByCustomersAsync(IEnumerable<EntityDto<Customer, CustomerSaveDto>> entitiesDtos, CancellationToken cancellationToken);
+
     }
 }

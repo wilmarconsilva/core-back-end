@@ -6,7 +6,7 @@ using Domain.Entities.Persons.Customers;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
 
-namespace Application.Services.Persons
+namespace Application.Services.Persons.Customers
 {
     public class CustomerService : CrudService<Customer, CustomerSaveDto>, ICustomerService
     {
@@ -27,9 +27,9 @@ namespace Application.Services.Persons
             return Task.FromResult(message);
         }
 
-        protected override async Task SaveDependentEntitiesAsync(IEnumerable<EntityDto<Customer, CustomerSaveDto>> entitiesDtos, CancellationToken cancellationToken)
+        protected override async Task SaveRelatedEntitiesAsync(EntityDto<Customer, CustomerSaveDto>[] entitiesDtos, CancellationToken cancellationToken)
         {
-            await _customerAddressService.SaveByCustomersAsync(entitiesDtos, cancellationToken);
+            await _customerAddressService.SaveByRelatedEntitiesAsync(entitiesDtos, c => c.Addresses, (address, customer) => address.Customer = customer, cancellationToken);
         }
     }
 }

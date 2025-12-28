@@ -1,5 +1,6 @@
 using Domain.Exceptions;
 using Domain.ValueObjects.Persons.Enums;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Domain.Entities.Persons.Customers
 {
@@ -19,8 +20,9 @@ namespace Domain.Entities.Persons.Customers
 
         #region Constructors
 
-        public Customer(PersonType personType, string document, string? email, string? stateRegistration)
+        public Customer(PersonType personType, string document, string? email, string? stateRegistration, long id)
         {
+            Id = id;
             PersonType = personType;
             Document = document;
             Email = email;
@@ -28,6 +30,10 @@ namespace Domain.Entities.Persons.Customers
 
             SetPersonType(personType);
         }
+
+        public Customer(PersonType personType, string document, string? email, string? stateRegistration) : this(personType, document, email, stateRegistration, 0) { }
+
+        public Customer(long id) : this(PersonType.Natural, string.Empty, null, null, id) { }
 
         #endregion Constructors
 

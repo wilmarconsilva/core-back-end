@@ -5,11 +5,10 @@ using Domain.Exceptions;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
 using AutoMapper;
-using Infrastructure.Persistece.Enums;
 
 namespace Application.Services
 {
-    public abstract class CrudService<TEntity, TEntitySaveDto> : ICrudService<TEntitySaveDto> where TEntitySaveDto : EntitySaveDto where TEntity : Entity
+    public abstract class CrudService<TEntity, TEntitySaveDto> : ICrudService<TEntity,TEntitySaveDto> where TEntitySaveDto : EntitySaveDto where TEntity : Entity
     {
         #region Attributes
 
@@ -89,19 +88,36 @@ namespace Application.Services
             await DeleteAsync([id], cancellationToken);
         }
 
+        public async Task SaveByRelatedEntitiesAsync<TRelatedEntity, TRelatedEntitySaveDto>(EntityDto<TRelatedEntity, TRelatedEntitySaveDto>[] relatedEntitiesDtos, Func<TRelatedEntitySaveDto, IEnumerable<TEntitySaveDto>> getEntitySaveDtoFromRelated, Action<TEntity, TRelatedEntity> setRelation, CancellationToken cancellationToken) where TRelatedEntity : Entity where TRelatedEntitySaveDto : EntitySaveDto
+        {
+            if (relatedEntitiesDtos == null || relatedEntitiesDtos.Length == 0)
+                return;
+
+            TEntitySaveDto[] entitiesSaveDtos = relatedEntitiesDtos.SelectMany(rd => getEntitySaveDtoFromRelated(rd.Dto)).ToArray();
+
+            if (entitiesSaveDtos.Length == 0)
+                return;
+
+            EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos = TransformToEntity(entitiesSaveDtos);
+
+            for (int i = 0; i < entitiesDtos.Length; i++)
+            {
+                EntityDto<TEntity, TEntitySaveDto> entityDto = entitiesDtos[i];
+
+                EntityDto<TRelatedEntity, TRelatedEntitySaveDto>? relatedEntityDto = relatedEntitiesDtos.FirstOrDefault(r => getEntitySaveDtoFromRelated(r.Dto).Any(d => ReferenceEquals(d, entityDto.Dto)));
+
+                if (relatedEntityDto == null)
+                    throw new KeyNotFoundException($"Related entity {typeof(TRelatedEntity).Name} not found for entity {typeof(TEntitySaveDto).Name}");
+
+                setRelation(entityDto.Entity, relatedEntityDto.Entity);
+            }
+
+            await SaveAsync(entitiesDtos, cancellationToken);
+        }
+
         #endregion Public methods
 
         #region Protected methods
-
-        protected virtual Task SaveDependentEntitiesAsync(IEnumerable<EntityDto<TEntity, TEntitySaveDto>> entitiesDtos, CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
-
-        protected virtual Task SaveAssociatedEntitiesAsync(IEnumerable<EntityDto<TEntity, TEntitySaveDto>> entitiesDtos, CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
 
         protected async virtual Task ValidateBusinessRulesForSaveAsync(EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos, CancellationToken cancellationToken)
         {
@@ -118,11 +134,20 @@ namespace Application.Services
         {
             return Task.FromResult<string?>(null);
         }
+        protected EntityDto<TEntity, TEntitySaveDto>[] TransformToEntity(IEnumerable<TEntitySaveDto> dtos)
+        {
+            return dtos.Select(TransformToEntity).ToArray();
+        }
 
-        protected async Task<IEnumerable<Entity>> SaveAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
+        protected Task<IEnumerable<Entity>> SaveAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
         {
             EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos = TransformToEntity(dtos);
 
+            return this.SaveAsync(entitiesDtos, cancellationToken);
+        }
+
+        protected async Task<IEnumerable<Entity>> SaveAsync(EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos, CancellationToken cancellationToken)
+        {
             IEnumerable<TEntity> entities = entitiesDtos.Select(ed => ed.Entity);
 
             await ValidateBusinessRulesForSaveAsync(entitiesDtos, cancellationToken);
@@ -135,22 +160,21 @@ namespace Application.Services
 
             await _unitOfWork.FlushAsync(cancellationToken);
 
-            await SaveRelatedEntities(entitiesDtos, cancellationToken);
+            await SaveRelatedEntitiesAsync(entitiesDtos, cancellationToken);
 
             await CommitAsync(cancellationToken);
 
             return entities;
         }
 
+        protected virtual async Task SaveRelatedEntitiesAsync(EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos, CancellationToken cancellationToken)
+        {
+            await Task.CompletedTask;
+        }
+
         #endregion Protected methods
 
         #region Private methods
-
-        private async Task SaveRelatedEntities(EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos, CancellationToken cancellationToken)
-        {
-            await this.SaveDependentEntitiesAsync(entitiesDtos, cancellationToken);
-            await this.SaveAssociatedEntitiesAsync(entitiesDtos, cancellationToken);
-        }
 
         private EntityDto<TEntity, TEntitySaveDto> TransformToEntity(TEntitySaveDto dto)
         {
@@ -161,11 +185,6 @@ namespace Application.Services
                 Entity = entity,
                 Dto = dto
             };
-        }
-
-        private EntityDto<TEntity, TEntitySaveDto>[] TransformToEntity(IEnumerable<TEntitySaveDto> dtos)
-        {
-            return dtos.Select(TransformToEntity).ToArray();
         }
 
         private TEntitySaveDto TransformToDto(Entity entity)

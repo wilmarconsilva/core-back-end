@@ -1,6 +1,6 @@
 using Application.Interfaces.Services.Persons;
-using Application.Mappings;
-using Application.Services.Persons;
+using Application.Mappings.Persons.Customers;
+using Application.Services.Persons.Customers;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
 using Infrastructure.Persistece;
