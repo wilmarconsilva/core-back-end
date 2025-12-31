@@ -3,6 +3,8 @@ using Application.Mappings.Persons.Customers;
 using Application.Services.Persons.Customers;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Infrastructure.Persistece;
 using Infrastructure.Repositories.Persons.Customers;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +40,9 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
