@@ -21,11 +21,11 @@ namespace Application.DataTransferObjects
                     .WithMessage(_requiredMessage);
         }
 
-        protected void RequiredNumber<TProperty>(Expression<Func<T, TProperty>> expression) where TProperty : struct, INumber<TProperty>
+        protected IRuleBuilderOptions<T, TProperty> RequiredNumber<TProperty>(Expression<Func<T, TProperty>> expression) where TProperty : INumber<TProperty>
         {
-            RuleFor(expression)
-                .Must(value => value > TProperty.Zero)
-                .WithMessage(_requiredMessage);
+            return RuleFor(expression)
+                    .Must(value => value > TProperty.Zero)
+                    .WithMessage(_requiredMessage);
         }
 
         #endregion Protected methods
