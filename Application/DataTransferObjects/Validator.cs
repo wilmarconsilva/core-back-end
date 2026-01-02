@@ -8,7 +8,9 @@ namespace Application.DataTransferObjects
     {
         #region Fields
 
-        private const string _requiredMessage = "O campo: {PropertyName} deve ser preenchido.";
+        private const string _requiredMessage = "O campo: {PropertyName} deve ser preenchido com um valor válido.";
+
+        protected const string _requiredEnumerableMessage = "É obrigatório informar ao menos um {PropertyName}";
 
         #endregion Fields
 
@@ -24,7 +26,14 @@ namespace Application.DataTransferObjects
         protected IRuleBuilderOptions<T, TProperty> RequiredNumber<TProperty>(Expression<Func<T, TProperty>> expression) where TProperty : INumber<TProperty>
         {
             return RuleFor(expression)
-                    .Must(value => value > TProperty.Zero)
+                    .NotEmpty()
+                    .WithMessage(_requiredMessage);
+        }
+
+        protected IRuleBuilderOptions<T, Enum> RequiredEnum(Expression<Func<T, Enum>> expression)
+        {
+            return RuleFor(expression)
+                    .IsInEnum()
                     .WithMessage(_requiredMessage);
         }
 

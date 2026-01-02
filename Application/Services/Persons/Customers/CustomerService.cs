@@ -10,26 +10,16 @@ namespace Application.Services.Persons.Customers
 {
     public class CustomerService : CrudService<Customer, CustomerSaveDto>, ICustomerService
     {
-        private readonly ICustomerAddressService _customerAddressService;
+        private readonly ICustomerAddressByCustomerService _customerAddressService;
 
-        public CustomerService(ICustomerRepository repository, IUnitOfWork unitOfWork, IMapper mapper, ICustomerAddressService customerAddressService) : base(repository, unitOfWork, mapper)
+        public CustomerService(ICustomerRepository repository, IUnitOfWork unitOfWork, IMapper mapper, ICustomerAddressByCustomerService customerAddressService) : base(repository, unitOfWork, mapper)
         {
             _customerAddressService = customerAddressService;
         }
 
-        protected override Task<string?> ValidateBusinessRulesForSaveAsync(EntityDto<Customer, CustomerSaveDto> entityDto, CancellationToken cancellationToken)
-        {
-            string? message = null;
-
-            if (entityDto.Dto.Addresses.Count == 0)
-                message = $"É obrigatório informar ao menos um endereço para o Cliente: {entityDto.Entity.Description}.";
-
-            return Task.FromResult(message);
-        }
-
         protected override async Task SaveRelatedEntitiesAsync(EntityDto<Customer, CustomerSaveDto>[] entitiesDtos, CancellationToken cancellationToken)
         {
-            await _customerAddressService.SaveByRelatedEntitiesAsync(entitiesDtos, c => c.Addresses, (address, customer) => address.Customer = customer, cancellationToken);
+            await _customerAddressService.SaveByRelatedEntitiesAsync(entitiesDtos, cancellationToken);
         }
     }
 }

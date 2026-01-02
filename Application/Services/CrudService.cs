@@ -8,7 +8,7 @@ using AutoMapper;
 
 namespace Application.Services
 {
-    public abstract class CrudService<TEntity, TEntitySaveDto> : ICrudService<TEntity,TEntitySaveDto> where TEntitySaveDto : EntitySaveDto where TEntity : Entity
+    public abstract class CrudService<TEntity, TEntitySaveDto> : ICrudService<TEntitySaveDto> where TEntity : Entity where TEntitySaveDto : EntitySaveDto
     {
         #region Attributes
 
@@ -88,31 +88,11 @@ namespace Application.Services
             await DeleteAsync([id], cancellationToken);
         }
 
-        public async Task SaveByRelatedEntitiesAsync<TRelatedEntity, TRelatedEntitySaveDto>(EntityDto<TRelatedEntity, TRelatedEntitySaveDto>[] relatedEntitiesDtos, Func<TRelatedEntitySaveDto, IEnumerable<TEntitySaveDto>> getEntitySaveDtoFromRelated, Action<TEntity, TRelatedEntity> setRelation, CancellationToken cancellationToken) where TRelatedEntity : Entity where TRelatedEntitySaveDto : EntitySaveDto
+        public Task<IEnumerable<Entity>> SaveAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
         {
-            if (relatedEntitiesDtos == null || relatedEntitiesDtos.Length == 0)
-                return;
+            EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos = TransformToEntity(dtos);
 
-            TEntitySaveDto[] entitiesSaveDtos = relatedEntitiesDtos.SelectMany(rd => getEntitySaveDtoFromRelated(rd.Dto)).ToArray();
-
-            if (entitiesSaveDtos.Length == 0)
-                return;
-
-            EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos = TransformToEntity(entitiesSaveDtos);
-
-            for (int i = 0; i < entitiesDtos.Length; i++)
-            {
-                EntityDto<TEntity, TEntitySaveDto> entityDto = entitiesDtos[i];
-
-                EntityDto<TRelatedEntity, TRelatedEntitySaveDto>? relatedEntityDto = relatedEntitiesDtos.FirstOrDefault(r => getEntitySaveDtoFromRelated(r.Dto).Any(d => ReferenceEquals(d, entityDto.Dto)));
-
-                if (relatedEntityDto == null)
-                    throw new KeyNotFoundException($"Related entity {typeof(TRelatedEntity).Name} not found for entity {typeof(TEntitySaveDto).Name}");
-
-                setRelation(entityDto.Entity, relatedEntityDto.Entity);
-            }
-
-            await SaveAsync(entitiesDtos, cancellationToken);
+            return this.SaveAsync(entitiesDtos, cancellationToken);
         }
 
         #endregion Public methods
@@ -137,13 +117,6 @@ namespace Application.Services
         protected EntityDto<TEntity, TEntitySaveDto>[] TransformToEntity(IEnumerable<TEntitySaveDto> dtos)
         {
             return dtos.Select(TransformToEntity).ToArray();
-        }
-
-        protected Task<IEnumerable<Entity>> SaveAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
-        {
-            EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos = TransformToEntity(dtos);
-
-            return this.SaveAsync(entitiesDtos, cancellationToken);
         }
 
         protected async Task<IEnumerable<Entity>> SaveAsync(EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos, CancellationToken cancellationToken)

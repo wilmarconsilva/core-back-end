@@ -1,6 +1,5 @@
 using Domain.Exceptions;
 using Domain.ValueObjects.Persons.Enums;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Domain.Entities.Persons.Customers
 {
