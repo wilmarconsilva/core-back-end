@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Queries\" />
+    <Folder Include="Interfaces\Queries\Persons\Customers\" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -57,19 +57,24 @@ namespace Infrastructure.Repositories
         {
             string? tableName = _context.Model.FindEntityType(typeof(TEntity))?.GetTableName();
 
-            if (string.IsNullOrEmpty(tableName))
-                throw new KeyNotFoundException($"Tabela não encontrada para a entidade {typeof(TEntity).Name}");
+            string columnName = GetColumnName(p => p.Id);
 
-            return _context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM {tableName} WHERE {GetColumnName(p => p.Id)} in ({string.Join(",", ids)});", cancellationToken);
+            string sql = $@"DELETE FROM ""{tableName}"" WHERE ""{columnName}"" = ANY(@ids);";
+
+            Npgsql.NpgsqlParameter<long[]> parameter = new("ids", ids.ToArray());
+
+            return _context.Database.ExecuteSqlRawAsync(sql, [parameter], cancellationToken);
         }
 
         #region Private methods
 
         private string GetColumnName(Expression<Func<Entity, object>> propertyExpression)
         {
-            IEntityType? entityType = _context.Model.FindEntityType(typeof(Entity)) ?? throw new KeyNotFoundException($"Entidade não encontrada para o tipo {typeof(Entity).Name}");
+            string entityName = typeof(TEntity).Name;
 
-            IProperty? property = entityType.FindProperty(propertyExpression.GetPropertyAccess().Name) ?? throw new KeyNotFoundException($"Propriedade não encontrada para o tipo {typeof(Entity).Name}");
+            IEntityType? entityType = _context.Model.FindEntityType(typeof(TEntity)) ?? throw new KeyNotFoundException($"Entidade não encontrada para o tipo {entityName}");
+
+            IProperty? property = entityType.FindProperty(propertyExpression.GetPropertyAccess().Name) ?? throw new KeyNotFoundException($"Propriedade não encontrada para o tipo {entityName}");
 
             return property.GetColumnName();
         }

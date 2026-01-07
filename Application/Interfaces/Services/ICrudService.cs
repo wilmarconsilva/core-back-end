@@ -16,7 +16,5 @@ namespace Application.Interfaces.Services
         Task DeleteAsync(IEnumerable<long> ids, CancellationToken cancellationToken);
 
         Task DeleteAsync(long id, CancellationToken cancellationToken);
-
-        Task<IEnumerable<Entity>> SaveAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken);
     }
 }

@@ -11,7 +11,6 @@ namespace Application.DataTransferObjects.Persons.Customers.Validators
 
             RequiredEnum(c => c.PersonType).WithName("Tipo de Pessoa");
 
-
             RuleFor(x => x.Addresses)
                 .Must(x => x?.Count > 0)
                 .WithMessage(_requiredEnumerableMessage)

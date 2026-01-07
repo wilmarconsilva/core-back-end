@@ -10,7 +10,7 @@ namespace Domain.Interfaces.Repositories
 
         ValueTask<TEntity?> GetByIdAsync(long id, CancellationToken cancellationToken);
 
-        Task<List<long>> GetExistingIdsAsync(IEnumerable<long> ids, CancellationToken cancellationToken);
+        Task<IReadOnlyList<long>> GetIdsAsync(IEnumerable<long> ids, CancellationToken cancellationToken);
 
         Task<bool> ExistsByIdAsync(long id, CancellationToken cancellationToken);
 

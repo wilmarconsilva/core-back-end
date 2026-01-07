@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using System;
 using System.Linq.Expressions;
 using System.Numerics;
 
@@ -30,7 +31,7 @@ namespace Application.DataTransferObjects
                     .WithMessage(_requiredMessage);
         }
 
-        protected IRuleBuilderOptions<T, Enum> RequiredEnum(Expression<Func<T, Enum>> expression)
+        protected IRuleBuilderOptions<T, TEnum> RequiredEnum<TEnum>(Expression<Func<T, TEnum>> expression) where TEnum : struct, Enum
         {
             return RuleFor(expression)
                     .IsInEnum()

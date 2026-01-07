@@ -1,3 +1,4 @@
+using Application.DataTransferObjects.Persons.Customers.Validators;
 using Application.Interfaces.Services.Persons;
 using Application.Mappings.Persons.Customers;
 using Application.Services.Persons.Customers;
@@ -42,7 +43,7 @@ builder.Host.UseSerilog();
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddValidatorsFromAssemblyContaining<CustomerSaveDtoValidator>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 

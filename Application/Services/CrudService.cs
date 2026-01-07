@@ -12,7 +12,7 @@ namespace Application.Services
     {
         #region Attributes
 
-        protected readonly IRepositoryCrud<TEntity> _repository;
+        protected readonly IRepositoryCrud<TEntity> _repositoryCrud;
 
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -25,7 +25,7 @@ namespace Application.Services
 
         protected CrudService(IRepositoryCrud<TEntity> repository, IUnitOfWork unitOfWork, IMapper mapper)
         {
-            this._repository = repository;
+            this._repositoryCrud = repository;
             this._unitOfWork = unitOfWork;
             this._hasExternalTransactionActive = _unitOfWork.IsTransactionBegun();
             this._mapper = mapper;
@@ -49,7 +49,7 @@ namespace Application.Services
 
         public async Task<TEntitySaveDto> GetByIdAsync(long id, CancellationToken cancellationToken)
         {
-            Entity? entity = await _repository.GetByIdAsync(id, cancellationToken);
+            Entity? entity = await _repositoryCrud.GetByIdAsync(id, cancellationToken);
 
             if (entity == null)
                 ThrowNotFoundException(id);
@@ -80,19 +80,14 @@ namespace Application.Services
 
             await ValidateIds(ids, cancellationToken);
 
+            await _repositoryCrud.DeleteAsync(ids, cancellationToken);
+
             await CommitAsync(cancellationToken);
         }
 
         public async Task DeleteAsync(long id, CancellationToken cancellationToken)
         {
             await DeleteAsync([id], cancellationToken);
-        }
-
-        public Task<IEnumerable<Entity>> SaveAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
-        {
-            EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos = TransformToEntity(dtos);
-
-            return this.SaveAsync(entitiesDtos, cancellationToken);
         }
 
         #endregion Public methods
@@ -119,7 +114,23 @@ namespace Application.Services
             return dtos.Select(TransformToEntity).ToArray();
         }
 
-        protected async Task<IEnumerable<Entity>> SaveAsync(EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos, CancellationToken cancellationToken)
+        protected virtual async Task SaveRelatedEntitiesAsync(EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos, CancellationToken cancellationToken)
+        {
+            await Task.CompletedTask;
+        }
+
+        protected Task<IEnumerable<Entity>> SaveAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
+        {
+            EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos = TransformToEntity(dtos);
+
+            return this.SaveAsync(entitiesDtos, cancellationToken);
+        }
+
+        #endregion Protected methods
+
+        #region Private methods
+
+        private async Task<IEnumerable<Entity>> SaveAsync(EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos, CancellationToken cancellationToken)
         {
             IEnumerable<TEntity> entities = entitiesDtos.Select(ed => ed.Entity);
 
@@ -127,9 +138,9 @@ namespace Application.Services
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            await _repository.UpdateAsync(entities.Where(e => e.Id > 0), cancellationToken);
+            await _repositoryCrud.UpdateAsync(entities.Where(e => e.Id > 0), cancellationToken);
 
-            await _repository.AddAsync(entities.Where(e => e.Id == 0), cancellationToken);
+            await _repositoryCrud.AddAsync(entities.Where(e => e.Id == 0), cancellationToken);
 
             await _unitOfWork.FlushAsync(cancellationToken);
 
@@ -139,15 +150,6 @@ namespace Application.Services
 
             return entities;
         }
-
-        protected virtual async Task SaveRelatedEntitiesAsync(EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos, CancellationToken cancellationToken)
-        {
-            await Task.CompletedTask;
-        }
-
-        #endregion Protected methods
-
-        #region Private methods
 
         private EntityDto<TEntity, TEntitySaveDto> TransformToEntity(TEntitySaveDto dto)
         {
@@ -172,13 +174,18 @@ namespace Application.Services
 
             return Task.CompletedTask;
         }
-        
+
+        private async Task<IEnumerable<long>> GetNotExistingIds(IEnumerable<long> dtosIds, CancellationToken cancellationToken)
+        {
+            List<long> existingIds = await _repositoryCrud.GetIdsAsync(dtosIds, cancellationToken);
+
+            return dtosIds.Except(existingIds);
+        }
+
         private async Task ValidateIds(IEnumerable<long> dtosIds, CancellationToken cancellationToken)
         {
-            List<long> existingIds = await _repository.GetExistingIdsAsync(dtosIds, cancellationToken);
+            IEnumerable<long> notExistingIds = await GetNotExistingIds(dtosIds, cancellationToken);
 
-            IEnumerable<long> notExistingIds = dtosIds.Except(existingIds);
-            
             if (notExistingIds.Any())
                 ThrowNotFoundException(notExistingIds);
         }
