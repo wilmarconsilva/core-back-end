@@ -191,7 +191,7 @@ namespace Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Domain.Entities.Persons.Customers.CustomerAddress", b =>
                 {
                     b.HasOne("Domain.Entities.Persons.Customers.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("Addresses")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -225,6 +225,11 @@ namespace Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Persons.Customers.Customer", b =>
+                {
+                    b.Navigation("Addresses");
                 });
 #pragma warning restore 612, 618
         }

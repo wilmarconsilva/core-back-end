@@ -5,6 +5,7 @@ using Domain.Exceptions;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
 using AutoMapper;
+using Application.Interfaces.Queries;
 
 namespace Application.Services
 {
@@ -13,6 +14,7 @@ namespace Application.Services
         #region Attributes
 
         protected readonly IRepositoryCrud<TEntity> _repositoryCrud;
+        protected readonly IEntitySaveDtoQuery<TEntitySaveDto>? _query;
 
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -23,9 +25,12 @@ namespace Application.Services
 
         #region Constructors
 
-        protected CrudService(IRepositoryCrud<TEntity> repository, IUnitOfWork unitOfWork, IMapper mapper)
+        protected CrudService(IRepositoryCrud<TEntity> repository, IUnitOfWork unitOfWork, IMapper mapper) : this(repository, null, unitOfWork, mapper) { }
+
+        protected CrudService(IRepositoryCrud<TEntity> repository, IEntitySaveDtoQuery<TEntitySaveDto>? query, IUnitOfWork unitOfWork, IMapper mapper)
         {
             this._repositoryCrud = repository;
+            this._query = query;
             this._unitOfWork = unitOfWork;
             this._hasExternalTransactionActive = _unitOfWork.IsTransactionBegun();
             this._mapper = mapper;
@@ -49,12 +54,12 @@ namespace Application.Services
 
         public async Task<TEntitySaveDto> GetByIdAsync(long id, CancellationToken cancellationToken)
         {
-            Entity? entity = await _repositoryCrud.GetByIdAsync(id, cancellationToken);
+            TEntitySaveDto? entitySaveDto = await GetQuery().GetSaveDto(id, cancellationToken);
 
-            if (entity == null)
+            if (entitySaveDto == null)
                 ThrowNotFoundException(id);
 
-            return TransformToDto(entity!);
+            return entitySaveDto!;
         }
 
         public async Task UpdateAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
@@ -162,11 +167,6 @@ namespace Application.Services
             };
         }
 
-        private TEntitySaveDto TransformToDto(Entity entity)
-        {
-            return _mapper.Map<TEntitySaveDto>(entity);
-        }
-
         private Task CommitAsync(CancellationToken cancellationToken)
         {
             if (!_hasExternalTransactionActive)
@@ -177,7 +177,7 @@ namespace Application.Services
 
         private async Task<IEnumerable<long>> GetNotExistingIds(IEnumerable<long> dtosIds, CancellationToken cancellationToken)
         {
-            List<long> existingIds = await _repositoryCrud.GetIdsAsync(dtosIds, cancellationToken);
+            IReadOnlyList<long> existingIds = await _repositoryCrud.GetIdsAsync(dtosIds, cancellationToken);
 
             return dtosIds.Except(existingIds);
         }
@@ -188,6 +188,11 @@ namespace Application.Services
 
             if (notExistingIds.Any())
                 ThrowNotFoundException(notExistingIds);
+        }
+
+        private IEntitySaveDtoQuery<TEntitySaveDto> GetQuery()
+        {
+            return _query ?? throw new InvalidOperationException("A query não foi fornecida no construtor.");
         }
 
         #region Private static methods

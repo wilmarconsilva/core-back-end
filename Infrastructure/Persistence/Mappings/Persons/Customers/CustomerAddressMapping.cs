@@ -20,7 +20,7 @@ namespace Infrastructure.Persistence.Mappings.Persons.Customers
 
             builder
                 .HasOne(c => c.Customer)
-                .WithMany()
+                .WithMany(c => c.Addresses)
                 .HasForeignKey(c => c.CustomerId)
                 .OnDelete(DeleteBehavior.Cascade);
 

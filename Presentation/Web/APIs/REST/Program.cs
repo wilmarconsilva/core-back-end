@@ -1,4 +1,5 @@
 using Application.DataTransferObjects.Persons.Customers.Validators;
+using Application.Interfaces.Queries.Persons.Customers;
 using Application.Interfaces.Services.Persons;
 using Application.Mappings.Persons.Customers;
 using Application.Services.Persons.Customers;
@@ -7,6 +8,7 @@ using Domain.Interfaces.Repositories;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Persistece;
+using Infrastructure.Queries.Persons.Customers;
 using Infrastructure.Repositories.Persons.Customers;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -51,6 +53,7 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ICustomerAddressService, CustomerAddressService>();
 
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICustomerQuery, CustomerQuery>();
 builder.Services.AddScoped<ICustomerAddressRepository, CustomerAddressRepository>();
 
 builder.Services.AddAutoMapper(typeof(CustomerProfile));

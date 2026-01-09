@@ -27,19 +27,14 @@ namespace Infrastructure.Repositories
             return AddAsync([entity], cancellationToken);
         }
 
-        public ValueTask<TEntity?> GetByIdAsync(long id, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<long>> GetIdsAsync(IEnumerable<long> ids, CancellationToken cancellationToken)
         {
-            return _entityDbSet.FindAsync(id, cancellationToken);
-        }
-
-        public Task<List<long>> GetExistingIdsAsync(IEnumerable<long> ids, CancellationToken cancellationToken)
-        {
-            return _entityDbSet.Where(e => ids.Contains(e.Id)).Select(e => e.Id).ToListAsync(cancellationToken);
+            return await _entityDbSet.Where(e => ids.Contains(e.Id)).Select(e => e.Id).ToListAsync(cancellationToken);
         }
 
         public async Task<bool> ExistsByIdAsync(long id, CancellationToken cancellationToken)
         {
-            return (await GetExistingIdsAsync([id], cancellationToken)).Count > 0;
+            return (await GetIdsAsync([id], cancellationToken)).Count > 0;
         }
 
         public Task UpdateAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken)

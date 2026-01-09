@@ -16,7 +16,7 @@ namespace Infrastructure.Repositories.Persons.Customers
 
         public async Task<IReadOnlyList<long>> GetIdsByCustomerAsync(IEnumerable<long> customerIds, CancellationToken cancellationToken)
         {
-            return await _dbSet.Where(ca => customerIds.Contains(ca.Id)).Select(ca => ca.Id).ToListAsync(cancellationToken);
+            return await _dbSet.Where(ca => customerIds.Contains(ca.CustomerId)).Select(ca => ca.Id).ToListAsync(cancellationToken);
         }
     }
 }

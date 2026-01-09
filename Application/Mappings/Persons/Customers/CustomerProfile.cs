@@ -5,6 +5,6 @@ namespace Application.Mappings.Persons.Customers
 {
     public class CustomerProfile : CrudProfile<CustomerSaveDto, Customer>
     {
-        
+
     }
 }
