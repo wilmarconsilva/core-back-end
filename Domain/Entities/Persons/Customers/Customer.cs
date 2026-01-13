@@ -5,22 +5,24 @@ namespace Domain.Entities.Persons.Customers
 {
     public class Customer : Person
     {
+        #region Fields
+
+        private string _document = null!;
+        private readonly List<CustomerAddress> _addresses = new();
+
+        #endregion Fields
+
         #region Constructors
 
-        public Customer(PersonType personType, string document, string? email, string? stateRegistration, long id)
+        public Customer(string name, PersonType personType, string document, string? email, string? stateRegistration, IEnumerable<CustomerAddress> addresses) : base(name)
         {
-            Id = id;
-            PersonType = personType;
-            Document = document;
+            SetPersonType(personType);
+            SetDocument(document);
+            SetAddresses(addresses);
+
             Email = email;
             StateRegistration = stateRegistration;
-
-            SetPersonType(personType);
         }
-
-        public Customer(PersonType personType, string document, string? email, string? stateRegistration) : this(personType, document, email, stateRegistration, 0) { }
-
-        public Customer(long id) : this(PersonType.Natural, string.Empty, null, null, id) { }
 
         #endregion Constructors
 
@@ -28,7 +30,7 @@ namespace Domain.Entities.Persons.Customers
 
         public PersonType PersonType { get; private set; }
 
-        public required string Document { get; set; }
+        public string Document { get => _document; private set => SetDocument(value); }
 
         public DocumentType DocumentType { get; private set; }
 
@@ -36,24 +38,55 @@ namespace Domain.Entities.Persons.Customers
 
         public string? StateRegistration { get; set; }
 
-        public ICollection<CustomerAddress>? Addresses { get; private set; }
+        public IReadOnlyCollection<CustomerAddress> Addresses => _addresses;
 
         #endregion Public properties
 
-        #region Private methods
+        #region Public methods
 
-        private void SetPersonType(PersonType personType)
+        public void SetPersonType(PersonType personType)
         {
             DocumentType = personType switch
             {
                 PersonType.Natural => DocumentType.CPF,
                 PersonType.Legal => DocumentType.CNPJ,
-                _ => throw new BusinessRuleException("Tipo de pessoa inválido para determinar o tipo de documento.")
+                _ => throw new BusinessRuleException($"Tipo de pessoa inválido para determinar o tipo de documento para o Cliente: {this.Description}.")
             };
 
             PersonType = personType;
         }
 
-        #endregion Private methods
+        public void SetDocument(string document)
+        {
+            Validate(document, nameof(Document));
+
+            Document = document;
+        }
+
+        public void SetAddresses(IEnumerable<CustomerAddress> addresses)
+        {
+            if (addresses == null || !addresses.Any())
+                throw new BusinessRuleException($"O Cliente: {this.Description} deve possuir ao menos um endereço.");
+
+            IEnumerable<long> newIds = addresses.Where(a => a.Id > 0).Select(a => a.Id);
+
+            _addresses.RemoveAll(a => a.Id > 0 && !newIds.Contains(a.Id));
+
+            foreach (CustomerAddress newAddress in addresses)
+            {
+                CustomerAddress? existing = _addresses.FirstOrDefault(a => a.Id == newAddress.Id);
+
+                if (existing == null)
+                {
+                    _addresses.Add(newAddress);
+                }
+                else
+                {
+                    existing.Set(newAddress);
+                }
+            }
+        }
+
+        #endregion Public methods
     }
 }

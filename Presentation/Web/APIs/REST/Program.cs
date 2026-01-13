@@ -50,11 +50,10 @@ builder.Services.AddValidatorsFromAssemblyContaining<CustomerSaveDtoValidator>()
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<ICustomerService, CustomerService>();
-builder.Services.AddScoped<ICustomerAddressService, CustomerAddressService>();
 
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+
 builder.Services.AddScoped<ICustomerQuery, CustomerQuery>();
-builder.Services.AddScoped<ICustomerAddressRepository, CustomerAddressRepository>();
 
 builder.Services.AddAutoMapper(typeof(CustomerProfile));
 

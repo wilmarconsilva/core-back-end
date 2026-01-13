@@ -11,16 +11,15 @@ namespace Application.Services.Persons.Customers
 {
     public class CustomerService : CrudService<Customer, CustomerSaveDto>, ICustomerService
     {
-        private readonly ICustomerAddressService _customerAddressService;
 
-        public CustomerService(ICustomerRepository repository, ICustomerQuery query, IUnitOfWork unitOfWork, IMapper mapper, ICustomerAddressService customerAddressService) : base(repository, query, unitOfWork, mapper)
+        public CustomerService(ICustomerRepository repository, ICustomerQuery query, IUnitOfWork unitOfWork, IMapper mapper) : base(repository, query, unitOfWork, mapper)
         {
-            _customerAddressService = customerAddressService;
+
         }
 
-        protected override async Task SaveRelatedEntitiesAsync(EntityDto<Customer, CustomerSaveDto>[] entitiesDtos, CancellationToken cancellationToken)
-        {
-            await _customerAddressService.SaveByCustomersAsync(entitiesDtos, cancellationToken);
-        }
+        //protected override async Task SaveAggregateEntitiesAsync(EntityDto<Customer, CustomerSaveDto>[] entitiesDtos, CancellationToken cancellationToken)
+        //{
+
+        //}
     }
 }

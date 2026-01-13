@@ -1,5 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Domain.Entities.Territories
 {
     public class Locality : Entity

@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using System;
 using System.Linq.Expressions;
 using System.Numerics;
 
@@ -10,8 +9,6 @@ namespace Application.DataTransferObjects
         #region Fields
 
         private const string _requiredMessage = "O campo: {PropertyName} deve ser preenchido com um valor válido.";
-
-        protected const string _requiredEnumerableMessage = "É obrigatório informar ao menos um {PropertyName}";
 
         #endregion Fields
 

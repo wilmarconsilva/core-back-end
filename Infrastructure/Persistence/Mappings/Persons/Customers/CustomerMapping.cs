@@ -32,10 +32,15 @@ namespace Infrastructure.Persistence.Mappings.Persons.Customers
             builder.Property(c => c.StateRegistration)
                 .HasColumnName("state_registration");
 
-            builder.HasMany(c => c.Addresses)
+            builder
+                .HasMany<CustomerAddress>("_addresses")
                 .WithOne(a => a.Customer)
                 .HasForeignKey(a => a.CustomerId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder
+                .Navigation("_addresses")
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
         }
 
         protected override void MapDescription(EntityTypeBuilder<Customer> builder)

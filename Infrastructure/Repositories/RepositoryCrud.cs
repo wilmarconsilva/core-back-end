@@ -17,14 +17,11 @@ namespace Infrastructure.Repositories
             _entityDbSet = _context.Set<TEntity>();
         }
 
-        public Task AddAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken)
+        public async Task SaveAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken)
         {
-            return _entityDbSet.AddRangeAsync(entities, cancellationToken);
-        }
+           await _entityDbSet.AddRangeAsync(entities.Where(e => e.Id == 0), cancellationToken);
 
-        public Task AddAsync(TEntity entity, CancellationToken cancellationToken)
-        {
-            return AddAsync([entity], cancellationToken);
+           _entityDbSet.UpdateRange(entities.Where(e => e.Id > 0));
         }
 
         public async Task<IReadOnlyList<long>> GetIdsAsync(IEnumerable<long> ids, CancellationToken cancellationToken)
@@ -35,17 +32,6 @@ namespace Infrastructure.Repositories
         public async Task<bool> ExistsByIdAsync(long id, CancellationToken cancellationToken)
         {
             return (await GetIdsAsync([id], cancellationToken)).Count > 0;
-        }
-
-        public Task UpdateAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken)
-        {
-            _entityDbSet.UpdateRange(entities);
-            return Task.CompletedTask;
-        }
-
-        public Task UpdateAsync(TEntity entity, CancellationToken cancellationToken)
-        {
-            return UpdateAsync([entity], cancellationToken);
         }
 
         public Task<int> DeleteAsync(IEnumerable<long> ids, CancellationToken cancellationToken)

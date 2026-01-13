@@ -47,11 +47,6 @@ namespace Application.Services
             return SaveAsync(dtos, cancellationToken);
         }
 
-        public async Task<Entity> CreateAsync(TEntitySaveDto dto, CancellationToken cancellationToken)
-        {
-            return (await CreateAsync([dto], cancellationToken)).First();
-        }
-
         public async Task<TEntitySaveDto> GetByIdAsync(long id, CancellationToken cancellationToken)
         {
             TEntitySaveDto? entitySaveDto = await GetQuery().GetSaveDto(id, cancellationToken);
@@ -99,29 +94,14 @@ namespace Application.Services
 
         #region Protected methods
 
-        protected async virtual Task ValidateBusinessRulesForSaveAsync(EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos, CancellationToken cancellationToken)
-        {
-            for (int i = 0; i < entitiesDtos.Length; i++)
-            {
-                string? message = await ValidateBusinessRulesForSaveAsync(entitiesDtos[i], cancellationToken);
-
-                if (!string.IsNullOrWhiteSpace(message))
-                    throw new BusinessRuleException(message);
-            }
-        }
-
-        protected virtual Task<string?> ValidateBusinessRulesForSaveAsync(EntityDto<TEntity, TEntitySaveDto> entityDto, CancellationToken cancellationToken)
-        {
-            return Task.FromResult<string?>(null);
-        }
         protected EntityDto<TEntity, TEntitySaveDto>[] TransformToEntity(IEnumerable<TEntitySaveDto> dtos)
         {
             return dtos.Select(TransformToEntity).ToArray();
         }
 
-        protected virtual async Task SaveRelatedEntitiesAsync(EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos, CancellationToken cancellationToken)
+        protected virtual Task SaveAggregateEntitiesAsync(EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos, CancellationToken cancellationToken)
         {
-            await Task.CompletedTask;
+            return Task.CompletedTask;
         }
 
         protected Task<IEnumerable<Entity>> SaveAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
@@ -139,17 +119,13 @@ namespace Application.Services
         {
             IEnumerable<TEntity> entities = entitiesDtos.Select(ed => ed.Entity);
 
-            await ValidateBusinessRulesForSaveAsync(entitiesDtos, cancellationToken);
-
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            await _repositoryCrud.UpdateAsync(entities.Where(e => e.Id > 0), cancellationToken);
-
-            await _repositoryCrud.AddAsync(entities.Where(e => e.Id == 0), cancellationToken);
+            await _repositoryCrud.SaveAsync(entities, cancellationToken);
 
             await _unitOfWork.FlushAsync(cancellationToken);
 
-            await SaveRelatedEntitiesAsync(entitiesDtos, cancellationToken);
+            await SaveAggregateEntitiesAsync(entitiesDtos, cancellationToken);
 
             await CommitAsync(cancellationToken);
 

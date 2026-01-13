@@ -7,8 +7,6 @@ namespace Application.Interfaces.Services
     {
         Task<IEnumerable<Entity>> CreateAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken);
 
-        Task<Entity> CreateAsync(TEntitySaveDto dto, CancellationToken cancellationToken);
-
         Task<TEntitySaveDto> GetByIdAsync(long id, CancellationToken cancellationToken);
 
         Task UpdateAsync(long id, TEntitySaveDto dto, CancellationToken cancellationToken);

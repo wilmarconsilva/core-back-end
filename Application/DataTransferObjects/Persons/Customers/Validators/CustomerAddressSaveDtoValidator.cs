@@ -1,15 +1,13 @@
-﻿using FluentValidation;
-
-namespace Application.DataTransferObjects.Persons.Customers.Validators
+﻿namespace Application.DataTransferObjects.Persons.Customers.Validators
 {
     public class CustomerAddressSaveDtoValidator : Validator<CustomerAddressSaveDto>
     {
         public CustomerAddressSaveDtoValidator() 
         {
-            RequiredString(c => c.Neighborhood).WithName("Bairro");
-            RequiredString(c => c.Street).WithName("Logradouro");
+            RequiredString(c => c.Neighborhood);
+            RequiredString(c => c.Street);
 
-            RequiredNumber(c => c.LocalityId).WithName("Localidade");
+            RequiredNumber(c => c.LocalityId);
         }
     }
 }

@@ -31,7 +31,7 @@ namespace REST.Controllers
         {
             return await ProcessRequestAsync<TEntitySaveDto>(async () =>
             {
-                Entity entity = await _service.CreateAsync(dto, cancellationToken);
+                Entity entity = (await _service.CreateAsync([dto], cancellationToken)).First();
                 return CreatedAtAction(nameof(GetById), new { id = entity.Id }, dto);
             }, cancellationToken);
         }
