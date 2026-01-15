@@ -1,9 +1,10 @@
 using System.Text;
 using Domain.Entities.Territories;
+using Domain.Interfaces.Entities;
 
 namespace Domain.Entities.Persons.Customers
 {
-    public class CustomerAddress : EntityWithoutDescription
+    public class CustomerAddress : EntityWithoutDescription, ISyncable<CustomerAddress>
     {
         public Locality? Locality { get; private set; }
 
@@ -23,9 +24,9 @@ namespace Domain.Entities.Persons.Customers
         
         public string? Number { get; set; }
 
-        #region Internal methods
+        #region Public methods
 
-        internal void Set(CustomerAddress customerAddress)
+        public void Sync(CustomerAddress customerAddress)
         {
             LocalityId = customerAddress.LocalityId;
             CustomerId = customerAddress.CustomerId;
@@ -36,7 +37,7 @@ namespace Domain.Entities.Persons.Customers
             Number = customerAddress.Number;
         }
 
-        #endregion Internal methods
+        #endregion Public methods
 
         #region Protected methods
 

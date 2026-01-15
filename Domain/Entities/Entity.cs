@@ -5,14 +5,6 @@ namespace Domain.Entities
 {
     public abstract class Entity
     {
-        /// <summary>
-        /// Constructor only for ORM.
-        /// </summary>
-        protected Entity() 
-        {
-
-        }
-
         #region Public properties
 
         public long Id { get; set; }

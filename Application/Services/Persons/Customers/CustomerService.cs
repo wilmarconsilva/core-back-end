@@ -16,10 +16,5 @@ namespace Application.Services.Persons.Customers
         {
 
         }
-
-        //protected override async Task SaveAggregateEntitiesAsync(EntityDto<Customer, CustomerSaveDto>[] entitiesDtos, CancellationToken cancellationToken)
-        //{
-
-        //}
     }
 }

@@ -6,6 +6,11 @@ namespace Domain.Entities.Persons
 
         #region Constructors
 
+        /// <summary>
+        /// Constructor only for ORM.
+        /// </summary>
+        protected Person() { }
+
         protected Person(string name)
         {
             SetName(name);

@@ -56,6 +56,8 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("state_registration");
 
+                    b.Navigation("_addresses");
+
                     b.HasKey("Id");
 
                     b.ToTable("customers", (string)null);
@@ -99,6 +101,22 @@ namespace Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("street");
+
+                    b.HasOne("Domain.Entities.Persons.Customers.Customer", "Customer")
+                        .WithMany("_addresses")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Territories.Locality", "Locality")
+                        .WithMany()
+                        .HasForeignKey("LocalityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Locality");
 
                     b.HasKey("Id");
 
@@ -188,25 +206,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("states", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.Persons.Customers.CustomerAddress", b =>
-                {
-                    b.HasOne("Domain.Entities.Persons.Customers.Customer", "Customer")
-                        .WithMany("Addresses")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Territories.Locality", "Locality")
-                        .WithMany()
-                        .HasForeignKey("LocalityId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Locality");
-                });
-
             modelBuilder.Entity("Domain.Entities.Territories.Locality", b =>
                 {
                     b.HasOne("Domain.Entities.Territories.State", "State")
@@ -225,11 +224,6 @@ namespace Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Country");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Persons.Customers.Customer", b =>
-                {
-                    b.Navigation("Addresses");
                 });
 #pragma warning restore 612, 618
         }

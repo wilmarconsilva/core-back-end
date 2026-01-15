@@ -14,15 +14,11 @@ namespace Infrastructure.Persistence.Mappings.Persons.Customers
                    .HasColumnName("customer_id")
                    .IsRequired();
 
+            builder.Ignore(c => c.Customer);
+
             builder.Property(c => c.LocalityId)
                    .HasColumnName("locality_id")
                    .IsRequired();
-
-            builder
-                .HasOne(c => c.Customer)
-                .WithMany(c => c.Addresses)
-                .HasForeignKey(c => c.CustomerId)
-                .OnDelete(DeleteBehavior.Cascade);
 
             builder
                 .HasOne(c => c.Locality)

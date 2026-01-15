@@ -1,4 +1,5 @@
 using Domain.Exceptions;
+using Domain.Utilities;
 using Domain.ValueObjects.Persons.Enums;
 
 namespace Domain.Entities.Persons.Customers
@@ -13,6 +14,11 @@ namespace Domain.Entities.Persons.Customers
         #endregion Fields
 
         #region Constructors
+
+        /// <summary>
+        /// Constructor only for ORM.
+        /// </summary>
+        protected Customer() { }
 
         public Customer(string name, PersonType personType, string document, string? email, string? stateRegistration, IEnumerable<CustomerAddress> addresses) : base(name)
         {
@@ -60,7 +66,7 @@ namespace Domain.Entities.Persons.Customers
         {
             Validate(document, nameof(Document));
 
-            Document = document;
+            _document = document;
         }
 
         public void SetAddresses(IEnumerable<CustomerAddress> addresses)
@@ -68,23 +74,7 @@ namespace Domain.Entities.Persons.Customers
             if (addresses == null || !addresses.Any())
                 throw new BusinessRuleException($"O Cliente: {this.Description} deve possuir ao menos um endereço.");
 
-            IEnumerable<long> newIds = addresses.Where(a => a.Id > 0).Select(a => a.Id);
-
-            _addresses.RemoveAll(a => a.Id > 0 && !newIds.Contains(a.Id));
-
-            foreach (CustomerAddress newAddress in addresses)
-            {
-                CustomerAddress? existing = _addresses.FirstOrDefault(a => a.Id == newAddress.Id);
-
-                if (existing == null)
-                {
-                    _addresses.Add(newAddress);
-                }
-                else
-                {
-                    existing.Set(newAddress);
-                }
-            }
+            EntityCollection.Sync(_addresses, addresses);
         }
 
         #endregion Public methods

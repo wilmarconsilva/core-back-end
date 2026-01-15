@@ -41,6 +41,8 @@ namespace Infrastructure.Persistence.Mappings.Persons.Customers
             builder
                 .Navigation("_addresses")
                 .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+            builder.Ignore(c => c.Addresses);
         }
 
         protected override void MapDescription(EntityTypeBuilder<Customer> builder)

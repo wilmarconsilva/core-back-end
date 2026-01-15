@@ -16,7 +16,7 @@ namespace Infrastructure.Queries.Persons.Customers
 
         protected override IQueryable<Customer> ApplyIncludes(IQueryable<Customer> query)
         {
-            return query.Include(c => c.Addresses);
+            return query.Include("_addresses");
         }
     }
 }

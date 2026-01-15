@@ -1,7 +1,6 @@
 ﻿using Application.DataTransferObjects;
 using Application.Interfaces.Queries;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Domain.Entities;
 using Infrastructure.Persistece;
 using Infrastructure.Persistence;
@@ -20,15 +19,15 @@ namespace Infrastructure.Queries
             _query = _context.Set<TEntity>().AsNoTracking();
         }
 
-        public Task<TEntitySaveDto?> GetSaveDto(long id, CancellationToken cancellationToken)
+        public async Task<TEntitySaveDto?> GetSaveDto(long id, CancellationToken cancellationToken)
         {
             IQueryable<TEntity> query = _query.Where(c => c.Id == id);
 
             query = ApplyIncludes(query);
 
-            return query
-                .ProjectTo<TEntitySaveDto?>(_mapper.ConfigurationProvider)
-                .FirstOrDefaultAsync(cancellationToken);
+            TEntity? entity = await query.FirstOrDefaultAsync(cancellationToken);
+
+            return entity == null ? null : _mapper.Map<TEntitySaveDto>(entity);
         }
 
         protected virtual IQueryable<TEntity> ApplyIncludes(IQueryable<TEntity> query)
