@@ -53,7 +53,7 @@ namespace Domain.Entities.Persons.Customers
 
         public string Neighborhood { get => _neighborhood; private set => SetNeighborhood(value); }
 
-        public string Street { get => _street; private set => SetNeighborhood(value); }
+        public string Street { get => _street; private set => SetStreet(value); }
 
         public string? Complement { get; set; }
 
