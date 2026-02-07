@@ -33,13 +33,13 @@ namespace Infrastructure.Persistence.Mappings.Persons.Customers
                 .HasColumnName("state_registration");
 
             builder
-                .HasMany<CustomerAddress>("_addresses")
+                .HasMany(c => c.Addresses)
                 .WithOne(a => a.Customer)
                 .HasForeignKey(a => a.CustomerId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder
-                .Navigation("_addresses")
+                .Navigation(c => c.Addresses)
                 .UsePropertyAccessMode(PropertyAccessMode.Field);
 
             builder.Ignore(c => c.Addresses);

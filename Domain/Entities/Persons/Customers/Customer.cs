@@ -23,9 +23,9 @@ namespace Domain.Entities.Persons.Customers
         public Customer(string name, PersonType personType, string document, string? email, string? stateRegistration, IEnumerable<CustomerAddress> addresses) : base(name)
         {
             SetPersonType(personType);
-            SetDocument(document);
             SetAddresses(addresses);
 
+            Document = document;
             Email = email;
             StateRegistration = stateRegistration;
         }

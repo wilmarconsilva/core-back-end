@@ -14,8 +14,6 @@ namespace Infrastructure.Persistence.Mappings.Persons.Customers
                    .HasColumnName("customer_id")
                    .IsRequired();
 
-            builder.Ignore(c => c.Customer);
-
             builder.Property(c => c.LocalityId)
                    .HasColumnName("locality_id")
                    .IsRequired();
