@@ -9,7 +9,7 @@ namespace Domain.Entities
 
         public long Id { get; set; }
 
-        public virtual required string Description { get; set; }
+        public abstract string Description { get; set; }
 
         #endregion Public properties
 

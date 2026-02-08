@@ -55,7 +55,7 @@ builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 
 builder.Services.AddScoped<ICustomerQuery, CustomerQuery>();
 
-builder.Services.AddAutoMapper(typeof(CustomerProfile));
+builder.Services.AddAutoMapper(typeof(CustomerAddressProfile));
 
 WebApplication app = builder.Build();
 

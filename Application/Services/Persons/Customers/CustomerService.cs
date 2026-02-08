@@ -11,10 +11,20 @@ namespace Application.Services.Persons.Customers
 {
     public class CustomerService : CrudService<Customer, CustomerSaveDto>, ICustomerService
     {
+        private readonly IMapper _mapper;
 
         public CustomerService(ICustomerRepository repository, ICustomerQuery query, IUnitOfWork unitOfWork, IMapper mapper) : base(repository, query, unitOfWork, mapper)
         {
+            _mapper = mapper;
+        }
 
+        protected override EntityDto<Customer, CustomerSaveDto> TransformToEntity(CustomerSaveDto dto)
+        {
+            return new EntityDto<Customer, CustomerSaveDto>
+            {
+                Entity = new Customer(dto.Name, dto.PersonType, dto.Document, dto.Email, dto.StateRegistration, _mapper.Map<IEnumerable<CustomerAddress>>(dto.Addresses)),
+                Dto = dto
+            };
         }
     }
 }

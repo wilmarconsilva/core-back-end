@@ -18,7 +18,7 @@ namespace Domain.Entities.Persons.Customers
         /// <summary>
         /// Constructor only for ORM.
         /// </summary>
-        protected Customer() { }
+        private Customer() { }
 
         public Customer(string name, PersonType personType, string document, string? email, string? stateRegistration, IEnumerable<CustomerAddress> addresses) : base(name)
         {

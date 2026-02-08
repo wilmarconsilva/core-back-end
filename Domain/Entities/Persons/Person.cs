@@ -13,14 +13,14 @@ namespace Domain.Entities.Persons
 
         protected Person(string name)
         {
-            SetName(name);
+            Name = name;
         }
 
         #endregion Constructors
 
-        public string Name => _name;
-        
-        public override required string Description { get => _name; set => SetName(value); }
+        public string Name { get => _name; set => SetName(value); }
+
+        public override string Description { get => _name; set => SetName(value); }
 
         #region Protected methods
 

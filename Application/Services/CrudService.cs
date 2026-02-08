@@ -17,7 +17,6 @@ namespace Application.Services
         protected readonly IEntitySaveDtoQuery<TEntitySaveDto>? _query;
 
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
 
         private readonly bool _hasExternalTransactionActive;
 
@@ -33,7 +32,6 @@ namespace Application.Services
             this._query = query;
             this._unitOfWork = unitOfWork;
             this._hasExternalTransactionActive = _unitOfWork.IsTransactionBegun();
-            this._mapper = mapper;
         }
 
         #endregion Constructors
@@ -111,6 +109,8 @@ namespace Application.Services
             return this.SaveAsync(entitiesDtos, cancellationToken);
         }
 
+        protected abstract EntityDto<TEntity, TEntitySaveDto> TransformToEntity(TEntitySaveDto dto);
+
         #endregion Protected methods
 
         #region Private methods
@@ -130,17 +130,6 @@ namespace Application.Services
             await CommitAsync(cancellationToken);
 
             return entities;
-        }
-
-        private EntityDto<TEntity, TEntitySaveDto> TransformToEntity(TEntitySaveDto dto)
-        {
-            TEntity entity = _mapper.Map<TEntity>(dto);
-
-            return new EntityDto<TEntity, TEntitySaveDto>
-            {
-                Entity = entity,
-                Dto = dto
-            };
         }
 
         private Task CommitAsync(CancellationToken cancellationToken)

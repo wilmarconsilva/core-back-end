@@ -33,6 +33,9 @@ namespace REST.Controllers
             }
             catch (Exception ex)
             {
+                if (ex.InnerException is BusinessRuleException businessRuleException)
+                    return ProcessException(businessRuleException, cancellationToken);
+
                 return ProcessException(ex, cancellationToken);
             }
         }

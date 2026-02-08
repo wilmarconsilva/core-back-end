@@ -2,7 +2,7 @@ namespace Domain.Entities
 {
     public abstract class EntityWithoutDescription : Entity
     {
-        public override required string Description
+        public override string Description
         {
             get
             {
