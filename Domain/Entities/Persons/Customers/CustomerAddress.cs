@@ -79,7 +79,7 @@ namespace Domain.Entities.Persons.Customers
 
         public void SetNeighborhood(string neighborhood)
         {
-            Validate(Neighborhood, nameof(Neighborhood));
+            Validate(neighborhood, nameof(Neighborhood));
 
             _neighborhood = neighborhood;
         }

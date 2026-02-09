@@ -7,9 +7,7 @@ namespace Domain.Utilities
     {
         public static void Sync<TEntity>(ICollection<TEntity> current, IEnumerable<TEntity> incoming) where TEntity : Entity, ICopyable<TEntity>
         {
-            IEnumerable<long> incomingIds = incoming
-                .Where(e => e.Id > 0)
-                .Select(e => e.Id);
+            IEnumerable<long> incomingIds = incoming.Select(e => e.Id);
 
             IEnumerable<TEntity> idsToRemove = current
                 .Where(e => e.Id > 0 && !incomingIds.Contains(e.Id));

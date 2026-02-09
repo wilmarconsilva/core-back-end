@@ -20,11 +20,23 @@ namespace Application.Services.Persons.Customers
 
         protected override EntityDto<Customer, CustomerSaveDto> TransformToEntity(CustomerSaveDto dto)
         {
+            for (int i = 0; i < dto.Addresses.Count; i++)
+            {
+                CustomerAddressSaveDto dtoAddress = dto.Addresses[i];
+
+                dtoAddress.CustomerId = dto.Id;
+            }
+
             return new EntityDto<Customer, CustomerSaveDto>
             {
                 Entity = new Customer(dto.Name, dto.PersonType, dto.Document, dto.Email, dto.StateRegistration, _mapper.Map<IEnumerable<CustomerAddress>>(dto.Addresses)),
                 Dto = dto
             };
+        }
+
+        protected virtual async Task<IEnumerable<Customer>> GetEntitiesToSave(EntityDto<Customer, CustomerSaveDto>[] entitiesDtos)
+        {
+
         }
     }
 }

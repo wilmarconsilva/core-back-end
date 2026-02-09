@@ -1,10 +1,11 @@
 using Domain.Exceptions;
+using Domain.Interfaces.Entities;
 using Domain.Utilities;
 using Domain.ValueObjects.Persons.Enums;
 
 namespace Domain.Entities.Persons.Customers
 {
-    public class Customer : Person
+    public class Customer : Person, ICopyable<Customer>
     {
         #region Fields
 
@@ -22,12 +23,7 @@ namespace Domain.Entities.Persons.Customers
 
         public Customer(string name, PersonType personType, string document, string? email, string? stateRegistration, IEnumerable<CustomerAddress> addresses) : base(name)
         {
-            SetPersonType(personType);
-            SetAddresses(addresses);
-
-            Document = document;
-            Email = email;
-            StateRegistration = stateRegistration;
+            Fill(personType, document, email, stateRegistration, addresses);
         }
 
         #endregion Constructors
@@ -77,6 +73,25 @@ namespace Domain.Entities.Persons.Customers
             EntityCollection.Sync(_addresses, addresses);
         }
 
+        public void Copy(Customer customer)
+        {
+            Fill(customer.PersonType, customer.Document, customer.Email, customer.StateRegistration, customer.Addresses);
+        }
+
         #endregion Public methods
+
+        #region Private methods
+
+        private void Fill(PersonType personType, string document, string? email, string? stateRegistration, IEnumerable<CustomerAddress> addresses)
+        {
+            SetPersonType(personType);
+            SetAddresses(addresses);
+
+            Document = document;
+            Email = email;
+            StateRegistration = stateRegistration;
+        }
+
+        #endregion Private methods
     }
 }

@@ -111,13 +111,18 @@ namespace Application.Services
 
         protected abstract EntityDto<TEntity, TEntitySaveDto> TransformToEntity(TEntitySaveDto dto);
 
+        protected virtual Task<IEnumerable<TEntity>> GetEntitiesToSave(EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos)
+        {
+            return Task.FromResult(entitiesDtos.Select(ed => ed.Entity));
+        }
+
         #endregion Protected methods
 
         #region Private methods
 
         private async Task<IEnumerable<Entity>> SaveAsync(EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos, CancellationToken cancellationToken)
         {
-            IEnumerable<TEntity> entities = entitiesDtos.Select(ed => ed.Entity);
+            IEnumerable<TEntity> entities = await GetEntitiesToSave(entitiesDtos);
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
