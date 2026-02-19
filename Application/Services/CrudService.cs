@@ -1,11 +1,10 @@
 using Application.DataTransferObjects;
+using Application.Interfaces.Queries;
 using Application.Interfaces.Services;
 using Domain.Entities;
 using Domain.Exceptions;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
-using AutoMapper;
-using Application.Interfaces.Queries;
 
 namespace Application.Services
 {
@@ -14,7 +13,7 @@ namespace Application.Services
         #region Attributes
 
         protected readonly IRepositoryCrud<TEntity> _repositoryCrud;
-        protected readonly IEntitySaveDtoQuery<TEntitySaveDto>? _query;
+        protected readonly IEntitySaveDtoQuery<TEntitySaveDto> _query;
 
         private readonly IUnitOfWork _unitOfWork;
 
@@ -24,9 +23,7 @@ namespace Application.Services
 
         #region Constructors
 
-        protected CrudService(IRepositoryCrud<TEntity> repository, IUnitOfWork unitOfWork, IMapper mapper) : this(repository, null, unitOfWork, mapper) { }
-
-        protected CrudService(IRepositoryCrud<TEntity> repository, IEntitySaveDtoQuery<TEntitySaveDto>? query, IUnitOfWork unitOfWork, IMapper mapper)
+        protected CrudService(IRepositoryCrud<TEntity> repository, IEntitySaveDtoQuery<TEntitySaveDto> query, IUnitOfWork unitOfWork)
         {
             this._repositoryCrud = repository;
             this._query = query;
@@ -47,7 +44,7 @@ namespace Application.Services
 
         public async Task<TEntitySaveDto> GetByIdAsync(long id, CancellationToken cancellationToken)
         {
-            TEntitySaveDto? entitySaveDto = await GetQuery().GetSaveDto(id, cancellationToken);
+            TEntitySaveDto? entitySaveDto = await _query.GetSaveDto(id, cancellationToken);
 
             if (entitySaveDto == null)
                 ThrowNotFoundException(id);
@@ -61,8 +58,6 @@ namespace Application.Services
 
             IEnumerable<long> dtosIds = dtos.Select(d => d.Id);
 
-            await ValidateIds(dtosIds, cancellationToken);
-
             await SaveAsync(dtos, cancellationToken);
         }
 
@@ -74,9 +69,11 @@ namespace Application.Services
 
         public async Task DeleteAsync(IEnumerable<long> ids, CancellationToken cancellationToken)
         {
-            await _unitOfWork.BeginTransactionAsync(cancellationToken);
-
             await ValidateIds(ids, cancellationToken);
+
+            await EntitiesCanBeDeleted(ids);
+
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             await _repositoryCrud.DeleteAsync(ids, cancellationToken);
 
@@ -92,45 +89,35 @@ namespace Application.Services
 
         #region Protected methods
 
-        protected EntityDto<TEntity, TEntitySaveDto>[] TransformToEntity(IEnumerable<TEntitySaveDto> dtos)
+        protected abstract TEntity CreateEntity(TEntitySaveDto dto);
+
+        protected abstract void UpdateEntity(TEntitySaveDto dto, TEntity entity);
+
+        protected abstract Task<bool> EntitiesCanBeDeleted(IEnumerable<long> ids);
+
+        protected async Task<IEnumerable<Entity>> SaveAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
         {
-            return dtos.Select(TransformToEntity).ToArray();
+            List<TEntity> entities = await TransformToEntity(dtos, cancellationToken);
+
+            return await this.SaveAsync(entities, cancellationToken);
         }
 
-        protected virtual Task SaveAggregateEntitiesAsync(EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos, CancellationToken cancellationToken)
+        protected static void ThrowNotFoundException(IEnumerable<long> ids)
         {
-            return Task.CompletedTask;
-        }
-
-        protected Task<IEnumerable<Entity>> SaveAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
-        {
-            EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos = TransformToEntity(dtos);
-
-            return this.SaveAsync(entitiesDtos, cancellationToken);
-        }
-
-        protected abstract EntityDto<TEntity, TEntitySaveDto> TransformToEntity(TEntitySaveDto dto);
-
-        protected virtual Task<IEnumerable<TEntity>> GetEntitiesToSave(EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos)
-        {
-            return Task.FromResult(entitiesDtos.Select(ed => ed.Entity));
+            throw new NotFoundException($"Nenhum registro de {nameof(TEntity)} encontrado para o(s) código(s): {string.Join(",", ids)}.");
         }
 
         #endregion Protected methods
 
         #region Private methods
 
-        private async Task<IEnumerable<Entity>> SaveAsync(EntityDto<TEntity, TEntitySaveDto>[] entitiesDtos, CancellationToken cancellationToken)
+        private async Task<IEnumerable<Entity>> SaveAsync(List<TEntity> entities, CancellationToken cancellationToken)
         {
-            IEnumerable<TEntity> entities = await GetEntitiesToSave(entitiesDtos);
-
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             await _repositoryCrud.SaveAsync(entities, cancellationToken);
 
             await _unitOfWork.FlushAsync(cancellationToken);
-
-            await SaveAggregateEntitiesAsync(entitiesDtos, cancellationToken);
 
             await CommitAsync(cancellationToken);
 
@@ -160,17 +147,37 @@ namespace Application.Services
                 ThrowNotFoundException(notExistingIds);
         }
 
-        private IEntitySaveDtoQuery<TEntitySaveDto> GetQuery()
+        private async Task<List<TEntity>> TransformToEntity(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
         {
-            return _query ?? throw new InvalidOperationException("A query não foi fornecida no construtor.");
+            IEnumerable<long> existingIds = dtos.Where(dto => dto.Id > 0).Select(dto => dto.Id);
+            List<TEntity> entities = await _repositoryCrud.GetByIdsAsync(existingIds, cancellationToken);
+
+            foreach (TEntitySaveDto dto in dtos)
+            {
+                TEntity? entity;
+
+                if (dto.Id > 0)
+                {
+                    entity = entities.Find(c => c.Id == dto.Id);
+
+                    if (entity == null)
+                        ThrowNotFoundException(dto.Id);
+                    else
+                    {
+                        UpdateEntity(dto, entity);
+                    }
+                }
+                else
+                {
+                    entity = CreateEntity(dto);
+                    entities.Add(entity);
+                }
+            }
+
+            return entities;
         }
 
         #region Private static methods
-
-        private static void ThrowNotFoundException(IEnumerable<long> ids)
-        {
-            throw new NotFoundException($"Nenhum cadastro encontrado para o(s) código(s): {string.Join(",", ids)}.");
-        }
 
         private static void ThrowNotFoundException(long id)
         {

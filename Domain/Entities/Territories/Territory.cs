@@ -13,7 +13,7 @@ namespace Domain.Entities.Territories
 
         public void SetAcronym(string acronym)
         {
-            Validate(acronym, nameof(Acronym));
+            ValidateValue(acronym, nameof(Acronym));
             _acronym = acronym;
         }
     }

@@ -17,11 +17,20 @@ namespace Infrastructure.Repositories
             _entityDbSet = _context.Set<TEntity>();
         }
 
+        #region Public methods
+
         public async Task SaveAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken)
         {
            await _entityDbSet.AddRangeAsync(entities.Where(e => e.Id == 0), cancellationToken);
 
            _entityDbSet.UpdateRange(entities.Where(e => e.Id > 0));
+        }
+
+        public Task<List<TEntity>> GetByIdsAsync(IEnumerable<long> ids, CancellationToken cancellationToken)
+        {
+            IQueryable<TEntity> query = _entityDbSet.Where(e => ids.Contains(e.Id));
+
+            return ApplyFetchsForGetByIds(query).ToListAsync(cancellationToken);
         }
 
         public async Task<IReadOnlyList<long>> GetIdsAsync(IEnumerable<long> ids, CancellationToken cancellationToken)
@@ -46,6 +55,17 @@ namespace Infrastructure.Repositories
 
             return _context.Database.ExecuteSqlRawAsync(sql, [parameter], cancellationToken);
         }
+
+        #endregion Public methods
+
+        #region Protected methods
+
+        protected virtual IQueryable<TEntity> ApplyFetchsForGetByIds(IQueryable<TEntity> query)
+        {
+            return query;
+        }
+
+        #endregion Protected methods
 
         #region Private methods
 

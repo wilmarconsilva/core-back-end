@@ -19,13 +19,13 @@ namespace Domain.Entities.Persons
 
         public void SetEmail(string email)
         {
-            Validate(email, nameof(Email));
+            ValidateValue(email, nameof(Email));
             Email = email;
         }
 
         public void SetPassword(string password)
         {
-            Validate(password, nameof(Password));
+            ValidateValue(password, nameof(Password));
             Password = password;
         }
     }

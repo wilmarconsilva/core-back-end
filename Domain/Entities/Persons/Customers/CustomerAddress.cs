@@ -4,7 +4,7 @@ using Domain.Interfaces.Entities;
 
 namespace Domain.Entities.Persons.Customers
 {
-    public class CustomerAddress : EntityWithoutDescription, ICopyable<CustomerAddress>
+    public class CustomerAddress : EntityWithoutDescription, ICopyable<CustomerAddress>, IEntityChild
     {
         #region Fields
 
@@ -19,37 +19,30 @@ namespace Domain.Entities.Persons.Customers
 
         public CustomerAddress(long localityId, long customerId, string neighborhood, string street, string? complement, string? postalCode, string? number)
         {
-            LocalityId = localityId;
-            CustomerId = customerId;
-            Neighborhood = neighborhood;
-            Street = street;
-            Complement = complement;
-            PostalCode = postalCode;
-            Number = number;
+            SetCustomerId(customerId);
+
+            Fill(localityId, neighborhood, street, complement, postalCode, number);
+        }
+
+        public CustomerAddress(long localityId, string neighborhood, string street, string? complement, string? postalCode, string? number)
+        {
+            Fill(localityId, neighborhood, street, complement, postalCode, number);
         }
 
         public void Copy(CustomerAddress customerAddress)
         {
-            Locality = customerAddress.Locality;
-            LocalityId = customerAddress.LocalityId;
-            Customer = customerAddress.Customer;
-            CustomerId = customerAddress.CustomerId;
-            Neighborhood = customerAddress.Neighborhood;
-            Street = customerAddress.Street;
-            Complement = customerAddress.Complement;
-            PostalCode = customerAddress.PostalCode;
-            Number = customerAddress.Number;
+            Fill(customerAddress.LocalityId, customerAddress.Neighborhood, customerAddress.Street, customerAddress.Complement, customerAddress.PostalCode, customerAddress.Number);
         }
 
         #endregion Constructors
 
-        public Locality? Locality { get; private set; }
+        public Locality? Locality { get; private init; }
 
         public long LocalityId { get => _localityId; private set => SetLocalityId(value); }
 
-        public Customer? Customer { get; private set; }
+        public Customer? Customer { get; private init; }
 
-        public long CustomerId { get => _customerId; private set => SetCustomerId(value); }
+        public long CustomerId { get => _customerId; }
 
         public string Neighborhood { get => _neighborhood; private set => SetNeighborhood(value); }
 
@@ -65,30 +58,35 @@ namespace Domain.Entities.Persons.Customers
 
         public void SetLocalityId(long localityId)
         {
-            Validate(localityId, nameof(LocalityId));
+            ValidateValue(localityId, nameof(LocalityId));
 
             _localityId = localityId;
         }
 
         public void SetCustomerId(long customerId)
         {
-            Validate(customerId, nameof(customerId));
+            ValidateValue(customerId, nameof(customerId));
 
             _customerId = customerId;
         }
 
         public void SetNeighborhood(string neighborhood)
         {
-            Validate(neighborhood, nameof(Neighborhood));
+            ValidateValue(neighborhood, nameof(Neighborhood));
 
             _neighborhood = neighborhood;
         }
 
         public void SetStreet(string street)
         {
-            Validate(street, nameof(Street));
+            ValidateValue(street, nameof(Street));
 
             _street = street;
+        }
+
+        public void SetFatherEntityId(long id)
+        {
+            SetCustomerId(id);
         }
 
         #endregion Public methods
@@ -114,5 +112,19 @@ namespace Domain.Entities.Persons.Customers
         }
 
         #endregion Protected methods
+
+        #region Private methods
+
+        private void Fill(long localityId, string neighborhood, string street, string? complement, string? postalCode, string? number)
+        {
+            SetLocalityId(localityId);
+            SetNeighborhood(neighborhood);
+            SetStreet(street);
+            Complement = complement;
+            PostalCode = postalCode;
+            Number = number;
+        }
+
+        #endregion Private methods
     }
 }

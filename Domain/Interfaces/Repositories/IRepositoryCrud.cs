@@ -11,5 +11,7 @@ namespace Domain.Interfaces.Repositories
         Task<bool> ExistsByIdAsync(long id, CancellationToken cancellationToken);
         
         Task<int> DeleteAsync(IEnumerable<long> ids, CancellationToken cancellationToken);
+
+        Task<List<TEntity>> GetByIdsAsync(IEnumerable<long> ids, CancellationToken cancellationToken);
     }
 }

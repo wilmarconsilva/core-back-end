@@ -1,4 +1,3 @@
-using Application.DataTransferObjects;
 using Application.DataTransferObjects.Persons.Customers;
 using Application.Interfaces.Queries.Persons.Customers;
 using Application.Interfaces.Services.Persons;
@@ -13,30 +12,24 @@ namespace Application.Services.Persons.Customers
     {
         private readonly IMapper _mapper;
 
-        public CustomerService(ICustomerRepository repository, ICustomerQuery query, IUnitOfWork unitOfWork, IMapper mapper) : base(repository, query, unitOfWork, mapper)
+        public CustomerService(ICustomerRepository repository, ICustomerQuery query, IUnitOfWork unitOfWork, IMapper mapper) : base(repository, query, unitOfWork)
         {
             _mapper = mapper;
         }
 
-        protected override EntityDto<Customer, CustomerSaveDto> TransformToEntity(CustomerSaveDto dto)
+        protected override Customer CreateEntity(CustomerSaveDto dto)
         {
-            for (int i = 0; i < dto.Addresses.Count; i++)
-            {
-                CustomerAddressSaveDto dtoAddress = dto.Addresses[i];
-
-                dtoAddress.CustomerId = dto.Id;
-            }
-
-            return new EntityDto<Customer, CustomerSaveDto>
-            {
-                Entity = new Customer(dto.Name, dto.PersonType, dto.Document, dto.Email, dto.StateRegistration, _mapper.Map<IEnumerable<CustomerAddress>>(dto.Addresses)),
-                Dto = dto
-            };
+            return new Customer(dto.Name, dto.PersonType, dto.Document, dto.Email, dto.StateRegistration, _mapper.Map<IEnumerable<CustomerAddress>>(dto.Addresses));
         }
 
-        protected virtual async Task<IEnumerable<Customer>> GetEntitiesToSave(EntityDto<Customer, CustomerSaveDto>[] entitiesDtos)
+        protected override void UpdateEntity(CustomerSaveDto dto, Customer entity)
         {
+            entity.Fill(dto.Name, dto.PersonType, dto.Document, dto.Email, dto.StateRegistration, _mapper.Map<IEnumerable<CustomerAddress>>(dto.Addresses));
+        }
 
+        protected override Task<bool> EntitiesCanBeDeleted(IEnumerable<long> ids)
+        {
+            return Task.FromResult(true);
         }
     }
 }

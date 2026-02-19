@@ -8,9 +8,6 @@ namespace Application.DataTransferObjects.Persons.Customers
 
         public required long LocalityId { get; set; }
 
-        [System.Text.Json.Serialization.JsonIgnore]
-        public long CustomerId { get; set; }
-
         public string? Complement { get; set; }
 
         public string? PostalCode { get; set; }

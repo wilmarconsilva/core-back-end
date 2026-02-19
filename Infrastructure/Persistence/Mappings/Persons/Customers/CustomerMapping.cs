@@ -33,9 +33,9 @@ namespace Infrastructure.Persistence.Mappings.Persons.Customers
                 .HasColumnName("state_registration");
 
             builder
-                .HasMany(c => c.Addresses)
-                .WithOne(a => a.Customer)
-                .HasForeignKey(a => a.CustomerId)
+                .HasMany("_addresses")
+                .WithOne(nameof(Customer))
+                .HasForeignKey(nameof(CustomerAddress.CustomerId))
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder

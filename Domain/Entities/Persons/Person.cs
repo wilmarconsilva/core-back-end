@@ -26,7 +26,7 @@ namespace Domain.Entities.Persons
 
         protected void SetName(string name)
         {
-            Validate(name, nameof(Name));
+            ValidateValue(name, nameof(Name));
 
             _name = name;
         }

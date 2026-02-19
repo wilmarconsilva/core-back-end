@@ -1,11 +1,10 @@
 using Domain.Exceptions;
-using Domain.Interfaces.Entities;
 using Domain.Utilities;
 using Domain.ValueObjects.Persons.Enums;
 
 namespace Domain.Entities.Persons.Customers
 {
-    public class Customer : Person, ICopyable<Customer>
+    public class Customer : Person
     {
         #region Fields
 
@@ -23,7 +22,7 @@ namespace Domain.Entities.Persons.Customers
 
         public Customer(string name, PersonType personType, string document, string? email, string? stateRegistration, IEnumerable<CustomerAddress> addresses) : base(name)
         {
-            Fill(personType, document, email, stateRegistration, addresses);
+            Fill(name, personType, document, email, stateRegistration, addresses);
         }
 
         #endregion Constructors
@@ -60,7 +59,7 @@ namespace Domain.Entities.Persons.Customers
 
         public void SetDocument(string document)
         {
-            Validate(document, nameof(Document));
+            ValidateValue(document, nameof(Document));
 
             _document = document;
         }
@@ -70,28 +69,21 @@ namespace Domain.Entities.Persons.Customers
             if (addresses == null || !addresses.Any())
                 throw new BusinessRuleException($"O Cliente: {this.Description} deve possuir ao menos um endereço.");
 
-            EntityCollection.Sync(_addresses, addresses);
+            EntityCollection.Sync(_addresses, addresses, this.Id);
         }
 
-        public void Copy(Customer customer)
-        {
-            Fill(customer.PersonType, customer.Document, customer.Email, customer.StateRegistration, customer.Addresses);
-        }
-
-        #endregion Public methods
-
-        #region Private methods
-
-        private void Fill(PersonType personType, string document, string? email, string? stateRegistration, IEnumerable<CustomerAddress> addresses)
+        public void Fill(string name, PersonType personType, string document, string? email, string? stateRegistration, IEnumerable<CustomerAddress> addresses)
         {
             SetPersonType(personType);
             SetAddresses(addresses);
 
+            Name = name;
             Document = document;
             Email = email;
             StateRegistration = stateRegistration;
         }
 
-        #endregion Private methods
+        #endregion Public methods
     }
 }
+ 
