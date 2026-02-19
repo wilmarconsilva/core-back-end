@@ -4,9 +4,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace Infrastructure.Persistece
 {
-    public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
+    public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
     {
-        public ApplicationDbContext CreateDbContext(string[] args)
+        public AppDbContext CreateDbContext(string[] args)
         {
             string basePath = Directory.GetCurrentDirectory();
 
@@ -19,11 +19,11 @@ namespace Infrastructure.Persistece
             string keyConnectionString = "Default";
             string connectionString = configuration.GetConnectionString(keyConnectionString) ?? throw new KeyNotFoundException($"Connection string: '{keyConnectionString}' not found.");
 
-            DbContextOptionsBuilder<ApplicationDbContext> optionsBuilder = new();
+            DbContextOptionsBuilder<AppDbContext> optionsBuilder = new();
 
             optionsBuilder.UseNpgsql(connectionString);
 
-            ApplicationDbContext context = new(optionsBuilder.Options);
+            AppDbContext context = new(optionsBuilder.Options);
 
             return context;
         }

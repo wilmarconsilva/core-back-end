@@ -9,14 +9,14 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Infrastructure.Persistence.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(AppDbContext))]
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.0-rc.2.25502.107")
+                .HasAnnotation("ProductVersion", "10.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -32,8 +32,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Document")
                         .IsRequired()
-                        .HasMaxLength(14)
-                        .HasColumnType("character varying(14)")
+                        .HasColumnType("text")
                         .HasColumnName("document");
 
                     b.Property<int>("DocumentType")
@@ -41,8 +40,7 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnName("document_type");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(320)
-                        .HasColumnType("character varying(320)")
+                        .HasColumnType("text")
                         .HasColumnName("email");
 
                     b.Property<string>("Name")
@@ -55,13 +53,60 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnName("person_type");
 
                     b.Property<string>("StateRegistration")
-                        .HasMaxLength(14)
-                        .HasColumnType("character varying(14)")
+                        .HasColumnType("text")
                         .HasColumnName("state_registration");
 
                     b.HasKey("Id");
 
                     b.ToTable("customers", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Persons.Customers.CustomerAddress", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Complement")
+                        .HasColumnType("text")
+                        .HasColumnName("complement");
+
+                    b.Property<long>("CustomerId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("customer_id");
+
+                    b.Property<long>("LocalityId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("locality_id");
+
+                    b.Property<string>("Neighborhood")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("neighborhood");
+
+                    b.Property<string>("Number")
+                        .HasColumnType("text")
+                        .HasColumnName("number");
+
+                    b.Property<string>("PostalCode")
+                        .HasColumnType("text")
+                        .HasColumnName("postal_code");
+
+                    b.Property<string>("Street")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("street");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("LocalityId");
+
+                    b.ToTable("customers_addresses", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Territories.Country", b =>
@@ -141,6 +186,25 @@ namespace Infrastructure.Persistence.Migrations
                     b.HasIndex("country_id");
 
                     b.ToTable("states", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Persons.Customers.CustomerAddress", b =>
+                {
+                    b.HasOne("Domain.Entities.Persons.Customers.Customer", "Customer")
+                        .WithMany("_addresses")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Territories.Locality", "Locality")
+                        .WithMany()
+                        .HasForeignKey("LocalityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Locality");
                 });
 
             modelBuilder.Entity("Domain.Entities.Territories.Locality", b =>

@@ -1,10 +1,15 @@
+using Application.DataTransferObjects.Persons.Customers.Validators;
+using Application.Interfaces.Queries.Persons.Customers;
 using Application.Interfaces.Services.Persons;
-using Application.Mappings;
-using Application.Services.Persons;
+using Application.Mappings.Persons.Customers;
+using Application.Services.Persons.Customers;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Infrastructure.Persistece;
-using Infrastructure.Repositories;
+using Infrastructure.Queries.Persons.Customers;
+using Infrastructure.Repositories.Persons.Customers;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -37,13 +42,20 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<CustomerSaveDtoValidator>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddAutoMapper(typeof(CustomerProfile));
 
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+
+builder.Services.AddScoped<ICustomerQuery, CustomerQuery>();
+
+builder.Services.AddAutoMapper(typeof(CustomerAddressProfile));
 
 WebApplication app = builder.Build();
 

@@ -2,8 +2,35 @@ namespace Domain.Entities.Persons
 {
     public abstract class Person : Entity
     {
-        public required string Name { get; set; }
-        
-        public override required string Description { get { return Name; } set { Name = value; } }
+        private string _name = null!;
+
+        #region Constructors
+
+        /// <summary>
+        /// Constructor only for ORM.
+        /// </summary>
+        protected Person() { }
+
+        protected Person(string name)
+        {
+            Name = name;
+        }
+
+        #endregion Constructors
+
+        public string Name { get => _name; set => SetName(value); }
+
+        public override string Description { get => _name; set => SetName(value); }
+
+        #region Protected methods
+
+        protected void SetName(string name)
+        {
+            ValidateValue(name, nameof(Name));
+
+            _name = name;
+        }
+
+        #endregion Protected methods
     }
 }

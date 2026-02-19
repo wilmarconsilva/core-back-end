@@ -1,15 +1,37 @@
 using Domain.Exceptions;
+using Domain.Utilities;
 using Domain.ValueObjects.Persons.Enums;
 
 namespace Domain.Entities.Persons.Customers
 {
     public class Customer : Person
     {
+        #region Fields
+
+        private string _document = null!;
+        private readonly List<CustomerAddress> _addresses = new();
+
+        #endregion Fields
+
+        #region Constructors
+
+        /// <summary>
+        /// Constructor only for ORM.
+        /// </summary>
+        private Customer() { }
+
+        public Customer(string name, PersonType personType, string document, string? email, string? stateRegistration, IEnumerable<CustomerAddress> addresses) : base(name)
+        {
+            Fill(name, personType, document, email, stateRegistration, addresses);
+        }
+
+        #endregion Constructors
+
         #region Public properties
 
         public PersonType PersonType { get; private set; }
 
-        public required string Document { get; set; }
+        public string Document { get => _document; private set => SetDocument(value); }
 
         public DocumentType DocumentType { get; private set; }
 
@@ -17,36 +39,51 @@ namespace Domain.Entities.Persons.Customers
 
         public string? StateRegistration { get; set; }
 
-        #region Constructors
-
-        public Customer(PersonType personType, string document, string? email, string? stateRegistration)
-        {
-            PersonType = personType;
-            Document = document;
-            Email = email;
-            StateRegistration = stateRegistration;
-
-            SetPersonType(personType);
-        }
-
-        #endregion Constructors
+        public IReadOnlyCollection<CustomerAddress> Addresses => _addresses;
 
         #endregion Public properties
 
-        #region Private methods
+        #region Public methods
 
-        private void SetPersonType(PersonType personType)
+        public void SetPersonType(PersonType personType)
         {
             DocumentType = personType switch
             {
                 PersonType.Natural => DocumentType.CPF,
                 PersonType.Legal => DocumentType.CNPJ,
-                _ => throw new BusinessRuleException("Tipo de pessoa inválido para determinar o tipo de documento.")
+                _ => throw new BusinessRuleException($"Tipo de pessoa inválido para determinar o tipo de documento para o Cliente: {this.Description}.")
             };
 
             PersonType = personType;
         }
 
-        #endregion Private methods
+        public void SetDocument(string document)
+        {
+            ValidateValue(document, nameof(Document));
+
+            _document = document;
+        }
+
+        public void SetAddresses(IEnumerable<CustomerAddress> addresses)
+        {
+            if (addresses == null || !addresses.Any())
+                throw new BusinessRuleException($"O Cliente: {this.Description} deve possuir ao menos um endereço.");
+
+            EntityCollection.Sync(_addresses, addresses, this.Id);
+        }
+
+        public void Fill(string name, PersonType personType, string document, string? email, string? stateRegistration, IEnumerable<CustomerAddress> addresses)
+        {
+            SetPersonType(personType);
+            SetAddresses(addresses);
+
+            Name = name;
+            Document = document;
+            Email = email;
+            StateRegistration = stateRegistration;
+        }
+
+        #endregion Public methods
     }
 }
+ 
