@@ -1,3 +1,4 @@
+using Application.DataTransferObjects;
 using Application.Interfaces.Services;
 using Domain.Entities;
 using Domain.Interfaces.Data;
@@ -6,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace REST.Controllers
 {
     [ApiController]
-    public abstract class CrudController<TEntitySaveDto> : Controller where TEntitySaveDto : class
+    public abstract class CrudController<TEntitySaveDto> : Controller where TEntitySaveDto : EntitySaveDto
     {
         protected readonly ICrudService<TEntitySaveDto> _service;
 
@@ -30,7 +31,7 @@ namespace REST.Controllers
         {
             return await ProcessRequestAsync<TEntitySaveDto>(async () =>
             {
-                Entity entity = await _service.CreateAsync(dto, cancellationToken);
+                Entity entity = (await _service.CreateAsync([dto], cancellationToken)).First();
                 return CreatedAtAction(nameof(GetById), new { id = entity.Id }, dto);
             }, cancellationToken);
         }

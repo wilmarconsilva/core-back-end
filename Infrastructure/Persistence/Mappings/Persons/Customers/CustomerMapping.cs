@@ -2,7 +2,7 @@ using Domain.Entities.Persons.Customers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Persistence.Mappings.Persons
+namespace Infrastructure.Persistence.Mappings.Persons.Customers
 {
     public class CustomerMapping : EntityMapping<Customer>
     {
@@ -20,7 +20,6 @@ namespace Infrastructure.Persistence.Mappings.Persons
 
             builder.Property(c => c.Document)
                 .HasColumnName("document")
-                .HasMaxLength(14)
                 .IsRequired();
 
             builder.Property(c => c.DocumentType)
@@ -28,12 +27,22 @@ namespace Infrastructure.Persistence.Mappings.Persons
                 .IsRequired();
 
             builder.Property(c => c.Email)
-                .HasColumnName("email")
-                .HasMaxLength(320);
+                .HasColumnName("email");
 
             builder.Property(c => c.StateRegistration)
-                .HasColumnName("state_registration")
-                .HasMaxLength(14);
+                .HasColumnName("state_registration");
+
+            builder
+                .HasMany("_addresses")
+                .WithOne(nameof(Customer))
+                .HasForeignKey(nameof(CustomerAddress.CustomerId))
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder
+                .Navigation(c => c.Addresses)
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+            builder.Ignore(c => c.Addresses);
         }
 
         protected override void MapDescription(EntityTypeBuilder<Customer> builder)

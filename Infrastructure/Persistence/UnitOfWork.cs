@@ -5,11 +5,11 @@ namespace Infrastructure.Persistece
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly ApplicationDbContext _context;
+        private readonly AppDbContext _context;
 
         private IDbContextTransaction? _transaction;
 
-        public UnitOfWork(ApplicationDbContext context)
+        public UnitOfWork(AppDbContext context)
         {
             _context = context;
         }

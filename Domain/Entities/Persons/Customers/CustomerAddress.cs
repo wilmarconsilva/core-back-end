@@ -1,23 +1,95 @@
 using System.Text;
 using Domain.Entities.Territories;
+using Domain.Interfaces.Entities;
 
 namespace Domain.Entities.Persons.Customers
 {
-    public class CustomerAddress : EntityWithoutDescription
+    public class CustomerAddress : EntityWithoutDescription, ICopyable<CustomerAddress>, IEntityChild
     {
-        public required string Neighborhood { get; set; }
+        #region Fields
 
-        public required string Street { get; set; }
+        private long _localityId;
+        private long _customerId;
+        private string _neighborhood = null!;
+        private string _street = null!;
 
-        public required Locality Locality { get; set; }
+        #endregion Fields
 
-        public required Customer Customer { get; set; }
+        #region Constructors
+
+        public CustomerAddress(long localityId, long customerId, string neighborhood, string street, string? complement, string? postalCode, string? number)
+        {
+            SetCustomerId(customerId);
+
+            Fill(localityId, neighborhood, street, complement, postalCode, number);
+        }
+
+        public CustomerAddress(long localityId, string neighborhood, string street, string? complement, string? postalCode, string? number)
+        {
+            Fill(localityId, neighborhood, street, complement, postalCode, number);
+        }
+
+        public void Copy(CustomerAddress customerAddress)
+        {
+            Fill(customerAddress.LocalityId, customerAddress.Neighborhood, customerAddress.Street, customerAddress.Complement, customerAddress.PostalCode, customerAddress.Number);
+        }
+
+        #endregion Constructors
+
+        public Locality? Locality { get; private init; }
+
+        public long LocalityId { get => _localityId; private set => SetLocalityId(value); }
+
+        public Customer? Customer { get; private init; }
+
+        public long CustomerId { get => _customerId; }
+
+        public string Neighborhood { get => _neighborhood; private set => SetNeighborhood(value); }
+
+        public string Street { get => _street; private set => SetStreet(value); }
 
         public string? Complement { get; set; }
 
         public string? PostalCode { get; set; }
         
         public string? Number { get; set; }
+
+        #region Public methods
+
+        public void SetLocalityId(long localityId)
+        {
+            ValidateValue(localityId, nameof(LocalityId));
+
+            _localityId = localityId;
+        }
+
+        public void SetCustomerId(long customerId)
+        {
+            ValidateValue(customerId, nameof(customerId));
+
+            _customerId = customerId;
+        }
+
+        public void SetNeighborhood(string neighborhood)
+        {
+            ValidateValue(neighborhood, nameof(Neighborhood));
+
+            _neighborhood = neighborhood;
+        }
+
+        public void SetStreet(string street)
+        {
+            ValidateValue(street, nameof(Street));
+
+            _street = street;
+        }
+
+        public void SetFatherEntityId(long id)
+        {
+            SetCustomerId(id);
+        }
+
+        #endregion Public methods
 
         #region Protected methods
 
@@ -36,9 +108,23 @@ namespace Domain.Entities.Persons.Customers
             if (!string.IsNullOrWhiteSpace(PostalCode))
                 description.Append($" {PostalCode}.");
 
-            return description.Append('.').ToString();
+            return description.ToString();
         }
 
         #endregion Protected methods
+
+        #region Private methods
+
+        private void Fill(long localityId, string neighborhood, string street, string? complement, string? postalCode, string? number)
+        {
+            SetLocalityId(localityId);
+            SetNeighborhood(neighborhood);
+            SetStreet(street);
+            Complement = complement;
+            PostalCode = postalCode;
+            Number = number;
+        }
+
+        #endregion Private methods
     }
 }
