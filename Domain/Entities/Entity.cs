@@ -9,7 +9,7 @@ namespace Domain.Entities
 
         public long Id { get; set; }
 
-        public abstract string Description { get; set; }
+        public abstract string Description { get; protected set; }
 
         #endregion Public properties
 
@@ -25,6 +25,12 @@ namespace Domain.Entities
         {
             if (value == TProperty.Zero)
                 throw new BusinessRuleException($"{propertyName} não pode ser zero.");
+        }
+
+        protected static void ValidateEnum<TEnum>(TEnum value, string propertyName) where TEnum : Enum
+        {
+            if (Enum.IsDefined(typeof(TEnum), value))
+                throw new BusinessRuleException($"{propertyName} possui um valor inválido.");
         }
 
         #endregion Protected methods
