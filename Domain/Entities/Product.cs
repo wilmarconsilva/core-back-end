@@ -4,21 +4,26 @@ namespace Domain.Entities
 {
     public class Product : Entity
     {
+        /// <summary>
+        /// Constructor only for ORM.
+        /// </summary>
+        private Product() { }
+
         private string _description = null!;
         private MeasureUnit _measureUnit;
 
         public override string Description { get => _description; protected set => SetDescription(value); }
 
-        public MeasureUnit MeasureUnit { get; }
+        public MeasureUnit MeasureUnit { get => _measureUnit; set => SetMeasureUnit(value); }
 
-        public void SetDescription(string description)
+        private void SetDescription(string description)
         {
             ValidateValue(description, nameof(Description));
 
             _description = description;
         }
 
-        public void SetMeasureUnit(MeasureUnit measureUnit)
+        private void SetMeasureUnit(MeasureUnit measureUnit)
         {
             ValidateEnum(measureUnit, nameof(MeasureUnit));
 

@@ -11,7 +11,7 @@ namespace Domain.Entities.Territories
 
         public string Acronym { get => _acronym; private set => SetAcronym(value); }
 
-        public void SetAcronym(string acronym)
+        private void SetAcronym(string acronym)
         {
             ValidateValue(acronym, nameof(Acronym));
             _acronym = acronym;

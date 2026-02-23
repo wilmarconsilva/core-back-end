@@ -29,8 +29,8 @@ namespace Domain.Entities
 
         protected static void ValidateEnum<TEnum>(TEnum value, string propertyName) where TEnum : Enum
         {
-            if (Enum.IsDefined(typeof(TEnum), value))
-                throw new BusinessRuleException($"{propertyName} possui um valor inválido.");
+            if (!Enum.IsDefined(typeof(TEnum), value))
+                throw new BusinessRuleException($"{propertyName} contém um valor inválido.");
         }
 
         #endregion Protected methods

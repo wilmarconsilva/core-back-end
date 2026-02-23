@@ -1,4 +1,5 @@
 using Application.DataTransferObjects.Products;
+using Application.Interfaces.Queries;
 using Application.Interfaces.Services;
 using Domain.Entities;
 using Domain.Interfaces.Data;
@@ -8,7 +9,7 @@ namespace Application.Services.Persons.Customers
 {
     public class ProductService : CrudService<Product, ProductSaveDto>, IProductService
     {
-        public ProductService(IProductRepository repository, ? query, IUnitOfWork unitOfWork) : base(repository, query, unitOfWork)
+        public ProductService(IProductRepository repository, IProductQuery query, IUnitOfWork unitOfWork) : base(repository, query, unitOfWork)
         {
 
         }
