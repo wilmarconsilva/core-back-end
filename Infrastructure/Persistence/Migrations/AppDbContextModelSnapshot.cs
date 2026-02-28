@@ -109,6 +109,29 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("customers_addresses", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.Product", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<int>("MeasureUnit")
+                        .HasColumnType("integer")
+                        .HasColumnName("measure_unit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("products", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.Territories.Country", b =>
                 {
                     b.Property<long>("Id")
@@ -225,6 +248,11 @@ namespace Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Persons.Customers.Customer", b =>
+                {
+                    b.Navigation("_addresses");
                 });
 #pragma warning restore 612, 618
         }

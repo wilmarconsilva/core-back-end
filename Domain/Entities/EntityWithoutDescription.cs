@@ -9,7 +9,7 @@ namespace Domain.Entities
                 return GetDescription();
             }
 
-            set { throw new InvalidOperationException("This property should not be filled in this class."); }
+            protected set { throw new InvalidOperationException("This property should not be filled in this class."); }
         }
 
         protected abstract string GetDescription();

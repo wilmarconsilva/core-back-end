@@ -20,7 +20,7 @@ namespace Domain.Entities.Persons
 
         public string Name { get => _name; set => SetName(value); }
 
-        public override string Description { get => _name; set => SetName(value); }
+        public override string Description { get => _name; protected set => SetName(value); }
 
         #region Protected methods
 

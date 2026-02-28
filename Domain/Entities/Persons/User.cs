@@ -17,13 +17,13 @@ namespace Domain.Entities.Persons
         
         public string? SignaturePath { get; set; }
 
-        public void SetEmail(string email)
+        private void SetEmail(string email)
         {
             ValidateValue(email, nameof(Email));
             Email = email;
         }
 
-        public void SetPassword(string password)
+        private void SetPassword(string password)
         {
             ValidateValue(password, nameof(Password));
             Password = password;
