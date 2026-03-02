@@ -33,41 +33,46 @@ namespace Infrastructure.Persistence.Mappings
                     .HasPrecision(18, 2)
                     .IsRequired();
 
+                payment.Property(p => p.HasInstallment)
+                    .HasColumnName("payment_installment_has_installment")
+                    .IsRequired();
+
                 // NÍVEL 2: Installment dentro de Payment
-                payment.OwnsOne(p => p.Installment, installments =>
+                payment.OwnsOne(p => p.Installment, installment =>
                 {
-                    installments.Property(i => i.HasInstallments)
-                        .HasColumnName("payment_installments_has_installments")
-                        .IsRequired();
+                    installment.Property(i => i.Value)
+                        .HasColumnName("payment_installment_value")
+                        .HasPrecision(18, 2);
 
-                    installments.Property(i => i.Value)
-                        .HasColumnName("payment_installments_value")
-                        .HasPrecision(18, 2)
-                        .IsRequired();
+                    installment.Property(i => i.Quantity)
+                        .HasColumnName("payment_installment_quantity");
 
-                    installments.Property(i => i.Quantity)
-                        .HasColumnName("payment_installments_quantity")
-                        .IsRequired();
+                    installment.Property(p => p.HasDownPayment)
+                        .HasColumnName("payment_installment_has_down_payment");
 
                     // NÍVEL 3: DownPayment dentro de Installment dentro de Payment
-                    installments.OwnsOne(i => i.DownPayment, downPayment =>
+                    installment.OwnsOne(i => i.DownPayment, downPayment =>
                     {
                         downPayment.Property(dp => dp.Value)
-                            .HasColumnName("payment_installments_down_payment_value")
-                            .HasPrecision(18, 2)
-                            .IsRequired();
+                            .HasColumnName("payment_installment_down_payment_value")
+                            .HasPrecision(18, 2);
 
                         downPayment.Property(dp => dp.Percentage)
-                            .HasColumnName("payment_installments_down_payment_percentage")
-                            .HasPrecision(18, 2)
-                            .IsRequired();
+                            .HasColumnName("payment_installment_down_payment_percentage")
+                            .HasPrecision(5, 2);
 
                         downPayment.Property(dp => dp.Method)
-                            .HasColumnName("payment_installments_down_payment_method")
-                            .IsRequired();
+                            .HasColumnName("payment_installment_down_payment_method");
                     });
                 });
             });
+
+            // Mapeamento da coleção de DocumentProducts (filhos)
+            builder.HasMany(d => d.Products)
+                .WithOne()
+                .HasForeignKey(p => p.DocumentId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Propriedades simples da entidade
             builder.Property(d => d.ValueSubtotal)

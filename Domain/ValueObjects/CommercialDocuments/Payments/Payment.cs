@@ -1,4 +1,4 @@
-using Domain.Exceptions;
+using Domain.Utilities.Entities;
 using Domain.ValueObjects.CommercialDocuments.Payments.Installments;
 using Domain.ValueObjects.Enums;
 
@@ -21,8 +21,8 @@ namespace Domain.ValueObjects.CommercialDocuments.Payments
 
         public Payment(PaymentMethod method, decimal discountValue, Installment? installments)
         {
-            ValidateEnum(method, nameof(Method));
-            ValidateValue(discountValue, nameof(DiscountValue));
+            Validator.ValidateEnum(method, nameof(Method));
+            Validator.ValidateValue(discountValue, nameof(DiscountValue));
 
             Method = method;
             DiscountValue = discountValue;
@@ -30,18 +30,6 @@ namespace Domain.ValueObjects.CommercialDocuments.Payments
 
             if (installments != null)
                 HasInstallment = true;
-        }
-
-        private static void ValidateEnum<TEnum>(TEnum value, string propertyName) where TEnum : Enum
-        {
-            if (!Enum.IsDefined(typeof(TEnum), value))
-                throw new BusinessRuleException($"{propertyName} contém um valor inválido.");
-        }
-
-        private static void ValidateValue(decimal value, string propertyName)
-        {
-            if (value < 0)
-                throw new BusinessRuleException($"{propertyName} não pode ser negativo.");
         }
     }
 }
