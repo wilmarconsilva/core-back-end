@@ -1,7 +1,7 @@
 ﻿using Domain.Entities;
 using Domain.Interfaces.Entities;
 
-namespace Domain.Utilities
+namespace Domain.Utilities.Entities
 {
     internal static class EntityCollection
     {

@@ -1,4 +1,5 @@
-﻿using Domain.ValueObjects.Enums;
+﻿using Domain.Utilities.Entities;
+using Domain.ValueObjects.Enums;
 
 namespace Domain.Entities
 {
@@ -18,14 +19,14 @@ namespace Domain.Entities
 
         private void SetDescription(string description)
         {
-            ValidateValue(description, nameof(Description));
+            Validator.ValidateValue(description, nameof(Description));
 
             _description = description;
         }
 
         private void SetMeasureUnit(MeasureUnit measureUnit)
         {
-            ValidateEnum(measureUnit, nameof(MeasureUnit));
+            Validator.ValidateEnum(measureUnit, nameof(MeasureUnit));
 
             _measureUnit = measureUnit;
         }
