@@ -1,7 +1,7 @@
 using Domain.Exceptions;
 using Domain.ValueObjects.Enums;
 
-namespace Domain.ValueObjects.CommercialDocuments.Payments.Installments
+namespace Domain.ValueObjects.Commercial.Documents.Payments.Installments
 {
     public class DownPayment
     {

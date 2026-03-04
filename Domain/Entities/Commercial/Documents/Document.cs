@@ -2,16 +2,16 @@ using Domain.Entities.Persons;
 using Domain.Entities.Persons.Customers;
 using Domain.Exceptions;
 using Domain.Utilities.Entities;
-using Domain.ValueObjects.CommercialDocuments.Payments;
-using Domain.ValueObjects.CommercialDocuments.Payments.Installments;
+using Domain.ValueObjects.Commercial.Documents.Payments;
+using Domain.ValueObjects.Commercial.Documents.Payments.Installments;
 
 namespace Domain.Entities.Commercial.Documents
 {
     public abstract class Document : EntityWithoutDescription
     {
-        private readonly List<DocumentProduct> _products = new();
         private Payment _payment = null!;
         private byte[] _customerSignatureImage = null!;
+        private List<DocumentProduct> _products = new();
 
         public DateTime CreationDateTime { get; private init; }
 
@@ -29,11 +29,11 @@ namespace Domain.Entities.Commercial.Documents
 
         public decimal ValueTotal { get; private set; }
 
-        public Payment Payment { get => _payment; }
+        public Payment Payment => _payment;
 
         public string? Observations { get; set; }
 
-        public byte[] CustomerSignatureImage { get => _customerSignatureImage; }
+        public byte[] CustomerSignatureImage => _customerSignatureImage;
 
         public IReadOnlyCollection<DocumentProduct> Products => _products;
 

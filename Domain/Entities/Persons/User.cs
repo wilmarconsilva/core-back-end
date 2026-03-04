@@ -1,3 +1,5 @@
+using Domain.Utilities.Entities;
+
 namespace Domain.Entities.Persons
 {
     public class User : Person
@@ -19,13 +21,13 @@ namespace Domain.Entities.Persons
 
         private void SetEmail(string email)
         {
-            ValidateValue(email, nameof(Email));
+           Validator.ValidateValue(email, nameof(Email));
             Email = email;
         }
 
         private void SetPassword(string password)
         {
-            ValidateValue(password, nameof(Password));
+            Validator.ValidateValue(password, nameof(Password));
             Password = password;
         }
     }

@@ -1,6 +1,7 @@
 using System.Text;
 using Domain.Entities.Territories;
 using Domain.Interfaces.Entities;
+using Domain.Utilities.Entities;
 
 namespace Domain.Entities.Persons.Customers
 {
@@ -58,28 +59,28 @@ namespace Domain.Entities.Persons.Customers
 
         public void SetLocalityId(long localityId)
         {
-            ValidateValue(localityId, nameof(LocalityId));
+            Validator.ValidateValue(localityId, nameof(LocalityId));
 
             _localityId = localityId;
         }
 
         public void SetCustomerId(long customerId)
         {
-            ValidateValue(customerId, nameof(customerId));
+            Validator.ValidateValue(customerId, nameof(customerId));
 
             _customerId = customerId;
         }
 
         public void SetNeighborhood(string neighborhood)
         {
-            ValidateValue(neighborhood, nameof(Neighborhood));
+            Validator.ValidateValue(neighborhood, nameof(Neighborhood));
 
             _neighborhood = neighborhood;
         }
 
         public void SetStreet(string street)
         {
-            ValidateValue(street, nameof(Street));
+            Validator.ValidateValue(street, nameof(Street));
 
             _street = street;
         }

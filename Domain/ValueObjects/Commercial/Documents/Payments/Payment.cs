@@ -1,8 +1,8 @@
 using Domain.Utilities.Entities;
-using Domain.ValueObjects.CommercialDocuments.Payments.Installments;
+using Domain.ValueObjects.Commercial.Documents.Payments.Installments;
 using Domain.ValueObjects.Enums;
 
-namespace Domain.ValueObjects.CommercialDocuments.Payments
+namespace Domain.ValueObjects.Commercial.Documents.Payments
 {
     public class Payment
     {

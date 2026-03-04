@@ -2,7 +2,7 @@ using Domain.Entities.Commercial.Documents;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Persistence.Mappings
+namespace Infrastructure.Persistence.Mappings.Territories.Commercial.Documents
 {
     /// <summary>
     /// Mapeamento para CommercialDocument com suporte a Value Objects aninhados em múltiplos níveis.
@@ -13,7 +13,7 @@ namespace Infrastructure.Persistence.Mappings
     ///       └── Installment (VO aninhado - Owned Type dentro de Owned Type)
     ///           └── DownPayment (VO aninhado - Owned Type dentro de Owned Type dentro de Owned Type)
     /// </summary>
-    public abstract class CommercialDocumentMapping<TEntity> : EntityMapping<TEntity>
+    public abstract class DocumentMapping<TEntity> : EntityMapping<TEntity>
         where TEntity : Document
     {
         public override void Configure(EntityTypeBuilder<TEntity> builder)
@@ -67,13 +67,6 @@ namespace Infrastructure.Persistence.Mappings
                 });
             });
 
-            // Mapeamento da coleção de DocumentProducts (filhos)
-            builder.HasMany(d => d.Products)
-                .WithOne()
-                .HasForeignKey(p => p.DocumentId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
-
             // Propriedades simples da entidade
             builder.Property(d => d.ValueSubtotal)
                 .HasColumnName("value_subtotal")
@@ -86,8 +79,7 @@ namespace Infrastructure.Persistence.Mappings
                 .IsRequired();
 
             builder.Property(d => d.Observations)
-                .HasColumnName("observations")
-                .HasMaxLength(1000);
+                .HasColumnName("observations");
 
             builder.Property(d => d.CustomerSignatureImage)
                 .HasColumnName("customer_signature_image")
@@ -111,6 +103,17 @@ namespace Infrastructure.Persistence.Mappings
                 .WithMany()
                 .HasForeignKey(d => d.CustomerId)
                 .IsRequired();
+
+            // Mapeamento da coleção de DocumentProducts (filhos) via campo privado
+            builder
+                .HasMany("_products")
+                .WithOne(nameof(DocumentProduct.Document))
+                .HasForeignKey(nameof(DocumentProduct.DocumentId))
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder
+                .Navigation(d => d.Products)
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
         }
     }
 }
