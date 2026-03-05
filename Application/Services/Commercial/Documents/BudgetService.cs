@@ -1,27 +1,32 @@
-using Application.DataTransferObjects;
+using Application.DataTransferObjects.Commercial.Documents.Budgets;
+using Application.Interfaces.Queries.Commercial.Documents.Budgets;
+using Application.Interfaces.Services.Commercial.Documents;
 using AutoMapper;
-using Domain.Entities;
+using Domain.Entities.Commercial.Documents.Budgets;
 using Domain.Interfaces.Data;
+using Domain.Interfaces.Repositories;
 
 namespace Application.Services.Commercial.Documents
 {
-    public abstract class BudgetService : CrudService<TEntity, TEntitySaveDto>
+    public class BudgetService : CrudService<Budget, BudgetSaveDto>, IBudgetService
     {
         private readonly IMapper _mapper;
 
-        public CustomerService(ICustomerRepository repository, ICustomerQuery query, IUnitOfWork unitOfWork, IMapper mapper) : base(repository, query, unitOfWork)
+        public BudgetService(IBudgetRepository repository, IBudgetQuery query, IUnitOfWork unitOfWork, IMapper mapper) : base(repository, query, unitOfWork)
         {
             _mapper = mapper;
         }
 
-        protected override Customer CreateEntity(CustomerSaveDto dto)
+        protected override Budget CreateEntity(BudgetSaveDto dto)
         {
-            return new Customer(dto.Name, dto.PersonType, dto.Document, dto.Email, dto.StateRegistration, _mapper.Map<IEnumerable<CustomerAddress>>(dto.Addresses));
+            List<BudgetProduct> products = _mapper.Map<List<BudgetProduct>>(dto.Products);
+            return new Budget(dto.UserId, dto.CustomerId, dto.Payment, dto.Observations, dto.CustomerSignatureImage, products);
         }
 
-        protected override void UpdateEntity(CustomerSaveDto dto, Customer entity)
+        protected override void UpdateEntity(BudgetSaveDto dto, Budget entity)
         {
-            entity.Fill(dto.Name, dto.PersonType, dto.Document, dto.Email, dto.StateRegistration, _mapper.Map<IEnumerable<CustomerAddress>>(dto.Addresses));
+            List<BudgetProduct> products = _mapper.Map<List<BudgetProduct>>(dto.Products);
+            entity.Fill(dto.UserId, dto.CustomerId, dto.Payment, dto.Observations, dto.CustomerSignatureImage, products);
         }
 
         protected override Task<bool> EntitiesCanBeDeleted(IEnumerable<long> ids)

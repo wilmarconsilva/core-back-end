@@ -41,8 +41,6 @@ namespace Domain.Entities.Persons.Customers
 
         public long LocalityId { get => _localityId; private set => SetLocalityId(value); }
 
-        public Customer? Customer { get; private init; }
-
         public long CustomerId { get => _customerId; }
 
         public string Neighborhood { get => _neighborhood; private set => SetNeighborhood(value); }

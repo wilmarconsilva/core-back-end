@@ -13,8 +13,9 @@ namespace Infrastructure.Persistence.Mappings.Territories.Commercial.Documents
     ///       └── Installment (VO aninhado - Owned Type dentro de Owned Type)
     ///           └── DownPayment (VO aninhado - Owned Type dentro de Owned Type dentro de Owned Type)
     /// </summary>
-    public abstract class DocumentMapping<TEntity> : EntityMapping<TEntity>
-        where TEntity : Document
+    public abstract class DocumentMapping<TEntity, TProduct> : EntityMapping<TEntity>
+        where TEntity : Document<TProduct>
+        where TProduct : DocumentProduct
     {
         public override void Configure(EntityTypeBuilder<TEntity> builder)
         {
@@ -82,8 +83,7 @@ namespace Infrastructure.Persistence.Mappings.Territories.Commercial.Documents
                 .HasColumnName("observations");
 
             builder.Property(d => d.CustomerSignatureImage)
-                .HasColumnName("customer_signature_image")
-                .IsRequired();
+                .HasColumnName("customer_signature_image");
 
             builder.Property(d => d.CreationDateTime)
                 .HasColumnName("creation_date_time")
@@ -94,6 +94,14 @@ namespace Infrastructure.Persistence.Mappings.Territories.Commercial.Documents
                 .IsRequired();
 
             // Relacionamentos
+            builder.Property(dp => dp.UserId)
+                .HasColumnName("user_id")
+                .IsRequired();
+
+            builder.Property(dp => dp.CustomerId)
+                .HasColumnName("customer_id")
+                .IsRequired();
+
             builder.HasOne(d => d.User)
                 .WithMany()
                 .HasForeignKey(d => d.UserId)
@@ -106,8 +114,8 @@ namespace Infrastructure.Persistence.Mappings.Territories.Commercial.Documents
 
             // Mapeamento da coleção de DocumentProducts (filhos) via campo privado
             builder
-                .HasMany("_products")
-                .WithOne(nameof(DocumentProduct.Document))
+                .HasMany(d => d.Products)
+                .WithOne()
                 .HasForeignKey(nameof(DocumentProduct.DocumentId))
                 .OnDelete(DeleteBehavior.Cascade);
 

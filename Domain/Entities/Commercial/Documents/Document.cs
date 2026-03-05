@@ -7,11 +7,10 @@ using Domain.ValueObjects.Commercial.Documents.Payments.Installments;
 
 namespace Domain.Entities.Commercial.Documents
 {
-    public abstract class Document : EntityWithoutDescription
+    public abstract class Document<TProduct> : EntityWithoutDescription where TProduct : DocumentProduct
     {
         private Payment _payment = null!;
-        private byte[] _customerSignatureImage = null!;
-        private List<DocumentProduct> _products = new();
+        private List<TProduct> _products = new();
 
         public DateTime CreationDateTime { get; private init; }
 
@@ -33,22 +32,22 @@ namespace Domain.Entities.Commercial.Documents
 
         public string? Observations { get; set; }
 
-        public byte[] CustomerSignatureImage => _customerSignatureImage;
+        public byte[]? CustomerSignatureImage { get; set; }
 
-        public IReadOnlyCollection<DocumentProduct> Products => _products;
+        public IReadOnlyCollection<TProduct> Products => _products;
 
         /// <summary>
         /// Constructor only for ORM.
         /// </summary>
         protected Document() { }
 
-        protected Document(long userId, long customerId, Payment payment, string? observations, byte[] customerSignatureImage, List<DocumentProduct> products)
+        protected Document(long userId, long customerId, Payment payment, string? observations, byte[]? customerSignatureImage, List<TProduct> products)
         {
             CreationDateTime = DateTime.UtcNow;
             Fill(userId, customerId, payment, observations, customerSignatureImage, products);
         }
 
-        public void Fill(long userId, long customerId, Payment payment, string? observations, byte[] customerSignatureImage, List<DocumentProduct> products)
+        public void Fill(long userId, long customerId, Payment payment, string? observations, byte[]? customerSignatureImage, List<TProduct> products)
         {
             LastUpdateDateTime = DateTime.UtcNow;
             SetUserId(userId);
@@ -56,7 +55,7 @@ namespace Domain.Entities.Commercial.Documents
             _payment = payment;
             SetValues();
             Observations = observations;
-            SetCustomerSignatureImage(customerSignatureImage);
+            CustomerSignatureImage = customerSignatureImage;
 
             EntityCollection.Sync(_products, products, Id);
         }
@@ -64,12 +63,6 @@ namespace Domain.Entities.Commercial.Documents
         protected override string GetDescription()
         {
             return Id.ToString();
-        }
-
-        private void SetCustomerSignatureImage(byte[] customerSignatureImage)
-        {
-            Validator.ValidateValue(customerSignatureImage, nameof(CustomerSignatureImage));
-            _customerSignatureImage = customerSignatureImage;
         }
 
         private void SetUserId(long userId)

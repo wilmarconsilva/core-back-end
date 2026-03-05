@@ -35,6 +35,13 @@ namespace Application.DataTransferObjects
                     .WithMessage(_requiredMessage);
         }
 
+        protected IRuleBuilderOptions<T, object> RequiredObject(Expression<Func<T, object>> expression)
+        {
+            return RuleFor(expression)
+                    .NotNull()
+                    .WithMessage(_requiredMessage);
+        }
+
         #endregion Protected methods
     }
 }

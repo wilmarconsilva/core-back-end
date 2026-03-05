@@ -20,14 +20,6 @@ namespace Infrastructure.Persistence.Mappings.Territories.Commercial.Documents
             base.Configure(builder);
 
             // Propriedades simples
-            builder.Property(dp => dp.DocumentId)
-                .HasColumnName("document_id")
-                .IsRequired();
-
-            builder.Property(dp => dp.ProductId)
-                .HasColumnName("product_id")
-                .IsRequired();
-
             builder.Property(dp => dp.Quantity)
                 .HasColumnName("quantity")
                 .HasPrecision(18, 2)
@@ -44,11 +36,13 @@ namespace Infrastructure.Persistence.Mappings.Territories.Commercial.Documents
                 .IsRequired();
 
             // Relacionamentos
-            builder.HasOne(dp => dp.Document)
-                .WithMany()
-                .HasForeignKey(dp => dp.DocumentId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
+            builder.Property(dp => dp.DocumentId)
+                .HasColumnName("document_id")
+                .IsRequired();
+
+            builder.Property(dp => dp.ProductId)
+                .HasColumnName("product_id")
+                .IsRequired();
 
             builder.HasOne(dp => dp.Product)
                 .WithMany()
