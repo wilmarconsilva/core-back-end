@@ -19,16 +19,16 @@ namespace Domain.ValueObjects.Commercial.Documents.Payments
         /// </summary>
         private Payment() { }
 
-        public Payment(PaymentMethod method, decimal discountValue, Installment? installments)
+        public Payment(PaymentMethod method, decimal discountValue, Installment? installment)
         {
             Validator.ValidateEnum(method, nameof(Method));
             Validator.ValidateValue(discountValue, nameof(DiscountValue));
 
             Method = method;
             DiscountValue = discountValue;
-            Installment = installments;
+            Installment = installment;
 
-            if (installments != null)
+            if (installment != null)
                 HasInstallment = true;
         }
     }

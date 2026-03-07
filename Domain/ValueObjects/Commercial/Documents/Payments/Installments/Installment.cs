@@ -17,13 +17,13 @@ namespace Domain.ValueObjects.Commercial.Documents.Payments.Installments
         /// </summary>
         private Installment() { }
 
-        public Installment(decimal installmentValue, int installmentQuantity, DownPayment? downPayment)
+        public Installment(decimal value, int quantity, DownPayment? downPayment)
         {
-            ValidateValue(installmentValue, nameof(Value));
-            ValidateValue(installmentQuantity, nameof(Quantity));
+            ValidateValue(value, nameof(Value));
+            ValidateValue(quantity, nameof(Quantity));
 
-            Value = installmentValue;
-            Quantity = installmentQuantity;
+            Value = value;
+            Quantity = quantity;
             DownPayment = downPayment;
 
             if (downPayment != null)

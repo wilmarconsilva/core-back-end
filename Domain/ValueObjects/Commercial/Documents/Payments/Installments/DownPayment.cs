@@ -16,7 +16,7 @@ namespace Domain.ValueObjects.Commercial.Documents.Payments.Installments
         /// </summary>
         private DownPayment() { }
 
-        public DownPayment(decimal value, decimal percentage, PaymentMethod method, bool hasDownPayment)
+        public DownPayment(decimal value, decimal percentage, PaymentMethod method)
         {
             ValidateValue(value, nameof(Value));
             ValidateValue(percentage, nameof(Percentage));

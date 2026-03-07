@@ -1,12 +1,11 @@
 using Application.DataTransferObjects;
 using AutoMapper;
-using Domain.Entities;
 
 namespace Application.Mappings
 {
     public abstract class CrudProfile<TDto, TEntity> : Profile
-        where TDto : EntitySaveDto
-        where TEntity : Entity
+        where TDto : class
+        where TEntity : class
     {
         protected CrudProfile()
         {

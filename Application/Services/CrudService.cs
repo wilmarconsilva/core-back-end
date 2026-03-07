@@ -150,7 +150,12 @@ namespace Application.Services
         private async Task<List<TEntity>> TransformToEntity(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
         {
             IEnumerable<long> existingIds = dtos.Where(dto => dto.Id > 0).Select(dto => dto.Id);
-            List<TEntity> entities = await _repositoryCrud.GetByIdsAsync(existingIds, cancellationToken);
+
+            List<TEntity> entities;
+            if (existingIds.Any())
+                entities = await _repositoryCrud.GetByIdsAsync(existingIds, cancellationToken);
+            else
+                entities = new List<TEntity>(dtos.Count());
 
             foreach (TEntitySaveDto dto in dtos)
             {
