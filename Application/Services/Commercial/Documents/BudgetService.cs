@@ -20,18 +20,16 @@ namespace Application.Services.Commercial.Documents
 
         protected override Budget CreateEntity(BudgetSaveDto dto)
         {
-            List<BudgetProduct> products;
-            Payment payment;
-            (products, payment) = GetObjectsFromMapper(dto);
+            List<BudgetProduct> products = _mapper.Map<List<BudgetProduct>>(dto.Products);
+            Payment payment = _mapper.Map<Payment>(dto.Payment);
 
             return new Budget(dto.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products);
         }
 
         protected override void UpdateEntity(BudgetSaveDto dto, Budget entity)
         {
-            List<BudgetProduct> products;
-            Payment payment;
-            (products, payment) = GetObjectsFromMapper(dto);
+            List<BudgetProduct> products = _mapper.Map<List<BudgetProduct>>(dto.Products);
+            Payment payment = _mapper.Map<Payment>(dto.Payment);
 
             entity.Fill(dto.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products);
         }
@@ -39,11 +37,6 @@ namespace Application.Services.Commercial.Documents
         protected override Task<bool> EntitiesCanBeDeleted(IEnumerable<long> ids)
         {
             return Task.FromResult(true);
-        }
-
-        private ValueTuple<List<BudgetProduct>, Payment> GetObjectsFromMapper(BudgetSaveDto dto)
-        {
-            return (_mapper.Map<List<BudgetProduct>>(dto.Products), _mapper.Map<Payment>(dto.Payment));
         }
     }
 }

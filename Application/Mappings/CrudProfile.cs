@@ -1,4 +1,3 @@
-using Application.DataTransferObjects;
 using AutoMapper;
 
 namespace Application.Mappings

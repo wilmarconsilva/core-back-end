@@ -1,4 +1,4 @@
-using Domain.Exceptions;
+using Domain.Utilities.Entities;
 using Domain.ValueObjects.Enums;
 
 namespace Domain.ValueObjects.Commercial.Documents.Payments.Installments
@@ -18,9 +18,11 @@ namespace Domain.ValueObjects.Commercial.Documents.Payments.Installments
 
         public DownPayment(decimal value, decimal percentage, PaymentMethod method)
         {
-            ValidateValue(value, nameof(Value));
-            ValidateValue(percentage, nameof(Percentage));
-            ValidateEnum(method, nameof(Method));
+            string downPaymentFullName = $"{typeof(DownPayment).FullName}";
+
+            Validator.ValidateValue(value, $"{downPaymentFullName}.{nameof(Value)}");
+            Validator.ValidateValue(percentage, $"{downPaymentFullName}.{nameof(Value)}");
+            Validator.ValidateEnum(method, $"{downPaymentFullName}.{nameof(Value)}");
 
             Value = value;
             Percentage = percentage;
@@ -35,18 +37,6 @@ namespace Domain.ValueObjects.Commercial.Documents.Payments.Installments
         public bool ValidateNotEqualTotal(decimal valueTotal)
         {
             return Value != valueTotal;
-        }
-
-        private static void ValidateValue(decimal value, string propertyName)
-        {
-            if (value <= 0)
-                throw new BusinessRuleException($"{propertyName} deve ser maior que zero.");
-        }
-
-        private static void ValidateEnum<TEnum>(TEnum enumValue, string propertyName) where TEnum : Enum
-        {
-            if (!Enum.IsDefined(typeof(TEnum), enumValue))
-                throw new BusinessRuleException($"{propertyName} contém um valor inválido.");
         }
     }
 }
