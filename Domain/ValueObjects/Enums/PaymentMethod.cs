@@ -2,11 +2,12 @@
 {
     public enum PaymentMethod
     {
-        PIX = 1,
-        Money = 2,
-        Deposit = 3,
-        DebitCard = 4,
-        CreditCard = 5,
-        Slip = 6,
+        DebitCard = 1,
+        CreditCard = 2,
+        Money = 3,
+        Deposit = 4,
+        Slip = 5,
+        Check = 6,
+        PIX = 7,
     }
 }

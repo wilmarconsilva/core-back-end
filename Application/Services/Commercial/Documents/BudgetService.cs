@@ -9,7 +9,7 @@ using Domain.ValueObjects.Commercial.Documents.Payments;
 
 namespace Application.Services.Commercial.Documents
 {
-    public class BudgetService : CrudService<Budget, BudgetSaveDto>, IBudgetService
+    public class BudgetService : DocumentService<Budget, BudgetSaveDto, BudgetProductSaveDto>, IBudgetService
     {
         private readonly IMapper _mapper;
 
@@ -21,7 +21,8 @@ namespace Application.Services.Commercial.Documents
         protected override Budget CreateEntity(BudgetSaveDto dto)
         {
             List<BudgetProduct> products = _mapper.Map<List<BudgetProduct>>(dto.Products);
-            Payment payment = _mapper.Map<Payment>(dto.Payment);
+
+            Payment payment = CreatePayment(dto);
 
             return new Budget(dto.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products);
         }
@@ -29,7 +30,7 @@ namespace Application.Services.Commercial.Documents
         protected override void UpdateEntity(BudgetSaveDto dto, Budget entity)
         {
             List<BudgetProduct> products = _mapper.Map<List<BudgetProduct>>(dto.Products);
-            Payment payment = _mapper.Map<Payment>(dto.Payment);
+            Payment payment = CreatePayment(dto);
 
             entity.Fill(dto.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products);
         }

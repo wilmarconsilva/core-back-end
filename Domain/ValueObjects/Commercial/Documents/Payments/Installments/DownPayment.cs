@@ -18,11 +18,9 @@ namespace Domain.ValueObjects.Commercial.Documents.Payments.Installments
 
         public DownPayment(decimal value, decimal percentage, PaymentMethod method)
         {
-            string downPaymentFullName = $"{nameof(Payment)}.{nameof(Installment)}.{nameof(DownPayment)}";
-
-            Validator.ValidateValue(value, $"{downPaymentFullName}.{nameof(Value)}");
-            Validator.ValidateValue(percentage, $"{downPaymentFullName}.{nameof(Value)}");
-            Validator.ValidateEnum(method, $"{downPaymentFullName}.{nameof(Value)}");
+            Validator.ValidateValue(value, "O valor da entrada");
+            Validator.ValidateValue(percentage, "A porcentagem da entrada");
+            Validator.ValidateEnum(method, "O método de pagamento da entrada");
 
             Value = value;
             Percentage = percentage;
@@ -34,9 +32,9 @@ namespace Domain.ValueObjects.Commercial.Documents.Payments.Installments
             return (valueTotal * (Percentage / 100)) == Value;
         }
 
-        public bool ValidateNotEqualTotal(decimal valueTotal)
+        public bool ValidateValueLessThanTotal(decimal valueTotal)
         {
-            return Value != valueTotal;
+            return Value < valueTotal;
         }
     }
 }

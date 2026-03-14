@@ -3,7 +3,6 @@ using Domain.Entities.Persons.Customers;
 using Domain.Exceptions;
 using Domain.Utilities.Entities;
 using Domain.ValueObjects.Commercial.Documents.Payments;
-using Domain.ValueObjects.Commercial.Documents.Payments.Installments;
 
 namespace Domain.Entities.Commercial.Documents
 {
@@ -87,7 +86,9 @@ namespace Domain.Entities.Commercial.Documents
 
             SetValueTotal();
 
-            ValidateInstallments();
+            _payment.Installment?.SetValue(ValueTotal);
+
+            ValidateInstallment();
         }
 
         private void SetValueTotal()
@@ -104,19 +105,19 @@ namespace Domain.Entities.Commercial.Documents
             ValueSubtotal = valueSubtotal;
         }
 
-        private void ValidateInstallments()
+        private void ValidateInstallment()
         {
             if (Payment.Installment == null || !Payment.HasInstallment)
                 return;
 
-            if (!Payment.Installment.ValidateInstallmentTotal(ValueTotal))
-                throw new BusinessRuleException($"{nameof(Payment.Installment.Value)} não corresponde ao {nameof(ValueTotal)} descontando a {nameof(DownPayment)}.");
-
             if (!Payment.Installment.ValidateDownPaymentPercentage(ValueTotal))
-                throw new BusinessRuleException($"{nameof(DownPayment.Percentage)} não corresponde ao {nameof(DownPayment.Value)}.");
+                throw new BusinessRuleException("O valor da entrada não corresponde a porcentagem da entrada em relação ao valor total do documento.");
 
-            if (!Payment.Installment.ValidateDownPaymentNotEqualTotal(ValueTotal))
-                throw new BusinessRuleException($"{nameof(DownPayment.Value)} não pode ser igual ao {nameof(ValueTotal)}.");
+            if (!Payment.Installment.ValidateDownPaymentValueLessThanTotal(ValueTotal))
+                throw new BusinessRuleException("O valor da entrada não pode ser igual ou maior que o valor total do documento.");
+
+            if (!Payment.Installment.ValidateInstallmentTotal(ValueTotal))
+                throw new BusinessRuleException("O valor total da(s) parcela(s) não corresponde ao valor total do documento descontando o valor da entrada.");
         }
     }
 }

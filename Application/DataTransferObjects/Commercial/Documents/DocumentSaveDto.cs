@@ -2,7 +2,7 @@ using Application.DataTransferObjects.Commercial.Documents.Payments;
 
 namespace Application.DataTransferObjects.Commercial.Documents
 {
-    public abstract class DocumentSaveDto<TDocumentProductSaveDto> : EntitySaveDto
+    public abstract class DocumentSaveDto<TDocumentProductSaveDto> : EntitySaveDto where TDocumentProductSaveDto : DocumentProductSaveDto
     {
         [System.Text.Json.Serialization.JsonIgnore]
         public override long Id { get; set; }

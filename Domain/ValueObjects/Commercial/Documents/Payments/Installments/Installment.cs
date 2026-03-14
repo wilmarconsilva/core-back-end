@@ -1,10 +1,10 @@
-using Domain.Exceptions;
+using Domain.Utilities.Entities;
 
 namespace Domain.ValueObjects.Commercial.Documents.Payments.Installments
 {
     public class Installment
     {
-        public decimal Value { get; private init; }
+        public decimal Value { get; private set; }
 
         public int Quantity { get; private init; }
 
@@ -17,14 +17,10 @@ namespace Domain.ValueObjects.Commercial.Documents.Payments.Installments
         /// </summary>
         private Installment() { }
 
-        public Installment(decimal value, int quantity, DownPayment? downPayment)
+        public Installment(int quantity, DownPayment? downPayment)
         {
-            string installmentFullName = $"{nameof(Payment)}.{nameof(Installment)}";
+            Validator.ValidateValue(quantity, $"A quantidade de parcelas");
 
-            ValidateValue(value, $"{installmentFullName}.{nameof(Value)}");
-            ValidateValue(quantity, $"{installmentFullName}.{nameof(Quantity)}");
-
-            Value = value;
             Quantity = quantity;
             DownPayment = downPayment;
 
@@ -32,10 +28,17 @@ namespace Domain.ValueObjects.Commercial.Documents.Payments.Installments
                 HasDownPayment = true;
         }
 
+        public void SetValue(decimal valueTotal)
+        {
+            decimal value = valueTotal / Quantity;
+            Validator.ValidateValue(value, "O valor da(s) parcela(s)");
+            Value = value;
+        }
+
         public bool ValidateInstallmentTotal(decimal valueTotal)
         {
             decimal downPaymentValue = DownPayment?.Value ?? 0;
-            return (Value * Quantity) == (valueTotal - downPaymentValue);
+            return (Value * Quantity) - downPaymentValue == (valueTotal - downPaymentValue);
         }
 
         public bool ValidateDownPaymentPercentage(decimal valueTotal)
@@ -46,24 +49,12 @@ namespace Domain.ValueObjects.Commercial.Documents.Payments.Installments
             return DownPayment.ValidatePercentageCorrespondsToValue(valueTotal);
         }
 
-        public bool ValidateDownPaymentNotEqualTotal(decimal valueTotal)
+        public bool ValidateDownPaymentValueLessThanTotal(decimal valueTotal)
         {
             if (DownPayment == null)
                 return true;
 
-            return DownPayment.ValidateNotEqualTotal(valueTotal);
-        }
-
-        private static void ValidateValue(decimal value, string propertyName)
-        {
-            if (value <= 0)
-                throw new BusinessRuleException($"{propertyName} deve ser maior que zero.");
-        }
-
-        private static void ValidateValue(int value, string propertyName)
-        {
-            if (value <= 0)
-                throw new BusinessRuleException($"{propertyName} deve ser maior que zero.");
+            return DownPayment.ValidateValueLessThanTotal(valueTotal);
         }
     }
 }

@@ -7,9 +7,7 @@ namespace Application.Mappings.Commercial.Documents.Budgets
     {
         public DownPaymentProfile()
         {
-            CreateMap<DownPaymentSaveDto, DownPayment>().ConstructUsing((src, ctx) =>
-                new DownPayment(src.Value, src.Percentage, src.Method)
-            );
+
         }
     }
 }

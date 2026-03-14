@@ -27,7 +27,9 @@ namespace Domain.Utilities.Entities
                 }
                 else
                 {
-                    entity.SetFatherEntityId(fatherEntityId);
+                    if (fatherEntityId > 0)
+                        entity.SetFatherEntityId(fatherEntityId);
+
                     current.Add(entity);
                 }
             }

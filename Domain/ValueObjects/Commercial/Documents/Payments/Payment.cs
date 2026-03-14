@@ -21,9 +21,7 @@ namespace Domain.ValueObjects.Commercial.Documents.Payments
 
         public Payment(PaymentMethod method, decimal discountValue, Installment? installment)
         {
-            string paymentFullName = $"{nameof(Payment)}";
-
-            Validator.ValidateEnum(method, $"{paymentFullName}.{nameof(Method)}");
+            Validator.ValidateEnum(method, $"O método de pagamento");
 
             Method = method;
             DiscountValue = discountValue;

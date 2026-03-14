@@ -6,7 +6,6 @@ namespace Application.DataTransferObjects.Commercial.Documents.Payments.Installm
     {
         public InstallmentSaveDtoValidator(IValidator<DownPaymentSaveDto> downPaymentSaveDtoValidator)
         {
-            RequiredNumber(i => i.Value);
             RequiredNumber(i => i.Quantity);
             When(i => i.DownPayment is not null, () =>
             {

@@ -20,7 +20,7 @@ namespace Domain.Entities.Commercial.Documents
 
         protected override string GetDescription()
         {
-            return $"{nameof(Product)}: {ProductId} of {nameof(Document<DocumentProduct>)}: {DocumentId}";
+            return $"Produto: {ProductId} do documento: {DocumentId}";
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Domain.Entities.Commercial.Documents
             ValueTotal = valueTotal;
 
             if ((quantity * valueUnit) != valueTotal)
-                throw new BusinessRuleException($"{ValueTotal} não corresponde com o resultado do cálculo: {Quantity} x {ValueUnit}");
+                throw new BusinessRuleException($"O valor total do produto de código: {ProductId} não corresponde com a sua quantidade multiplicada pelo seu valor unitário.");
         }
 
         private void SetProductId(long productId)
