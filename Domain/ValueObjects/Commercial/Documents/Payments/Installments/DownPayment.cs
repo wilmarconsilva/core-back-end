@@ -18,7 +18,7 @@ namespace Domain.ValueObjects.Commercial.Documents.Payments.Installments
 
         public DownPayment(decimal value, decimal percentage, PaymentMethod method)
         {
-            string downPaymentFullName = $"{typeof(DownPayment).FullName}";
+            string downPaymentFullName = $"{nameof(Payment)}.{nameof(Installment)}.{nameof(DownPayment)}";
 
             Validator.ValidateValue(value, $"{downPaymentFullName}.{nameof(Value)}");
             Validator.ValidateValue(percentage, $"{downPaymentFullName}.{nameof(Value)}");

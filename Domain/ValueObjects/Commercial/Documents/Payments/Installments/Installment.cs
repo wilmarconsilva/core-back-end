@@ -19,8 +19,10 @@ namespace Domain.ValueObjects.Commercial.Documents.Payments.Installments
 
         public Installment(decimal value, int quantity, DownPayment? downPayment)
         {
-            ValidateValue(value, nameof(Value));
-            ValidateValue(quantity, nameof(Quantity));
+            string installmentFullName = $"{nameof(Payment)}.{nameof(Installment)}";
+
+            ValidateValue(value, $"{installmentFullName}.{nameof(Value)}");
+            ValidateValue(quantity, $"{installmentFullName}.{nameof(Quantity)}");
 
             Value = value;
             Quantity = quantity;

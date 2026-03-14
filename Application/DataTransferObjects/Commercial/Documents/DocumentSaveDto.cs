@@ -1,5 +1,4 @@
 using Application.DataTransferObjects.Commercial.Documents.Payments;
-using Domain.ValueObjects.Commercial.Documents.Payments;
 
 namespace Application.DataTransferObjects.Commercial.Documents
 {

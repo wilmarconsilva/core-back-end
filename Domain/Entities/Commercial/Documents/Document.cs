@@ -10,7 +10,7 @@ namespace Domain.Entities.Commercial.Documents
     public abstract class Document<TProduct> : EntityWithoutDescription where TProduct : DocumentProduct
     {
         private Payment _payment = null!;
-        private List<TProduct> _products = new();
+        private readonly List<TProduct> _products = new();
 
         public DateTime CreationDateTime { get; private init; }
 
@@ -53,11 +53,15 @@ namespace Domain.Entities.Commercial.Documents
             SetUserId(userId);
             SetCustomerId(customerId);
             _payment = payment;
+
+            if (products == null || !products.Any())
+                throw new BusinessRuleException($"O Orçamento: {this.Description} deve possuir ao menos um produto.");
+
+            EntityCollection.Sync(_products, products, Id);
+
             SetValues();
             Observations = observations;
             CustomerSignatureImage = customerSignatureImage;
-
-            EntityCollection.Sync(_products, products, Id);
         }
 
         protected override string GetDescription()

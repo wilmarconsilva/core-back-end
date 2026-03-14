@@ -1,3 +1,6 @@
+using Application.DataTransferObjects.Commercial.Documents.Budgets.Validators;
+using Application.DataTransferObjects.Commercial.Documents.Payments;
+using Application.DataTransferObjects.Commercial.Documents.Payments.Installments;
 using Application.DataTransferObjects.Persons.Customers.Validators;
 using Application.Interfaces.Queries;
 using Application.Interfaces.Queries.Commercial.Documents.Budgets;

@@ -7,7 +7,7 @@ namespace Application.DataTransferObjects.Commercial.Documents.Payments
     {
         public required PaymentMethod Method { get; set; }
 
-        public required decimal DiscountValue { get; set; }
+        public decimal DiscountValue { get; set; }
 
         public InstallmentSaveDto? Installment { get; set; }
     }

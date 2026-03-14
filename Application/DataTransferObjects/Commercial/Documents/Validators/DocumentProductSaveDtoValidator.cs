@@ -1,6 +1,6 @@
 namespace Application.DataTransferObjects.Commercial.Documents.Budgets.Validators
 {
-    public abstract class DocumentProductSaveDtoValidator : Validator<DocumentProductSaveDto>
+    public abstract class DocumentProductSaveDtoValidator<TDocumentProductSaveDto> : Validator<TDocumentProductSaveDto> where TDocumentProductSaveDto : DocumentProductSaveDto
     {
         protected DocumentProductSaveDtoValidator()
         {

@@ -1,6 +1,4 @@
-﻿using Domain.ValueObjects.Commercial.Documents.Payments.Installments;
-
-namespace Application.DataTransferObjects.Commercial.Documents.Payments.Installments
+﻿namespace Application.DataTransferObjects.Commercial.Documents.Payments.Installments
 {
     public class InstallmentSaveDto
     {

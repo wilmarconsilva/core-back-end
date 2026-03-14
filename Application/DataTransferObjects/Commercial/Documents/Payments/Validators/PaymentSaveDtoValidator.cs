@@ -10,8 +10,6 @@ namespace Application.DataTransferObjects.Commercial.Documents.Budgets.Validator
         {
             RequiredEnum(p => p.Method);
 
-            RequiredNumber(p => p.DiscountValue);
-
             When(p => p.Installment is not null, () =>
             {
                 RuleFor(p => p.Installment).SetValidator(installmentSaveDtoValidator!);
