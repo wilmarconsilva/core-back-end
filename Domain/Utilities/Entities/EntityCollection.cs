@@ -1,7 +1,7 @@
 ﻿using Domain.Entities;
 using Domain.Interfaces.Entities;
 
-namespace Domain.Utilities
+namespace Domain.Utilities.Entities
 {
     internal static class EntityCollection
     {
@@ -27,7 +27,9 @@ namespace Domain.Utilities
                 }
                 else
                 {
-                    entity.SetFatherEntityId(fatherEntityId);
+                    if (fatherEntityId > 0)
+                        entity.SetFatherEntityId(fatherEntityId);
+
                     current.Add(entity);
                 }
             }

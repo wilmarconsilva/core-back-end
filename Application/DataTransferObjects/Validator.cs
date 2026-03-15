@@ -8,7 +8,7 @@ namespace Application.DataTransferObjects
     {
         #region Fields
 
-        private const string _requiredMessage = "O campo: {PropertyName} deve ser preenchido com um valor válido.";
+        protected const string _requiredMessage = "O campo: {PropertyName} deve ser preenchido com um valor válido.";
 
         #endregion Fields
 
