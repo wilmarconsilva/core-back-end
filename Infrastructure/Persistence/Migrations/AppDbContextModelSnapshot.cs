@@ -115,6 +115,105 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("budgets_products", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.Commercial.Documents.Orders.Order", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("BudgetId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("budget_id");
+
+                    b.Property<DateTime>("CreationDateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("creation_date_time");
+
+                    b.Property<long>("CustomerId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("customer_id");
+
+                    b.Property<byte[]>("CustomerSignatureImage")
+                        .HasColumnType("bytea")
+                        .HasColumnName("customer_signature_image");
+
+                    b.Property<DateTime>("LastUpdateDateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_update_date_time");
+
+                    b.Property<string>("Observations")
+                        .HasColumnType("text")
+                        .HasColumnName("observations");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("user_id");
+
+                    b.Property<decimal>("ValueSubtotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("value_subtotal");
+
+                    b.Property<decimal>("ValueTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("value_total");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BudgetId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("orders", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Commercial.Documents.Orders.OrderProduct", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("DocumentId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("document_id");
+
+                    b.Property<long>("ProductId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("product_id");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("quantity");
+
+                    b.Property<decimal>("ValueTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("value_total");
+
+                    b.Property<decimal>("ValueUnit")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("value_unit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("orders_products", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.Persons.Customers.Customer", b =>
                 {
                     b.Property<long>("Id")
@@ -343,13 +442,13 @@ namespace Infrastructure.Persistence.Migrations
                     b.HasOne("Domain.Entities.Persons.Customers.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.Persons.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.OwnsOne("Domain.ValueObjects.Commercial.Documents.Payments.Payment", "Payment", b1 =>
@@ -460,6 +559,135 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Commercial.Documents.Orders.Order", b =>
+                {
+                    b.HasOne("Domain.Entities.Commercial.Documents.Budgets.Budget", "Budget")
+                        .WithMany()
+                        .HasForeignKey("BudgetId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Domain.Entities.Persons.Customers.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Persons.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.OwnsOne("Domain.ValueObjects.Commercial.Documents.Payments.Payment", "Payment", b1 =>
+                        {
+                            b1.Property<long>("OrderId")
+                                .HasColumnType("bigint");
+
+                            b1.Property<decimal>("DiscountValue")
+                                .HasPrecision(18, 2)
+                                .HasColumnType("numeric(18,2)")
+                                .HasColumnName("payment_discount_value");
+
+                            b1.Property<bool>("HasInstallment")
+                                .HasColumnType("boolean")
+                                .HasColumnName("payment_installment_has_installment");
+
+                            b1.Property<int>("Method")
+                                .HasColumnType("integer")
+                                .HasColumnName("payment_method");
+
+                            b1.HasKey("OrderId");
+
+                            b1.ToTable("orders");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OrderId");
+
+                            b1.OwnsOne("Domain.ValueObjects.Commercial.Documents.Payments.Installments.Installment", "Installment", b2 =>
+                                {
+                                    b2.Property<long>("PaymentOrderId")
+                                        .HasColumnType("bigint");
+
+                                    b2.Property<bool>("HasDownPayment")
+                                        .HasColumnType("boolean")
+                                        .HasColumnName("payment_installment_has_down_payment");
+
+                                    b2.Property<int>("Quantity")
+                                        .HasColumnType("integer")
+                                        .HasColumnName("payment_installment_quantity");
+
+                                    b2.Property<decimal>("Value")
+                                        .HasPrecision(18, 2)
+                                        .HasColumnType("numeric(18,2)")
+                                        .HasColumnName("payment_installment_value");
+
+                                    b2.HasKey("PaymentOrderId");
+
+                                    b2.ToTable("orders");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("PaymentOrderId");
+
+                                    b2.OwnsOne("Domain.ValueObjects.Commercial.Documents.Payments.Installments.DownPayment", "DownPayment", b3 =>
+                                        {
+                                            b3.Property<long>("InstallmentPaymentOrderId")
+                                                .HasColumnType("bigint");
+
+                                            b3.Property<int>("Method")
+                                                .HasColumnType("integer")
+                                                .HasColumnName("payment_installment_down_payment_method");
+
+                                            b3.Property<decimal>("Percentage")
+                                                .HasPrecision(5, 2)
+                                                .HasColumnType("numeric(5,2)")
+                                                .HasColumnName("payment_installment_down_payment_percentage");
+
+                                            b3.Property<decimal>("Value")
+                                                .HasPrecision(18, 2)
+                                                .HasColumnType("numeric(18,2)")
+                                                .HasColumnName("payment_installment_down_payment_value");
+
+                                            b3.HasKey("InstallmentPaymentOrderId");
+
+                                            b3.ToTable("orders");
+
+                                            b3.WithOwner()
+                                                .HasForeignKey("InstallmentPaymentOrderId");
+                                        });
+
+                                    b2.Navigation("DownPayment");
+                                });
+
+                            b1.Navigation("Installment");
+                        });
+
+                    b.Navigation("Budget");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Payment")
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Commercial.Documents.Orders.OrderProduct", b =>
+                {
+                    b.HasOne("Domain.Entities.Commercial.Documents.Orders.Order", null)
+                        .WithMany("Products")
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Domain.Entities.Persons.Customers.CustomerAddress", b =>
                 {
                     b.HasOne("Domain.Entities.Persons.Customers.Customer", null)
@@ -498,6 +726,11 @@ namespace Infrastructure.Persistence.Migrations
                 });
 
             modelBuilder.Entity("Domain.Entities.Commercial.Documents.Budgets.Budget", b =>
+                {
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Commercial.Documents.Orders.Order", b =>
                 {
                     b.Navigation("Products");
                 });
