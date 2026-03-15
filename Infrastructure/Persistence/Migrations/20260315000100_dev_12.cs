@@ -33,7 +33,6 @@ namespace Infrastructure.Persistence.Migrations
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    description = table.Column<string>(type: "text", nullable: false),
                     creation_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     last_update_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     user_id = table.Column<long>(type: "bigint", nullable: false),
@@ -75,7 +74,6 @@ namespace Infrastructure.Persistence.Migrations
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    description = table.Column<string>(type: "text", nullable: false),
                     document_id = table.Column<long>(type: "bigint", nullable: false),
                     product_id = table.Column<long>(type: "bigint", nullable: false),
                     quantity = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),

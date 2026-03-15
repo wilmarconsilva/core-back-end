@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260305020946_dev_12")]
+    [Migration("20260315000100_dev_12")]
     partial class dev_12
     {
         /// <inheritdoc />
@@ -45,11 +45,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<byte[]>("CustomerSignatureImage")
                         .HasColumnType("bytea")
                         .HasColumnName("customer_signature_image");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("description");
 
                     b.Property<DateTime>("LastUpdateDateTime")
                         .HasColumnType("timestamp with time zone")
@@ -90,11 +85,6 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("description");
 
                     b.Property<long>("DocumentId")
                         .HasColumnType("bigint")

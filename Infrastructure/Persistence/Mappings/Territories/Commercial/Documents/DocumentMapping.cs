@@ -1,4 +1,5 @@
 using Domain.Entities.Commercial.Documents;
+using Domain.Entities.Persons.Customers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -122,6 +123,11 @@ namespace Infrastructure.Persistence.Mappings.Territories.Commercial.Documents
             builder
                 .Navigation(d => d.Products)
                 .UsePropertyAccessMode(PropertyAccessMode.Field);
+        }
+
+        protected override void MapDescription(EntityTypeBuilder<TEntity> builder)
+        {
+            builder.Ignore(e => e.Description);
         }
     }
 }

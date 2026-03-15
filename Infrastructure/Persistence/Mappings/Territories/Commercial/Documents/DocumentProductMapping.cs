@@ -49,5 +49,10 @@ namespace Infrastructure.Persistence.Mappings.Territories.Commercial.Documents
                 .HasForeignKey(dp => dp.ProductId)
                 .IsRequired();
         }
+
+        protected override void MapDescription(EntityTypeBuilder<TEntity> builder)
+        {
+            builder.Ignore(e => e.Description);
+        }
     }
 }
