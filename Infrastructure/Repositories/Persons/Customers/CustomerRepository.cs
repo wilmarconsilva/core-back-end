@@ -7,9 +7,9 @@ namespace Infrastructure.Repositories.Persons.Customers
 {
     public class CustomerRepository(AppDbContext context) : RepositoryCrud<Customer>(context), ICustomerRepository
     {
-        protected override IQueryable<Customer> ApplyFetchsForGetByIds(IQueryable<Customer> query)
+        protected override IQueryable<Customer> ApplyIncludesForGetByIds(IQueryable<Customer> query)
         {
-            return query.Include("_addresses");
+            return query.Include(c => c.Addresses);
         }
     }
 }

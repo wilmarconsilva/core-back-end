@@ -20,7 +20,7 @@ namespace Domain.Entities.Persons.Customers
         /// </summary>
         private Customer() { }
 
-        public Customer(string name, PersonType personType, string document, string? email, string? stateRegistration, IEnumerable<CustomerAddress> addresses) : base(name)
+        public Customer(string name, PersonType personType, string document, string? email, string? stateRegistration, IReadOnlyCollection<CustomerAddress> addresses) : base(name)
         {
             Fill(name, personType, document, email, stateRegistration, addresses);
         }
@@ -64,7 +64,7 @@ namespace Domain.Entities.Persons.Customers
             _document = document;
         }
 
-        public void SetAddresses(IEnumerable<CustomerAddress> addresses)
+        public void SetAddresses(IReadOnlyCollection<CustomerAddress> addresses)
         {
             if (addresses == null || !addresses.Any())
                 throw new BusinessRuleException($"O Cliente: {this.Description} deve possuir ao menos um endereço.");
@@ -72,7 +72,7 @@ namespace Domain.Entities.Persons.Customers
             EntityCollection.Sync(_addresses, addresses, this.Id);
         }
 
-        public void Fill(string name, PersonType personType, string document, string? email, string? stateRegistration, IEnumerable<CustomerAddress> addresses)
+        public void Fill(string name, PersonType personType, string document, string? email, string? stateRegistration, IReadOnlyCollection<CustomerAddress> addresses)
         {
             SetPersonType(personType);
             SetAddresses(addresses);

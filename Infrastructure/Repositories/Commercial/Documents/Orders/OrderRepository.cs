@@ -4,7 +4,7 @@ using Infrastructure.Persistece;
 
 namespace Infrastructure.Repositories.Commercial.Documents.Orders
 {
-    public class OrderRepository : RepositoryCrud<Order>, IOrderRepository
+    public class OrderRepository : DocumentoRepository<Order, OrderProduct>, IOrderRepository
     {
         public OrderRepository(AppDbContext context) : base(context)
         {

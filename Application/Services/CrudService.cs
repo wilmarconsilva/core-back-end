@@ -99,30 +99,33 @@ namespace Application.Services
         {
             List<TEntity> entities = await TransformToEntity(dtos, cancellationToken);
 
-            return await this.SaveAsync(entities, cancellationToken);
+            await this.SaveAsync(entities, cancellationToken);
+
+            return entities;
         }
 
         protected static void ThrowNotFoundException(IEnumerable<long> ids)
         {
-            throw new NotFoundException($"Nenhum registro de {nameof(TEntity)} encontrado para o(s) código(s): {string.Join(",", ids)}.");
+            throw new NotFoundException(GetNotFoundMessage(ids));
         }
 
-        #endregion Protected methods
+        protected static string GetNotFoundMessage(IEnumerable<long> ids)
+        {
+            return $"Nenhum registro encontrado para o(s) código(s): {string.Join(",", ids)}.";
+        }
 
-        #region Private methods
-
-        private async Task<IEnumerable<Entity>> SaveAsync(List<TEntity> entities, CancellationToken cancellationToken)
+        protected async Task SaveAsync(List<TEntity> entities, CancellationToken cancellationToken)
         {
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             await _repositoryCrud.SaveAsync(entities, cancellationToken);
 
-            await _unitOfWork.FlushAsync(cancellationToken);
-
             await CommitAsync(cancellationToken);
-
-            return entities;
         }
+
+        #endregion Protected methods
+
+        #region Private methods
 
         private Task CommitAsync(CancellationToken cancellationToken)
         {

@@ -10,10 +10,18 @@ namespace Domain.Entities.Commercial.Documents.Orders
         /// </summary>
         public Order() { }
 
-        public Order(long userId, long customerId, Payment payment, string? observations, byte[]? customerSignatureImage, List<OrderProduct> products, long? budgetId)
+        public Order(long userId, long customerId, Payment payment, string? observations, byte[]? customerSignatureImage, IReadOnlyCollection<OrderProduct> products, long? budgetId)
             : base(userId, customerId, payment, observations, customerSignatureImage, products)
         {
             BudgetId = budgetId;
+        }
+
+        public Order(Budget budget)
+            : base(budget.UserId, budget.CustomerId, budget.Payment, budget.Observations, budget.CustomerSignatureImage,
+                   budget.Products.Select(p => new OrderProduct(p.ProductId, p.Quantity, p.ValueUnit, p.ValueTotal)).ToList())
+        {
+            BudgetId = budget.Id;
+            Budget = budget;
         }
 
         public long? BudgetId { get; set; }
