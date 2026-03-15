@@ -19,12 +19,12 @@ namespace Application.Services.Persons.Customers
 
         protected override Customer CreateEntity(CustomerSaveDto dto)
         {
-            return new Customer(dto.Name, dto.PersonType, dto.Document, dto.Email, dto.StateRegistration, _mapper.Map<IEnumerable<CustomerAddress>>(dto.Addresses));
+            return new Customer(dto.Name, dto.PersonType, dto.Document, dto.Email, dto.StateRegistration, _mapper.Map<IReadOnlyCollection<CustomerAddress>>(dto.Addresses));
         }
 
         protected override void UpdateEntity(CustomerSaveDto dto, Customer entity)
         {
-            entity.Fill(dto.Name, dto.PersonType, dto.Document, dto.Email, dto.StateRegistration, _mapper.Map<IEnumerable<CustomerAddress>>(dto.Addresses));
+            entity.Fill(dto.Name, dto.PersonType, dto.Document, dto.Email, dto.StateRegistration, _mapper.Map<IReadOnlyCollection<CustomerAddress>>(dto.Addresses));
         }
 
         protected override Task<bool> EntitiesCanBeDeleted(IEnumerable<long> ids)
