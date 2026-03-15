@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -6,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class dev_12 : Migration
+    public partial class dev_13 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -59,13 +60,13 @@ namespace Infrastructure.Persistence.Migrations
                         column: x => x.customer_id,
                         principalTable: "customers",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_budgets_users_user_id",
                         column: x => x.user_id,
                         principalTable: "users",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -97,6 +98,83 @@ namespace Infrastructure.Persistence.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "orders",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    budget_id = table.Column<long>(type: "bigint", nullable: true),
+                    creation_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    last_update_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    user_id = table.Column<long>(type: "bigint", nullable: false),
+                    customer_id = table.Column<long>(type: "bigint", nullable: false),
+                    value_subtotal = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    value_total = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    payment_method = table.Column<int>(type: "integer", nullable: false),
+                    payment_discount_value = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    payment_installment_has_installment = table.Column<bool>(type: "boolean", nullable: false),
+                    payment_installment_value = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: true),
+                    payment_installment_quantity = table.Column<int>(type: "integer", nullable: true),
+                    payment_installment_has_down_payment = table.Column<bool>(type: "boolean", nullable: true),
+                    payment_installment_down_payment_value = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: true),
+                    payment_installment_down_payment_percentage = table.Column<decimal>(type: "numeric(5,2)", precision: 5, scale: 2, nullable: true),
+                    payment_installment_down_payment_method = table.Column<int>(type: "integer", nullable: true),
+                    observations = table.Column<string>(type: "text", nullable: true),
+                    customer_signature_image = table.Column<byte[]>(type: "bytea", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_orders", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_orders_budgets_budget_id",
+                        column: x => x.budget_id,
+                        principalTable: "budgets",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_orders_customers_customer_id",
+                        column: x => x.customer_id,
+                        principalTable: "customers",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_orders_users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "orders_products",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    document_id = table.Column<long>(type: "bigint", nullable: false),
+                    product_id = table.Column<long>(type: "bigint", nullable: false),
+                    quantity = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    value_unit = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    value_total = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_orders_products", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_orders_products_orders_document_id",
+                        column: x => x.document_id,
+                        principalTable: "orders",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_orders_products_products_product_id",
+                        column: x => x.product_id,
+                        principalTable: "products",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_budgets_customer_id",
                 table: "budgets",
@@ -116,6 +194,31 @@ namespace Infrastructure.Persistence.Migrations
                 name: "IX_budgets_products_product_id",
                 table: "budgets_products",
                 column: "product_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_orders_budget_id",
+                table: "orders",
+                column: "budget_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_orders_customer_id",
+                table: "orders",
+                column: "customer_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_orders_user_id",
+                table: "orders",
+                column: "user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_orders_products_document_id",
+                table: "orders_products",
+                column: "document_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_orders_products_product_id",
+                table: "orders_products",
+                column: "product_id");
         }
 
         /// <inheritdoc />
@@ -123,6 +226,12 @@ namespace Infrastructure.Persistence.Migrations
         {
             migrationBuilder.DropTable(
                 name: "budgets_products");
+
+            migrationBuilder.DropTable(
+                name: "orders_products");
+
+            migrationBuilder.DropTable(
+                name: "orders");
 
             migrationBuilder.DropTable(
                 name: "budgets");
