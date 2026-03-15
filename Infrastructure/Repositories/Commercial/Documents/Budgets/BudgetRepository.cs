@@ -4,7 +4,7 @@ using Infrastructure.Persistece;
 
 namespace Infrastructure.Repositories.Commercial.Documents.Budgets
 {
-    public class BudgetRepository : RepositoryCrud<Budget>, IBudgetRepository
+    public class BudgetRepository : DocumentoRepository<Budget, BudgetProduct>, IBudgetRepository
     {
         public BudgetRepository(AppDbContext context) : base(context)
         {

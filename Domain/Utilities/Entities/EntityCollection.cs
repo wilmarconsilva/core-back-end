@@ -5,7 +5,7 @@ namespace Domain.Utilities.Entities
 {
     internal static class EntityCollection
     {
-        public static void Sync<TEntity>(ICollection<TEntity> current, IEnumerable<TEntity> incoming, long fatherEntityId) where TEntity : Entity, ICopyable<TEntity>, IEntityChild
+        public static void Sync<TEntity>(ICollection<TEntity> current, IReadOnlyCollection<TEntity> incoming, long fatherEntityId) where TEntity : Entity, ICopyable<TEntity>, IEntityChild
         {
             IEnumerable<long> incomingIds = incoming.Select(e => e.Id);
 

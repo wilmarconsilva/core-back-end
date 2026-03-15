@@ -2,6 +2,7 @@ using Application.DataTransferObjects.Commercial.Documents.Orders;
 using Application.Interfaces.Queries.Commercial.Documents.Orders;
 using Application.Interfaces.Services.Commercial.Documents;
 using AutoMapper;
+using Domain.Entities.Commercial.Documents.Budgets;
 using Domain.Entities.Commercial.Documents.Orders;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
@@ -18,9 +19,18 @@ namespace Application.Services.Commercial.Documents
             _mapper = mapper;
         }
 
+        public async Task<OrderSaveDto> CreateByBudgetAsync(Budget budget, CancellationToken cancellationToken)
+        {
+            Order order = new Order(budget);
+
+            await SaveAsync([order], cancellationToken);
+
+            return _mapper.Map<Order, OrderSaveDto>(order);
+        }
+
         protected override Order CreateEntity(OrderSaveDto dto)
         {
-            List<OrderProduct> products = _mapper.Map<List<OrderProduct>>(dto.Products);
+            IReadOnlyCollection<OrderProduct> products = _mapper.Map<IReadOnlyCollection<OrderProduct>>(dto.Products);
 
             Payment payment = CreatePayment(dto);
 

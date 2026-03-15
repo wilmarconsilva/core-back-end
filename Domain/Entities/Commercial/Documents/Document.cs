@@ -40,13 +40,13 @@ namespace Domain.Entities.Commercial.Documents
         /// </summary>
         protected Document() { }
 
-        protected Document(long userId, long customerId, Payment payment, string? observations, byte[]? customerSignatureImage, List<TProduct> products)
+        protected Document(long userId, long customerId, Payment payment, string? observations, byte[]? customerSignatureImage, IReadOnlyCollection<TProduct> products)
         {
             CreationDateTime = DateTime.UtcNow;
             Fill(userId, customerId, payment, observations, customerSignatureImage, products);
         }
 
-        public void Fill(long userId, long customerId, Payment payment, string? observations, byte[]? customerSignatureImage, List<TProduct> products)
+        public void Fill(long userId, long customerId, Payment payment, string? observations, byte[]? customerSignatureImage, IReadOnlyCollection<TProduct> products)
         {
             LastUpdateDateTime = DateTime.UtcNow;
             SetUserId(userId);

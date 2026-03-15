@@ -1,8 +1,6 @@
-using Application.DataTransferObjects;
 using Application.DataTransferObjects.Commercial.Documents.Budgets;
 using Application.DataTransferObjects.Commercial.Documents.Orders;
 using Application.Interfaces.Services.Commercial.Documents;
-using Domain.Entities;
 using Domain.Interfaces.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,13 +17,13 @@ namespace REST.Controllers.Commercial.Documents
             _service = service;
         }
 
-        [HttpPost]
-        public async Task<ActionResult<OrderSaveDto>> CreateOrderByBudget(long id, CancellationToken cancellationToken)
+        [HttpPost("{id}/orders")]
+        public async Task<ActionResult<OrderSaveDto>> CreateOrderByBudget([FromRoute] long id, CancellationToken cancellationToken)
         {
             return await ProcessRequestAsync<OrderSaveDto>(async () =>
             {
                 OrderSaveDto orderSaveDto = await _service.CreateOrderByBudget(id, cancellationToken);
-                return CreatedAtAction(nameof(GetById), nameof(OrdersController), new { id = orderSaveDto.Id }, orderSaveDto);
+                return CreatedAtAction(nameof(OrdersController.GetById), nameof(OrdersController).Replace("Controller", string.Empty), new { id = orderSaveDto.Id }, orderSaveDto);
             }, cancellationToken);
         }
     }

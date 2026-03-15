@@ -28,14 +28,21 @@ namespace Domain.Entities.Commercial.Documents
         /// </summary>
         protected DocumentProduct() { }
 
+        public DocumentProduct(long productId, decimal quantity, decimal valueUnit, decimal valueTotal)
+        {
+            Fill(productId, quantity, valueUnit, valueTotal);
+        }
+
         public DocumentProduct(long documentId, long productId, decimal quantity, decimal valueUnit, decimal valueTotal)
         {
-            Fill(documentId, productId, quantity, valueUnit, valueTotal);
+            SetDocumentId(documentId);
+
+            Fill(productId, quantity, valueUnit, valueTotal);
         }
 
         public void Copy(DocumentProduct product)
         {
-            Fill(product.DocumentId, product.ProductId, product.Quantity, product.ValueUnit, product.ValueTotal);
+            Fill(product.ProductId, product.Quantity, product.ValueUnit, product.ValueTotal);
         }
 
         public void SetFatherEntityId(long id)
@@ -43,10 +50,8 @@ namespace Domain.Entities.Commercial.Documents
             SetDocumentId(id);
         }
 
-        private void Fill(long documentId, long productId, decimal quantity, decimal valueUnit, decimal valueTotal)
+        private void Fill(long productId, decimal quantity, decimal valueUnit, decimal valueTotal)
         {
-            SetDocumentId(documentId);
-
             SetProductId(productId);
 
             SetValues(quantity, valueUnit, valueTotal);

@@ -30,7 +30,7 @@ namespace Infrastructure.Repositories
         {
             IQueryable<TEntity> query = _entityDbSet.Where(e => ids.Contains(e.Id));
 
-            return ApplyFetchsForGetByIds(query).ToListAsync(cancellationToken);
+            return ApplyIncludesForGetByIds(query).ToListAsync(cancellationToken);
         }
 
         public async Task<IReadOnlyList<long>> GetIdsAsync(IEnumerable<long> ids, CancellationToken cancellationToken)
@@ -60,7 +60,7 @@ namespace Infrastructure.Repositories
 
         #region Protected methods
 
-        protected virtual IQueryable<TEntity> ApplyFetchsForGetByIds(IQueryable<TEntity> query)
+        protected virtual IQueryable<TEntity> ApplyIncludesForGetByIds(IQueryable<TEntity> query)
         {
             return query;
         }
