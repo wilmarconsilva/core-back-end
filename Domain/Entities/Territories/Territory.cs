@@ -1,3 +1,5 @@
+using Domain.Utilities.Entities;
+
 namespace Domain.Entities.Territories
 {
     public abstract class Territory : Entity
@@ -13,7 +15,7 @@ namespace Domain.Entities.Territories
 
         private void SetAcronym(string acronym)
         {
-            ValidateValue(acronym, nameof(Acronym));
+            Validator.ValidateValue(acronym, nameof(Acronym));
             _acronym = acronym;
         }
     }

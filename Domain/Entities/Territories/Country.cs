@@ -1,3 +1,5 @@
+using Domain.Utilities.Entities;
+
 namespace Domain.Entities.Territories
 {
     public class Country : Territory
@@ -10,7 +12,7 @@ namespace Domain.Entities.Territories
 
         private void SetDescription(string description)
         {
-            ValidateValue(description, nameof(Description));
+            Validator.ValidateValue(description, nameof(Description));
             _description = description;
         }
     }

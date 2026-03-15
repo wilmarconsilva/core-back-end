@@ -1,3 +1,5 @@
+using Domain.Utilities.Entities;
+
 namespace Domain.Entities.Persons
 {
     public abstract class Person : Entity
@@ -26,7 +28,7 @@ namespace Domain.Entities.Persons
 
         protected void SetName(string name)
         {
-            ValidateValue(name, nameof(Name));
+            Validator.ValidateValue(name, nameof(Name));
 
             _name = name;
         }

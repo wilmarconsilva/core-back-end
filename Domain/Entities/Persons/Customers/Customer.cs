@@ -1,5 +1,5 @@
 using Domain.Exceptions;
-using Domain.Utilities;
+using Domain.Utilities.Entities;
 using Domain.ValueObjects.Persons.Enums;
 
 namespace Domain.Entities.Persons.Customers
@@ -59,7 +59,7 @@ namespace Domain.Entities.Persons.Customers
 
         public void SetDocument(string document)
         {
-            ValidateValue(document, nameof(Document));
+            Validator.ValidateValue(document, nameof(Document));
 
             _document = document;
         }
