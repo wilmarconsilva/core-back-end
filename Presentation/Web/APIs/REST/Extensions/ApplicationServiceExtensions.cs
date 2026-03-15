@@ -4,6 +4,7 @@ using Application.DataTransferObjects.Commercial.Documents.Payments.Installments
 using Application.DataTransferObjects.Persons.Customers.Validators;
 using Application.Interfaces.Queries;
 using Application.Interfaces.Queries.Commercial.Documents.Budgets;
+using Application.Interfaces.Queries.Commercial.Documents.Orders;
 using Application.Interfaces.Queries.Persons.Customers;
 using Application.Interfaces.Services;
 using Application.Interfaces.Services.Commercial.Documents;
@@ -15,6 +16,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Queries;
 using Infrastructure.Queries.Commercial.Documents.Budgets;
+using Infrastructure.Queries.Commercial.Documents.Orders;
 using Infrastructure.Queries.Persons.Customers;
 
 namespace Presentation.Web.APIs.REST.Extensions;
@@ -33,6 +35,7 @@ public static class ApplicationServiceExtensions
         AddCustomerServices(services);
         AddProductServices(services);
         AddBudgetServices(services);
+        AddOrderServices(services);
 
         return services;
     }
@@ -64,5 +67,11 @@ public static class ApplicationServiceExtensions
     {
         services.AddScoped<IBudgetService, BudgetService>();
         services.AddScoped<IBudgetQuery, BudgetQuery>();
+    }
+
+    private static void AddOrderServices(IServiceCollection services)
+    {
+        services.AddScoped<IOrderService, OrderService>();
+        services.AddScoped<IOrderQuery, OrderQuery>();
     }
 }

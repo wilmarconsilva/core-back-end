@@ -2,6 +2,7 @@ using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
 using Infrastructure.Persistece;
 using Infrastructure.Repositories.Commercial.Documents.Budgets;
+using Infrastructure.Repositories.Commercial.Documents.Orders;
 using Infrastructure.Repositories.Persons.Customers;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,5 +37,6 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IBudgetRepository, BudgetRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
     }
 }

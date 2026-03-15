@@ -106,12 +106,14 @@ namespace Infrastructure.Persistence.Mappings.Territories.Commercial.Documents
             builder.HasOne(d => d.User)
                 .WithMany()
                 .HasForeignKey(d => d.UserId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(d => d.Customer)
                 .WithMany()
                 .HasForeignKey(d => d.CustomerId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Mapeamento da coleção de DocumentProducts (filhos) via campo privado
             builder

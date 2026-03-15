@@ -11,6 +11,8 @@ namespace Application.DataTransferObjects.Commercial.Documents
 
         public required long CustomerId { get; set; }
 
+        public long? BudgetId { get; set; }
+
         public required PaymentSaveDto Payment { get; set; }
 
         public string? Observations { get; set; }
