@@ -9,7 +9,7 @@ namespace REST.Controllers
     [ApiController]
     public abstract class CrudController<TEntitySaveDto> : Controller where TEntitySaveDto : EntitySaveDto
     {
-        protected readonly ICrudService<TEntitySaveDto> _service;
+        private readonly ICrudService<TEntitySaveDto> _service;
 
         protected CrudController(ICrudService<TEntitySaveDto> service, ILogger logger, IUnitOfWork unitOfWork) : base(logger, unitOfWork)
         {

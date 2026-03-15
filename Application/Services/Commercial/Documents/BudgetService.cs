@@ -1,8 +1,11 @@
 using Application.DataTransferObjects.Commercial.Documents.Budgets;
+using Application.DataTransferObjects.Commercial.Documents.Orders;
 using Application.Interfaces.Queries.Commercial.Documents.Budgets;
 using Application.Interfaces.Services.Commercial.Documents;
 using AutoMapper;
 using Domain.Entities.Commercial.Documents.Budgets;
+using Domain.Entities.Commercial.Documents.Orders;
+using Domain.Exceptions;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
 using Domain.ValueObjects.Commercial.Documents.Payments;
@@ -33,6 +36,19 @@ namespace Application.Services.Commercial.Documents
             Payment payment = CreatePayment(dto);
 
             entity.Fill(dto.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products);
+        }
+
+        public async Task<OrderSaveDto> CreateOrderByBudget(long id, CancellationToken cancellationToken)
+        {
+            Budget? budget = (await _repositoryCrud.?([id], cancellationToken)).FirstOrDefault();
+
+            if (budget == null)
+                throw new BusinessRuleException("Orçamento não encontrado. Por favor, tente novamente ou contate o suporte.");
+
+            Order order = new Order(budget);
+            OrderSaveDto orderSaveDto = _mapper.Map<OrderSaveDto>(order);
+
+            return orderSaveDto;
         }
 
         protected override Task<bool> EntitiesCanBeDeleted(IEnumerable<long> ids)
