@@ -19,7 +19,7 @@ namespace REST.Controllers.Commercial.Documents
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<OrderReport>>> GetAll([FromQuery] DocumentReportFilter filter, CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<OrderReport>>> Get([FromQuery] DocumentReportFilter filter, CancellationToken cancellationToken)
         {
             return await ProcessRequestAsync<IEnumerable<OrderReport>>(async () =>
             {

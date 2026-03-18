@@ -1,6 +1,8 @@
+using Domain.ValueObjects.Enums;
+
 namespace Application.DataTransferObjects.Commercial.Documents
 {
-    public abstract class DocumentReport<TDocumentProductReport> where TDocumentProductReport : DocumentProductReport
+    public abstract class DocumentReport
     {
         public string CreationDateTimeDescription { get; set; } = null!;
 
@@ -10,7 +12,9 @@ namespace Application.DataTransferObjects.Commercial.Documents
 
         public decimal ValueTotal { get; set; }
 
-        public string PaymentMethodDescription { get; set; } = null!;
+        public PaymentMethod PaymentMethod { private get; set; }
+
+        public string PaymentMethodDescription => PaymentMethod.GetDescription();
 
         public decimal PaymentDiscountValue { get; set; }
 
@@ -22,7 +26,9 @@ namespace Application.DataTransferObjects.Commercial.Documents
 
         public decimal? PaymentInstallmentDownPaymentPercentage { get; set; }
 
-        public string? PaymentInstallmentDownPaymentMethodDescription { get; set; }
+        public PaymentMethod? PaymentInstallmentDownPaymentMethod { private get; set; }
+
+        public string? PaymentInstallmentDownPaymentMethodDescription => PaymentInstallmentDownPaymentMethod?.GetDescription();
 
         public string? Observations { get; set; }
 

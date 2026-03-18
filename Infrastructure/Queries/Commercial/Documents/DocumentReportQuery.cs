@@ -1,18 +1,14 @@
 using Application.DataTransferObjects.Commercial.Documents;
 using Application.Interfaces.Queries.Commercial.Documents;
-using Domain.Entities.Commercial.Documents;
-using Domain.ValueObjects.Enums;
 using Infrastructure.Persistece;
 using Microsoft.EntityFrameworkCore;
+using System.Data.Common;
+using System.Text;
 
 namespace Infrastructure.Queries.Commercial.Documents
 {
-    public abstract class DocumentReportQuery<TDocument, TDocumentProduct, TDocumentReport, TDocumentProductReport>
-        : ReportQuery<TDocument, TDocumentReport, DocumentReportFilter>, IDocumentReportQuery<TDocumentReport, TDocumentProductReport>
-        where TDocument : Document<TDocumentProduct>
-        where TDocumentProduct : DocumentProduct
-        where TDocumentReport : DocumentReport<TDocumentProductReport>, new()
-        where TDocumentProductReport : DocumentProductReport
+    public abstract class DocumentReportQuery<TDocumentReport> : ReportQuery<TDocumentReport, DocumentReportFilter>, IDocumentReportQuery<TDocumentReport>
+        where TDocumentReport : DocumentReport
     {
         protected DocumentReportQuery(AppDbContext context) : base(context)
         {
@@ -20,69 +16,99 @@ namespace Infrastructure.Queries.Commercial.Documents
 
         public override async Task<IEnumerable<TDocumentReport>> Get(DocumentReportFilter filter, CancellationToken cancellationToken)
         {
-            IQueryable<TDocument> query = ApplyFilter(filter);
+            List<DbParameter> parameters = [];
+            string sql = GetSql(filter, parameters);
 
-            List<TDocument> entities = await ApplyIncludes(query).ToListAsync(cancellationToken);
-
-            return entities.Select(d =>
-            {
-                TDocumentReport report = MapCommonProperties(d);
-                MapExtraProperties(report, d);
-                return report;
-            });
+            return await _context.Database
+                .SqlQueryRaw<TDocumentReport>(sql, GetParameters(parameters))
+                .ToListAsync(cancellationToken);
         }
 
-        protected virtual IQueryable<TDocument> ApplyIncludes(IQueryable<TDocument> query)
-        {
-            return query
-                .Include(d => d.User)
-                .Include(d => d.Customer)
-                    .ThenInclude(c => c!.Addresses)
-                    .ThenInclude(a => a.Locality)
-                    .ThenInclude(l => l!.State);
-        }
+        protected virtual string GetExtraSelectColumns() => "";
 
-        protected virtual void MapExtraProperties(TDocumentReport report, TDocument document) { }
+        protected virtual string GetExtraJoins() => "";
 
-        private IQueryable<TDocument> ApplyFilter(DocumentReportFilter filter)
+        private string GetSql(DocumentReportFilter filter, List<DbParameter> parameters)
         {
-            IQueryable<TDocument> query = _query;
+            StringBuilder where = new();
+            using DbCommand command = CreateCommand();
 
             if (filter.CreationDateTimeStart.HasValue)
-                query = query.Where(d => d.CreationDateTime >= filter.CreationDateTimeStart.Value);
+            {
+                string parameterName = "@creation_date_time_start";
+                where.Append($" AND d.creation_date_time >= {parameterName}");
+                AddParameter(command, parameters, parameterName, filter.CreationDateTimeStart.Value);
+            }
 
             if (filter.CreationDateTimeEnd.HasValue)
-                query = query.Where(d => d.CreationDateTime <= filter.CreationDateTimeEnd.Value);
+            {
+                string parameterName = "@creation_date_time_end";
+                where.Append($" AND d.creation_date_time <= {parameterName}");
+                AddParameter(command, parameters, parameterName, filter.CreationDateTimeEnd.Value);
+            }
 
             if (filter.LastUpdateDateTimeStart.HasValue)
-                query = query.Where(d => d.LastUpdateDateTime >= filter.LastUpdateDateTimeStart.Value);
+            {
+                string parameterName = "@update_date_time_start";
+                where.Append($" AND d.last_update_date_time >= {parameterName}");
+                AddParameter(command, parameters, parameterName, filter.LastUpdateDateTimeStart.Value);
+            }
 
             if (filter.LastUpdateDateTimeEnd.HasValue)
-                query = query.Where(d => d.LastUpdateDateTime <= filter.LastUpdateDateTimeEnd.Value);
-
-            return query;
-        }
-
-        private TDocumentReport MapCommonProperties(TDocument d)
-        {
-            return new TDocumentReport
             {
-                CreationDateTimeDescription = d.CreationDateTime.ToShortDateString(),
-                LastUpdateDateTimeDescription = d.LastUpdateDateTime.ToShortDateString(),
-                ValueSubtotal = d.ValueSubtotal,
-                ValueTotal = d.ValueTotal,
-                PaymentMethodDescription = d.Payment.Method.GetDescription(),
-                PaymentDiscountValue = d.Payment.DiscountValue,
-                PaymentInstallmentValue = d.Payment.Installment?.Value,
-                PaymentInstallmentQuantity = d.Payment.Installment?.Quantity,
-                PaymentInstallmentDownPaymentValue = d.Payment.Installment?.DownPayment?.Value,
-                PaymentInstallmentDownPaymentPercentage = d.Payment.Installment?.DownPayment?.Percentage,
-                PaymentInstallmentDownPaymentMethodDescription = d.Payment.Installment?.DownPayment?.Method.GetDescription(),
-                Observations = d.Observations,
-                UserName = d.User!.Name,
-                CustomerName = d.Customer!.Description,
-                CustomerAddressCityState = $"{d.Customer.Addresses.First().Locality!.Description} - {d.Customer.Addresses.First().Locality!.State!.Acronym}"
-            };
+                string parameterName = "@update_date_time_end";
+                where.Append($" AND d.last_update_date_time <= {parameterName}");
+                AddParameter(command, parameters, parameterName, filter.LastUpdateDateTimeEnd.Value);
+            }
+
+            string dateTimePattern = "'DD/MM/YYYY'";
+
+            return $"""
+                SELECT
+                    to_char(d.creation_date_time, {dateTimePattern}) AS "{nameof(DocumentReport.CreationDateTimeDescription)}",
+                    to_char(d.last_update_date_time, {dateTimePattern}) AS "{nameof(DocumentReport.LastUpdateDateTimeDescription)}",
+                    d.value_subtotal AS "{nameof(DocumentReport.ValueSubtotal)}",
+                    d.value_total AS "{nameof(DocumentReport.ValueTotal)}",
+                    d.payment_method AS "{nameof(DocumentReport.PaymentMethod)}",
+                    d.payment_discount_value AS "{nameof(DocumentReport.PaymentDiscountValue)}",
+                    CASE
+                        WHEN d.payment_installment_has_installment THEN d.payment_installment_quantity::numeric
+                        ELSE NULL
+                    END AS "{nameof(DocumentReport.PaymentInstallmentQuantity)}",
+                    CASE
+                        WHEN d.payment_installment_has_installment THEN d.payment_installment_value
+                        ELSE NULL
+                    END AS "{nameof(DocumentReport.PaymentInstallmentValue)}",
+                    CASE
+                        WHEN COALESCE(d.payment_installment_has_down_payment, false) THEN d.payment_installment_down_payment_value
+                        ELSE NULL
+                    END AS "{nameof(DocumentReport.PaymentInstallmentDownPaymentValue)}",
+                    CASE
+                        WHEN COALESCE(d.payment_installment_has_down_payment, false) THEN d.payment_installment_down_payment_percentage
+                        ELSE NULL
+                    END AS "{nameof(DocumentReport.PaymentInstallmentDownPaymentPercentage)}",
+                    d.payment_installment_has_down_payment AS "{nameof(DocumentReport.PaymentInstallmentDownPaymentMethod)}",
+                    d.observations AS "{nameof(DocumentReport.Observations)}",
+                    u.name AS "{nameof(DocumentReport.UserName)}",
+                    c.name AS "{nameof(DocumentReport.CustomerName)}",
+                    COALESCE(addr.locality_description, '') || ' - ' || COALESCE(addr.state_acronym, '') AS "{nameof(DocumentReport.CustomerAddressCityState)}"
+                    {GetExtraSelectColumns()}
+                FROM {GetTableName()} d
+                INNER JOIN users u ON u.id = d.user_id
+                INNER JOIN customers c ON c.id = d.customer_id
+                LEFT JOIN LATERAL (
+                    SELECT l.description AS locality_description, s.acronym AS state_acronym
+                    FROM customers_addresses ca
+                    INNER JOIN localities l ON l.id = ca.locality_id
+                    INNER JOIN states s ON s.id = l.state_id
+                    WHERE ca.customer_id = d.customer_id
+                    ORDER BY ca.id
+                    LIMIT 1
+                ) addr ON true
+                {GetExtraJoins()}
+                WHERE 1 = 1{where}
+                """;
         }
+
     }
 }

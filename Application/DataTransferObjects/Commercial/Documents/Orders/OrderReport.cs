@@ -1,7 +1,7 @@
 namespace Application.DataTransferObjects.Commercial.Documents.Orders
 {
-    public class OrderReport : DocumentReport<OrderProductReport>
+    public class OrderReport : DocumentReport
     {
-        public long? BudgetId { get; set; }
+
     }
 }
