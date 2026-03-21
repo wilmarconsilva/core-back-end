@@ -1,6 +1,6 @@
 using Domain.ValueObjects.Enums;
 
-namespace Application.DataTransferObjects.Commercial.Documents
+namespace Application.DataTransferObjects.Commercial.Documents.DocumentsReports
 {
     public abstract class DocumentReport
     {

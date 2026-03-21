@@ -3,7 +3,7 @@ using Application.Interfaces.Services.Commercial.Documents;
 using Domain.Interfaces.Data;
 using Microsoft.AspNetCore.Mvc;
 
-namespace REST.Controllers.Commercial.Documents
+namespace REST.Controllers.Commercial.Documents.Orders
 {
     [ApiController]
     [Route("[controller]")]

@@ -1,5 +1,4 @@
-using Application.DataTransferObjects.Commercial.Documents;
-using Application.Interfaces.Queries.Commercial.Documents;
+using Application.DataTransferObjects.Commercial.Documents.DocumentsReports;
 using Infrastructure.Persistece;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
@@ -7,14 +6,15 @@ using System.Text;
 
 namespace Infrastructure.Queries.Commercial.Documents
 {
-    public abstract class DocumentReportQuery<TDocumentReport> : ReportQuery<TDocumentReport, DocumentReportFilter>, IDocumentReportQuery<TDocumentReport>
+    public abstract class DocumentReportQuery<TDocumentReport, TDocumentReportFilter> : ReportQuery<TDocumentReport, TDocumentReportFilter>
         where TDocumentReport : DocumentReport
+        where TDocumentReportFilter : DocumentReportFilter
     {
         protected DocumentReportQuery(AppDbContext context) : base(context)
         {
         }
 
-        public override async Task<IEnumerable<TDocumentReport>> Get(DocumentReportFilter filter, CancellationToken cancellationToken)
+        public override async Task<List<TDocumentReport>> Get(TDocumentReportFilter filter, CancellationToken cancellationToken)
         {
             List<DbParameter> parameters = [];
             string sql = GetSql(filter, parameters);

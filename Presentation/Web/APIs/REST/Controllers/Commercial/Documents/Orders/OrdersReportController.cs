@@ -1,10 +1,10 @@
-using Application.DataTransferObjects.Commercial.Documents;
-using Application.DataTransferObjects.Commercial.Documents.Orders;
+using Application.DataTransferObjects.Commercial.Documents.Orders.Reports;
+using Application.DataTransferObjects.Listings.Commercial.Documents.Orders;
 using Application.Interfaces.Queries.Commercial.Documents.Orders;
 using Domain.Interfaces.Data;
 using Microsoft.AspNetCore.Mvc;
 
-namespace REST.Controllers.Commercial.Documents
+namespace REST.Controllers.Commercial.Documents.Orders
 {
     [ApiController]
     [Route("[controller]")]
@@ -19,12 +19,12 @@ namespace REST.Controllers.Commercial.Documents
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<OrderReport>>> Get([FromQuery] DocumentReportFilter filter, CancellationToken cancellationToken)
+        public async Task<ActionResult<OrderReportListing>> Get([FromQuery] OrderReportFilter filter, CancellationToken cancellationToken)
         {
-            return await ProcessRequestAsync<IEnumerable<OrderReport>>(async () =>
+            return await ProcessRequestAsync<OrderReportListing>(async () =>
             {
-                IEnumerable<OrderReport> reports = await _query.Get(filter, cancellationToken);
-                return Ok(reports);
+                OrderReportListing listing = await _query.Get(filter, cancellationToken);
+                return Ok(listing);
             }, cancellationToken);
         }
     }

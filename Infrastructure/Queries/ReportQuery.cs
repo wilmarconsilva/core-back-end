@@ -12,7 +12,7 @@ namespace Infrastructure.Queries
         {
         }
 
-        public abstract Task<IEnumerable<TReport>> Get(TFilter filter, CancellationToken cancellationToken);
+        public abstract Task<List<TReport>> Get(TFilter filter, CancellationToken cancellationToken);
 
         protected abstract string GetTableName();
 

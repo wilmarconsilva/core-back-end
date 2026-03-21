@@ -1,4 +1,4 @@
-using Application.DataTransferObjects.Commercial.Documents.Orders;
+using Application.DataTransferObjects.Commercial.Documents.Orders.Reports;
 using Application.Interfaces.Queries.Commercial.Documents.Orders;
 using Infrastructure.Persistece;
 
