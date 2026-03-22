@@ -18,7 +18,8 @@ using Infrastructure.Queries;
 using Infrastructure.Queries.Commercial.Documents.Budgets;
 using Infrastructure.Queries.Commercial.Documents.Orders;
 using Infrastructure.Queries.Persons.Customers;
-using Application.Interfaces.Queries.Commercial.Documents.Orders;
+using Application.Services.Commercial.Documents.Orders;
+using Application.Interfaces.Services.Commercial.Documents.Orders;
 
 namespace Presentation.Web.APIs.REST.Extensions;
 
@@ -73,6 +74,7 @@ public static class ApplicationServiceExtensions
     private static void AddOrderServices(IServiceCollection services)
     {
         services.AddScoped<IOrderService, OrderService>();
+        services.AddScoped<IOrderReportService, OrderReportService>();
         services.AddScoped<IOrderQuery, OrderQuery>();
         services.AddScoped<IOrderReportQuery, OrderReportQuery>();
     }

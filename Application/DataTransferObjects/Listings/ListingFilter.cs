@@ -18,16 +18,16 @@ namespace Application.DataTransferObjects.Listings
         protected ListingFilter(int registersStart, int registersEnd)
         {
             SetRegistersStart(registersStart);
-            SetRegistersStart(registersEnd);
+            SetRegistersEnd(registersEnd);
         }
 
-        public int RegistersStart { get => _registersStart; }
+        public int RegistersStart { get => _registersStart; init => SetRegistersStart(value); }
 
-        public int RegistersEnd { get => _registersEnd; }
+        public int RegistersEnd { get => _registersEnd; init => SetRegistersEnd(value); }
 
         public void SetRegistersStart(int registersStart)
         {
-            if (registersStart <= RegistersStartDefault)
+            if (registersStart >= RegistersStartDefault)
                 _registersStart = registersStart;
             else
                 throw new BusinessRuleException(GetMinValueExceptionMessage(registersStart, RegistersStartDefault));

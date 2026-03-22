@@ -1,7 +1,10 @@
+using Application.DataTransferObjects.Listings;
+
 namespace Application.Interfaces.Queries
 {
-    public interface IReportQuery<TReport, TFilter>
+    public interface IReportQuery<TReport, TListingFilter> where TReport : class where TListingFilter : ListingFilter
+
     {
-        Task<List<TReport>> Get(TFilter filter, CancellationToken cancellationToken);
+        Task<List<TReport>> GetAsync(TListingFilter filter, CancellationToken cancellationToken);
     }
 }

@@ -1,4 +1,5 @@
-using Application.DataTransferObjects;
+using Application.DataTransferObjects.Entities;
+using Application.DataTransferObjects.Listings;
 using Application.Interfaces.Queries;
 using Application.Interfaces.Services;
 using Domain.Entities;
@@ -85,6 +86,10 @@ namespace Application.Services
             await DeleteAsync([id], cancellationToken);
         }
 
+        public abstract Task<List<TListing>> GetAllAsync<TListing, TFilter>(TFilter filter, CancellationToken cancellationToken)
+            where TListing : EntityListing
+            where TFilter : EntityListingFilter;
+
         #endregion Public methods
 
         #region Protected methods
@@ -95,15 +100,6 @@ namespace Application.Services
 
         protected abstract Task<bool> EntitiesCanBeDeleted(IEnumerable<long> ids);
 
-        protected async Task<IEnumerable<Entity>> SaveAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
-        {
-            List<TEntity> entities = await TransformToEntity(dtos, cancellationToken);
-
-            await this.SaveAsync(entities, cancellationToken);
-
-            return entities;
-        }
-
         protected static void ThrowNotFoundException(IEnumerable<long> ids)
         {
             throw new NotFoundException(GetNotFoundMessage(ids));
@@ -112,6 +108,15 @@ namespace Application.Services
         protected static string GetNotFoundMessage(IEnumerable<long> ids)
         {
             return $"Nenhum registro encontrado para o(s) código(s): {string.Join(",", ids)}.";
+        }
+
+        protected async Task<IEnumerable<Entity>> SaveAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
+        {
+            List<TEntity> entities = await TransformToEntity(dtos, cancellationToken);
+
+            await this.SaveAsync(entities, cancellationToken);
+
+            return entities;
         }
 
         protected async Task SaveAsync(List<TEntity> entities, CancellationToken cancellationToken)

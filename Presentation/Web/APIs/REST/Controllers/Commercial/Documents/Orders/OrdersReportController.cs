@@ -1,6 +1,6 @@
+using Application.DataTransferObjects.Commercial.Documents.Orders;
 using Application.DataTransferObjects.Commercial.Documents.Orders.Reports;
-using Application.DataTransferObjects.Listings.Commercial.Documents.Orders;
-using Application.Interfaces.Queries.Commercial.Documents.Orders;
+using Application.Interfaces.Services.Commercial.Documents.Orders;
 using Domain.Interfaces.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,12 +10,12 @@ namespace REST.Controllers.Commercial.Documents.Orders
     [Route("[controller]")]
     public class OrdersReportController : Controller
     {
-        private readonly IOrderReportQuery _query;
+        private readonly IOrderReportService _service;
 
-        public OrdersReportController(IOrderReportQuery query, ILogger<OrdersReportController> logger, IUnitOfWork unitOfWork)
+        public OrdersReportController(IOrderReportService service, ILogger<OrdersReportController> logger, IUnitOfWork unitOfWork)
             : base(logger, unitOfWork)
         {
-            _query = query;
+            _service = service;
         }
 
         [HttpGet]
@@ -23,7 +23,7 @@ namespace REST.Controllers.Commercial.Documents.Orders
         {
             return await ProcessRequestAsync<OrderReportListing>(async () =>
             {
-                OrderReportListing listing = await _query.Get(filter, cancellationToken);
+                OrderReportListing listing = await _service.Get(filter, cancellationToken);
                 return Ok(listing);
             }, cancellationToken);
         }

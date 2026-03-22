@@ -1,4 +1,4 @@
-using Application.DataTransferObjects.Commercial.Documents.DocumentsReports;
+using Application.DataTransferObjects.Commercial.Documents.Reports;
 using Infrastructure.Persistece;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
@@ -14,7 +14,7 @@ namespace Infrastructure.Queries.Commercial.Documents
         {
         }
 
-        public override async Task<List<TDocumentReport>> Get(TDocumentReportFilter filter, CancellationToken cancellationToken)
+        public override async Task<List<TDocumentReport>> GetAsync(TDocumentReportFilter filter, CancellationToken cancellationToken)
         {
             List<DbParameter> parameters = [];
             string sql = GetSql(filter, parameters);
@@ -24,14 +24,12 @@ namespace Infrastructure.Queries.Commercial.Documents
                 .ToListAsync(cancellationToken);
         }
 
-        protected virtual string GetExtraSelectColumns() => "";
-
-        protected virtual string GetExtraJoins() => "";
-
         private string GetSql(DocumentReportFilter filter, List<DbParameter> parameters)
         {
             StringBuilder where = new();
             using DbCommand command = CreateCommand();
+
+            AddListingFilterParameters(command, parameters, filter);
 
             if (filter.CreationDateTimeStart.HasValue)
             {
@@ -65,34 +63,22 @@ namespace Infrastructure.Queries.Commercial.Documents
 
             return $"""
                 SELECT
-                    to_char(d.creation_date_time, {dateTimePattern}) AS "{nameof(DocumentReport.CreationDateTimeDescription)}",
-                    to_char(d.last_update_date_time, {dateTimePattern}) AS "{nameof(DocumentReport.LastUpdateDateTimeDescription)}",
+                    d.id AS "{nameof(DocumentReport.Id)}",
+                    to_char(d.creation_date_time, {dateTimePattern}) AS "{nameof(DocumentReport.CreationDateTime)}",
+                    to_char(d.last_update_date_time, {dateTimePattern}) AS "{nameof(DocumentReport.LastUpdateDateTime)}",
                     d.value_subtotal AS "{nameof(DocumentReport.ValueSubtotal)}",
                     d.value_total AS "{nameof(DocumentReport.ValueTotal)}",
                     d.payment_method AS "{nameof(DocumentReport.PaymentMethod)}",
                     d.payment_discount_value AS "{nameof(DocumentReport.PaymentDiscountValue)}",
-                    CASE
-                        WHEN d.payment_installment_has_installment THEN d.payment_installment_quantity::numeric
-                        ELSE NULL
-                    END AS "{nameof(DocumentReport.PaymentInstallmentQuantity)}",
-                    CASE
-                        WHEN d.payment_installment_has_installment THEN d.payment_installment_value
-                        ELSE NULL
-                    END AS "{nameof(DocumentReport.PaymentInstallmentValue)}",
-                    CASE
-                        WHEN COALESCE(d.payment_installment_has_down_payment, false) THEN d.payment_installment_down_payment_value
-                        ELSE NULL
-                    END AS "{nameof(DocumentReport.PaymentInstallmentDownPaymentValue)}",
-                    CASE
-                        WHEN COALESCE(d.payment_installment_has_down_payment, false) THEN d.payment_installment_down_payment_percentage
-                        ELSE NULL
-                    END AS "{nameof(DocumentReport.PaymentInstallmentDownPaymentPercentage)}",
-                    d.payment_installment_has_down_payment AS "{nameof(DocumentReport.PaymentInstallmentDownPaymentMethod)}",
+                    d.payment_installment_quantity AS "{nameof(DocumentReport.PaymentInstallmentQuantity)}",
+                    d.payment_installment_value AS "{nameof(DocumentReport.PaymentInstallmentValue)}",
+                    d.payment_installment_down_payment_value AS "{nameof(DocumentReport.PaymentInstallmentDownPaymentValue)}",
+                    d.payment_installment_down_payment_percentage AS "{nameof(DocumentReport.PaymentInstallmentDownPaymentPercentage)}",
+                    d.payment_installment_down_payment_method AS "{nameof(DocumentReport.PaymentInstallmentDownPaymentMethod)}",
                     d.observations AS "{nameof(DocumentReport.Observations)}",
                     u.name AS "{nameof(DocumentReport.UserName)}",
                     c.name AS "{nameof(DocumentReport.CustomerName)}",
-                    COALESCE(addr.locality_description, '') || ' - ' || COALESCE(addr.state_acronym, '') AS "{nameof(DocumentReport.CustomerAddressCityState)}"
-                    {GetExtraSelectColumns()}
+                    COALESCE(addr.locality_description, '') || ' - ' || COALESCE(addr.state_acronym, '') AS "{nameof(DocumentReport.CustomerCityState)}"
                 FROM {GetTableName()} d
                 INNER JOIN users u ON u.id = d.user_id
                 INNER JOIN customers c ON c.id = d.customer_id
@@ -105,8 +91,8 @@ namespace Infrastructure.Queries.Commercial.Documents
                     ORDER BY ca.id
                     LIMIT 1
                 ) addr ON true
-                {GetExtraJoins()}
                 WHERE 1 = 1{where}
+                {GetListingFilterSql()}
                 """;
         }
 

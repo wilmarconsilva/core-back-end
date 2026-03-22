@@ -1,3 +1,4 @@
+using Application.DataTransferObjects.Listings;
 using Application.Interfaces.Queries;
 using Infrastructure.Persistece;
 using Infrastructure.Persistence;
@@ -6,13 +7,18 @@ using System.Data.Common;
 
 namespace Infrastructure.Queries
 {
-    public abstract class ReportQuery<TReport, TFilter> : AppDbContextAcessor, IReportQuery<TReport, TFilter>
+    public abstract class ReportQuery<TReport, TListingFilter> : AppDbContextAcessor, IReportQuery<TReport, TListingFilter>
+        where TReport : class
+        where TListingFilter : ListingFilter
     {
+        protected const string RegistersStartParameterName = "@registers_start";
+        protected const string RegistersEndParameterName = "@registers_end";
+
         protected ReportQuery(AppDbContext context) : base(context)
         {
         }
 
-        public abstract Task<List<TReport>> Get(TFilter filter, CancellationToken cancellationToken);
+        public abstract Task<List<TReport>> GetAsync(TListingFilter filter, CancellationToken cancellationToken);
 
         protected abstract string GetTableName();
 
@@ -27,6 +33,17 @@ namespace Infrastructure.Queries
             parameter.ParameterName = name;
             parameter.Value = value;
             parameters.Add(parameter);
+        }
+
+        protected static void AddListingFilterParameters(DbCommand command, ICollection<DbParameter> parameters, ListingFilter filter)
+        {
+            AddParameter(command, parameters, RegistersStartParameterName, filter.RegistersStart);
+            AddParameter(command, parameters, RegistersEndParameterName, filter.RegistersEnd);
+        }
+
+        protected static string GetListingFilterSql()
+        {
+            return $"OFFSET {RegistersStartParameterName}\nLIMIT {RegistersEndParameterName}";
         }
 
         protected static object[] GetParameters(IEnumerable<DbParameter> parameters)

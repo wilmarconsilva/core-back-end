@@ -1,6 +1,7 @@
 using Application.DataTransferObjects.Commercial.Documents.Orders;
+using Application.DataTransferObjects.Commercial.Documents.Orders.Listings;
 using Application.Interfaces.Queries.Commercial.Documents.Orders;
-using Application.Interfaces.Services.Commercial.Documents;
+using Application.Interfaces.Services.Commercial.Documents.Orders;
 using AutoMapper;
 using Domain.Entities.Commercial.Documents.Budgets;
 using Domain.Entities.Commercial.Documents.Orders;
@@ -8,7 +9,7 @@ using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
 using Domain.ValueObjects.Commercial.Documents.Payments;
 
-namespace Application.Services.Commercial.Documents
+namespace Application.Services.Commercial.Documents.Orders
 {
     public class OrderService : DocumentService<Order, OrderSaveDto, OrderProductSaveDto>, IOrderService
     {
@@ -26,6 +27,13 @@ namespace Application.Services.Commercial.Documents
             await SaveAsync([order], cancellationToken);
 
             return _mapper.Map<Order, OrderSaveDto>(order);
+        }
+
+        public override async Task<List<TListing>> GetAllAsync<TListing, TFilter>(TFilter filter, CancellationToken cancellationToken)
+            where TListing : OrderListing
+            where TFilter : OrderListingFilter
+        {
+            throw new NotImplementedException();
         }
 
         protected override Order CreateEntity(OrderSaveDto dto)

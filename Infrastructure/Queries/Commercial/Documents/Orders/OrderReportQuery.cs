@@ -4,7 +4,7 @@ using Infrastructure.Persistece;
 
 namespace Infrastructure.Queries.Commercial.Documents.Orders
 {
-    public class OrderReportQuery : DocumentReportQuery<OrderReport>, IOrderReportQuery
+    public class OrderReportQuery : DocumentReportQuery<OrderReport, OrderReportFilter>, IOrderReportQuery
     {
         public OrderReportQuery(AppDbContext context) : base(context)
         {

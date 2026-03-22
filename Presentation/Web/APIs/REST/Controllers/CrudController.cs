@@ -1,4 +1,4 @@
-using Application.DataTransferObjects;
+using Application.DataTransferObjects.Entities;
 using Application.Interfaces.Services;
 using Domain.Entities;
 using Domain.Interfaces.Data;
@@ -55,5 +55,18 @@ namespace REST.Controllers
                 return NoContent();
             }, cancellationToken);
         }
+
+        [HttpGet]
+        public async Task<ActionResult<List<TListing>>> GetAll<TListing, TFilter>(TFilter filter, CancellationToken cancellationToken)
+            where TListing : Application.DataTransferObjects.Entities.EntityListing
+            where TFilter : Application.DataTransferObjects.Entities.EntityListingFilter
+        {
+            return await ProcessRequestAsync<List<TListing>>(async () =>
+            {
+                List<TListing> dto = await _service.GetAllAsync<TListing, TFilter>(filter, cancellationToken);
+                return Ok(dto);
+            }, cancellationToken);
+        }
+
     }
 }

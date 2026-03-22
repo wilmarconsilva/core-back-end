@@ -27,12 +27,12 @@ namespace Domain.ValueObjects.Commercial.Documents.Payments.Installments
             Method = method;
         }
 
-        public bool ValidatePercentageCorrespondsToValue(decimal valueTotal)
+        public bool ValidatePercentage(decimal valueTotal)
         {
             return (valueTotal * (Percentage / 100)) == Value;
         }
 
-        public bool ValidateValueLessThanTotal(decimal valueTotal)
+        public bool ValidateValue(decimal valueTotal)
         {
             return Value < valueTotal;
         }

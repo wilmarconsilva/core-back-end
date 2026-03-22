@@ -1,4 +1,4 @@
-﻿using Application.DataTransferObjects;
+﻿using Application.DataTransferObjects.Entities;
 using Application.Interfaces.Queries;
 using AutoMapper;
 using Domain.Entities;

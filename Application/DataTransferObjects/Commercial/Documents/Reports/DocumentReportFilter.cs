@@ -1,6 +1,6 @@
 using Application.DataTransferObjects.Listings;
 
-namespace Application.DataTransferObjects.Commercial.Documents.DocumentsReports
+namespace Application.DataTransferObjects.Commercial.Documents.Reports
 {
     public abstract class DocumentReportFilter : ListingFilter
     {

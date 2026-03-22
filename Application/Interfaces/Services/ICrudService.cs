@@ -1,4 +1,4 @@
-using Application.DataTransferObjects;
+using Application.DataTransferObjects.Entities;
 using Domain.Entities;
 
 namespace Application.Interfaces.Services
@@ -14,5 +14,9 @@ namespace Application.Interfaces.Services
         Task DeleteAsync(IEnumerable<long> ids, CancellationToken cancellationToken);
 
         Task DeleteAsync(long id, CancellationToken cancellationToken);
+
+        Task<List<TListing>> GetAllAsync<TListing, TFilter>(TFilter filter, CancellationToken cancellationToken)
+            where TListing : EntityListing
+            where TFilter : EntityListingFilter;
     }
 }

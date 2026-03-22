@@ -1,4 +1,4 @@
-namespace Application.DataTransferObjects
+namespace Application.DataTransferObjects.Entities
 {
     public abstract class EntitySaveDto
     {

@@ -1,18 +1,20 @@
 using Domain.ValueObjects.Enums;
 
-namespace Application.DataTransferObjects.Commercial.Documents.DocumentsReports
+namespace Application.DataTransferObjects.Commercial.Documents.Reports
 {
     public abstract class DocumentReport
     {
-        public string CreationDateTimeDescription { get; set; } = null!;
+        public long Id { get; set; }
 
-        public string LastUpdateDateTimeDescription { get; set; } = null!;
+        public string CreationDateTime { get; set; } = null!;
+
+        public string LastUpdateDateTime { get; set; } = null!;
 
         public decimal ValueSubtotal { get; set; }
 
         public decimal ValueTotal { get; set; }
 
-        public PaymentMethod PaymentMethod { private get; set; }
+        public PaymentMethod PaymentMethod { get; set; }
 
         public string PaymentMethodDescription => PaymentMethod.GetDescription();
 
@@ -26,7 +28,7 @@ namespace Application.DataTransferObjects.Commercial.Documents.DocumentsReports
 
         public decimal? PaymentInstallmentDownPaymentPercentage { get; set; }
 
-        public PaymentMethod? PaymentInstallmentDownPaymentMethod { private get; set; }
+        public PaymentMethod? PaymentInstallmentDownPaymentMethod { get; set; }
 
         public string? PaymentInstallmentDownPaymentMethodDescription => PaymentInstallmentDownPaymentMethod?.GetDescription();
 
@@ -36,6 +38,6 @@ namespace Application.DataTransferObjects.Commercial.Documents.DocumentsReports
 
         public string CustomerName { get; set; } = null!;
 
-        public string CustomerAddressCityState { get; set; } = null!;
+        public string CustomerCityState { get; set; } = null!;
     }
 }
