@@ -58,8 +58,8 @@ namespace REST.Controllers
 
         [HttpGet]
         public async Task<ActionResult<List<TListing>>> GetAll<TListing, TFilter>(TFilter filter, CancellationToken cancellationToken)
-            where TListing : Application.DataTransferObjects.Entities.EntityListing
-            where TFilter : Application.DataTransferObjects.Entities.EntityListingFilter
+            where TListing : EntityListing
+            where TFilter : EntityListingFilter
         {
             return await ProcessRequestAsync<List<TListing>>(async () =>
             {
