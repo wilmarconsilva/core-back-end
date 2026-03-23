@@ -1,4 +1,5 @@
-using Application.DataTransferObjects;
+using Application.DataTransferObjects.Entities;
+using Application.DataTransferObjects.Listings;
 using Application.Interfaces.Queries;
 using Application.Interfaces.Services;
 using Domain.Entities;
@@ -8,12 +9,17 @@ using Domain.Interfaces.Repositories;
 
 namespace Application.Services
 {
-    public abstract class CrudService<TEntity, TEntitySaveDto> : ICrudService<TEntitySaveDto> where TEntity : Entity where TEntitySaveDto : EntitySaveDto
+    public abstract class CrudService<TEntity, TEntitySaveDto, TListing, TFilter> : ICrudService<TEntitySaveDto, TListing, TFilter>
+        where TEntity : Entity
+        where TEntitySaveDto : EntitySaveDto
+        where TListing : EntityListing
+        where TFilter : ListingFilter
     {
         #region Attributes
 
         protected readonly IRepositoryCrud<TEntity> _repositoryCrud;
         protected readonly IEntitySaveDtoQuery<TEntitySaveDto> _query;
+        protected readonly IEntityListingQuery<TListing, TFilter> _listingQuery;
 
         private readonly IUnitOfWork _unitOfWork;
 
@@ -27,6 +33,7 @@ namespace Application.Services
         {
             this._repositoryCrud = repository;
             this._query = query;
+            this._listingQuery = (IEntityListingQuery<TListing, TFilter>)query;
             this._unitOfWork = unitOfWork;
             this._hasExternalTransactionActive = _unitOfWork.IsTransactionBegun();
         }
@@ -85,6 +92,11 @@ namespace Application.Services
             await DeleteAsync([id], cancellationToken);
         }
 
+        public Task<List<TListing>> GetAllAsync(TFilter filter, CancellationToken cancellationToken)
+        {
+            return _listingQuery.GetAll(filter, cancellationToken);
+        }
+
         #endregion Public methods
 
         #region Protected methods
@@ -95,15 +107,6 @@ namespace Application.Services
 
         protected abstract Task<bool> EntitiesCanBeDeleted(IEnumerable<long> ids);
 
-        protected async Task<IEnumerable<Entity>> SaveAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
-        {
-            List<TEntity> entities = await TransformToEntity(dtos, cancellationToken);
-
-            await this.SaveAsync(entities, cancellationToken);
-
-            return entities;
-        }
-
         protected static void ThrowNotFoundException(IEnumerable<long> ids)
         {
             throw new NotFoundException(GetNotFoundMessage(ids));
@@ -112,6 +115,15 @@ namespace Application.Services
         protected static string GetNotFoundMessage(IEnumerable<long> ids)
         {
             return $"Nenhum registro encontrado para o(s) código(s): {string.Join(",", ids)}.";
+        }
+
+        protected async Task<IEnumerable<Entity>> SaveAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
+        {
+            List<TEntity> entities = await TransformToEntity(dtos, cancellationToken);
+
+            await this.SaveAsync(entities, cancellationToken);
+
+            return entities;
         }
 
         protected async Task SaveAsync(List<TEntity> entities, CancellationToken cancellationToken)

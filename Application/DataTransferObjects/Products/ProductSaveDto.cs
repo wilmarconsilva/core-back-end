@@ -1,4 +1,5 @@
-﻿using Domain.ValueObjects.Enums;
+﻿using Application.DataTransferObjects.Entities;
+using Domain.ValueObjects.Enums;
 
 namespace Application.DataTransferObjects.Products
 {

@@ -1,4 +1,5 @@
 using Application.DataTransferObjects.Commercial.Documents.Payments;
+using Application.DataTransferObjects.Entities;
 
 namespace Application.DataTransferObjects.Commercial.Documents
 {

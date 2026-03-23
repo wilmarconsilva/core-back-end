@@ -10,7 +10,7 @@ namespace Domain.Entities.Territories
 
         public override string Description { get => _description; protected set => SetDescription(value); }
 
-        private void SetDescription(string description)
+        public void SetDescription(string description)
         {
             Validator.ValidateValue(description, nameof(Description));
             _description = description;

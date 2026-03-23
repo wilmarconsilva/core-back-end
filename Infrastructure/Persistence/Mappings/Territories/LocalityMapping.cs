@@ -1,4 +1,5 @@
 using Domain.Entities.Territories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Mappings.Territories
 {
@@ -8,11 +9,15 @@ namespace Infrastructure.Persistence.Mappings.Territories
         {
             base.Configure(builder);
 
+            builder.Property(l => l.StateId)
+                   .HasColumnName("state_id")
+                   .IsRequired();
+
             builder
-                .HasOne(s => s.State)
+                .HasOne(l => l.State)
                 .WithMany()
-                .HasForeignKey("state_id")
-                .OnDelete(Microsoft.EntityFrameworkCore.DeleteBehavior.Restrict);
+                .HasForeignKey(l => l.StateId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         protected override string GetTableName()

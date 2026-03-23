@@ -1,3 +1,4 @@
+using Application.DataTransferObjects.Entities;
 using Domain.ValueObjects.Persons.Enums;
 
 namespace Application.DataTransferObjects.Persons.Customers

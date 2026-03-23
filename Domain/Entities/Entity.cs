@@ -1,6 +1,3 @@
-using Domain.Exceptions;
-using System.Numerics;
-
 namespace Domain.Entities
 {
     public abstract class Entity

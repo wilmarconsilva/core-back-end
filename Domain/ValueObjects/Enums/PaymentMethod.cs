@@ -10,4 +10,22 @@
         Check = 6,
         PIX = 7,
     }
+
+    public static class PaymentMethodExtensions
+    {
+        public static string GetDescription(this PaymentMethod paymentMethod)
+        {
+            return paymentMethod switch
+            {
+                PaymentMethod.DebitCard => "Cartão de Débito",
+                PaymentMethod.CreditCard => "Cartão de Crédito",
+                PaymentMethod.Money => "Dinheiro",
+                PaymentMethod.Deposit => "Depósito",
+                PaymentMethod.Slip => "Boleto",
+                PaymentMethod.Check => "Cheque",
+                PaymentMethod.PIX => "PIX",
+                _ => "Não definido"
+            };
+        }
+    }
 }

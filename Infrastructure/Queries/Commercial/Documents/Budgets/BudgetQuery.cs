@@ -1,4 +1,5 @@
 using Application.DataTransferObjects.Commercial.Documents.Budgets;
+using Application.DataTransferObjects.Commercial.Documents.Budgets.Listings;
 using Application.Interfaces.Queries.Commercial.Documents.Budgets;
 using AutoMapper;
 using Domain.Entities.Commercial.Documents.Budgets;
@@ -7,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Queries.Commercial.Documents.Budgets
 {
-    public class BudgetQuery : SaveDtoQuery<Budget, BudgetSaveDto>, IBudgetQuery
+    public class BudgetQuery : DocumentQuery<Budget, BudgetSaveDto, BudgetProduct, BudgetListing, BudgetListingFilter>, IBudgetQuery
     {
         public BudgetQuery(AppDbContext context, IMapper mapper) : base(context, mapper)
         {
