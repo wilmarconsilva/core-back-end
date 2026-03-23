@@ -25,6 +25,8 @@ using Infrastructure.Queries.Territories;
 using Infrastructure.Repositories.Territories;
 using Application.Services.Commercial.Documents.Orders;
 using Application.Interfaces.Services.Commercial.Documents.Orders;
+using Application.Interfaces.Services.Commercial.Documents.Budgets;
+using Application.Services.Commercial.Documents.Budgets;
 using Domain.Interfaces.Repositories;
 
 namespace Presentation.Web.APIs.REST.Extensions;
@@ -105,6 +107,8 @@ public static class ApplicationServiceExtensions
     {
         services.AddScoped<IBudgetService, BudgetService>();
         services.AddScoped<IBudgetQuery, BudgetQuery>();
+        services.AddScoped<IBudgetReportService, BudgetReportService>();
+        services.AddScoped<IBudgetReportQuery, BudgetReportQuery>();
     }
 
     private static void AddOrderServices(IServiceCollection services)
