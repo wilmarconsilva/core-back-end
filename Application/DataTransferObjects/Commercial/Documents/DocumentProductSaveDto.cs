@@ -1,3 +1,5 @@
+using Application.DataTransferObjects.Entities;
+
 namespace Application.DataTransferObjects.Commercial.Documents
 {
     public abstract class DocumentProductSaveDto : EntitySaveDto

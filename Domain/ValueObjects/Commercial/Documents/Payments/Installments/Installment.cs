@@ -30,15 +30,18 @@ namespace Domain.ValueObjects.Commercial.Documents.Payments.Installments
 
         public void SetValue(decimal valueTotal)
         {
+            if (DownPayment != null)
+                valueTotal -= DownPayment.Value;
+
             decimal value = valueTotal / Quantity;
             Validator.ValidateValue(value, "O valor da(s) parcela(s)");
             Value = value;
         }
 
-        public bool ValidateInstallmentTotal(decimal valueTotal)
+        public bool ValidateInstallmentValueQuantity(decimal valueTotal)
         {
             decimal downPaymentValue = DownPayment?.Value ?? 0;
-            return (Value * Quantity) - downPaymentValue == (valueTotal - downPaymentValue);
+            return (Value * Quantity) == (valueTotal - downPaymentValue);
         }
 
         public bool ValidateDownPaymentPercentage(decimal valueTotal)
@@ -46,15 +49,15 @@ namespace Domain.ValueObjects.Commercial.Documents.Payments.Installments
             if (DownPayment == null)
                 return true;
 
-            return DownPayment.ValidatePercentageCorrespondsToValue(valueTotal);
+            return DownPayment.ValidatePercentage(valueTotal);
         }
 
-        public bool ValidateDownPaymentValueLessThanTotal(decimal valueTotal)
+        public bool ValidateDownPaymentValue(decimal valueTotal)
         {
             if (DownPayment == null)
                 return true;
 
-            return DownPayment.ValidateValueLessThanTotal(valueTotal);
+            return DownPayment.ValidateValue(valueTotal);
         }
     }
 }

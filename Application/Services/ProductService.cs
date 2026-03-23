@@ -1,4 +1,5 @@
 using Application.DataTransferObjects.Products;
+using Application.DataTransferObjects.Products.Listings;
 using Application.Interfaces.Queries;
 using Application.Interfaces.Services;
 using Domain.Entities;
@@ -7,11 +8,10 @@ using Domain.Interfaces.Repositories;
 
 namespace Application.Services.Persons.Customers
 {
-    public class ProductService : CrudService<Product, ProductSaveDto>, IProductService
+    public class ProductService : CrudService<Product, ProductSaveDto, ProductListing, ProductListingFilter>, IProductService
     {
         public ProductService(IProductRepository repository, IProductQuery query, IUnitOfWork unitOfWork) : base(repository, query, unitOfWork)
         {
-
         }
 
         protected override Product CreateEntity(ProductSaveDto dto)

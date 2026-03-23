@@ -1,7 +1,9 @@
 using Application.DataTransferObjects.Commercial.Documents.Budgets;
+using Application.DataTransferObjects.Commercial.Documents.Budgets.Listings;
 using Application.DataTransferObjects.Commercial.Documents.Orders;
 using Application.Interfaces.Queries.Commercial.Documents.Budgets;
 using Application.Interfaces.Services.Commercial.Documents;
+using Application.Interfaces.Services.Commercial.Documents.Orders;
 using AutoMapper;
 using Domain.Entities.Commercial.Documents.Budgets;
 using Domain.Exceptions;
@@ -11,7 +13,7 @@ using Domain.ValueObjects.Commercial.Documents.Payments;
 
 namespace Application.Services.Commercial.Documents
 {
-    public class BudgetService : DocumentService<Budget, BudgetSaveDto, BudgetProductSaveDto>, IBudgetService
+    public class BudgetService : DocumentService<Budget, BudgetSaveDto, BudgetProductSaveDto, BudgetListing, BudgetListingFilter>, IBudgetService
     {
         private readonly IMapper _mapper;
         private readonly IOrderService _orderService;

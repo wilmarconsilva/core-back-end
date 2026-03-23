@@ -1,6 +1,7 @@
 using Application.DataTransferObjects.Commercial.Documents.Orders;
+using Application.DataTransferObjects.Commercial.Documents.Orders.Listings;
 using Application.Interfaces.Queries.Commercial.Documents.Orders;
-using Application.Interfaces.Services.Commercial.Documents;
+using Application.Interfaces.Services.Commercial.Documents.Orders;
 using AutoMapper;
 using Domain.Entities.Commercial.Documents.Budgets;
 using Domain.Entities.Commercial.Documents.Orders;
@@ -8,9 +9,9 @@ using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
 using Domain.ValueObjects.Commercial.Documents.Payments;
 
-namespace Application.Services.Commercial.Documents
+namespace Application.Services.Commercial.Documents.Orders
 {
-    public class OrderService : DocumentService<Order, OrderSaveDto, OrderProductSaveDto>, IOrderService
+    public class OrderService : DocumentService<Order, OrderSaveDto, OrderProductSaveDto, OrderListing, OrderListingFilter>, IOrderService
     {
         private readonly IMapper _mapper;
 

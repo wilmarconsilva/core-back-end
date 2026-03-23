@@ -113,10 +113,10 @@ namespace Domain.Entities.Commercial.Documents
             if (!Payment.Installment.ValidateDownPaymentPercentage(ValueTotal))
                 throw new BusinessRuleException("O valor da entrada não corresponde a porcentagem da entrada em relação ao valor total do documento.");
 
-            if (!Payment.Installment.ValidateDownPaymentValueLessThanTotal(ValueTotal))
+            if (!Payment.Installment.ValidateDownPaymentValue(ValueTotal))
                 throw new BusinessRuleException("O valor da entrada não pode ser igual ou maior que o valor total do documento.");
 
-            if (!Payment.Installment.ValidateInstallmentTotal(ValueTotal))
+            if (!Payment.Installment.ValidateInstallmentValueQuantity(ValueTotal))
                 throw new BusinessRuleException("O valor total da(s) parcela(s) não corresponde ao valor total do documento descontando o valor da entrada.");
         }
     }
