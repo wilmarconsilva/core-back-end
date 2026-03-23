@@ -2,6 +2,6 @@
 {
     public abstract class EntityListing
     {
-        public required long Id { get; init; }
+        public long Id { get; init; }
     }
 }

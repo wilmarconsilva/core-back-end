@@ -1,4 +1,6 @@
 using Application.DataTransferObjects.Commercial.Documents;
+using Application.DataTransferObjects.Entities;
+using Application.DataTransferObjects.Listings;
 using Application.Interfaces.Queries;
 using Domain.Entities;
 using Domain.Interfaces.Data;
@@ -8,10 +10,12 @@ using Domain.ValueObjects.Commercial.Documents.Payments.Installments;
 
 namespace Application.Services.Commercial.Documents
 {
-    public abstract class DocumentService<TEntity, TDocumentSaveDto, TDocumentProductSaveDto> : CrudService<TEntity, TDocumentSaveDto>
+    public abstract class DocumentService<TEntity, TDocumentSaveDto, TDocumentProductSaveDto, TListing, TFilter> : CrudService<TEntity, TDocumentSaveDto, TListing, TFilter>
         where TEntity : Entity
         where TDocumentSaveDto : DocumentSaveDto<TDocumentProductSaveDto>
         where TDocumentProductSaveDto : DocumentProductSaveDto
+        where TListing : EntityListing
+        where TFilter : ListingFilter
     {
         protected DocumentService(IRepositoryCrud<TEntity> repository, IEntitySaveDtoQuery<TDocumentSaveDto> query, IUnitOfWork unitOfWork)
             : base(repository, query, unitOfWork)

@@ -31,7 +31,7 @@ namespace Domain.Entities.Persons.Customers
 
         public PersonType PersonType { get; private set; }
 
-        public string Document { get => _document; private set => SetDocument(value); }
+        public string Document { get => _document; set => SetDocument(value); }
 
         public DocumentType DocumentType { get; private set; }
 
@@ -57,13 +57,6 @@ namespace Domain.Entities.Persons.Customers
             PersonType = personType;
         }
 
-        public void SetDocument(string document)
-        {
-            Validator.ValidateValue(document, nameof(Document));
-
-            _document = document;
-        }
-
         public void SetAddresses(IReadOnlyCollection<CustomerAddress> addresses)
         {
             if (addresses == null || !addresses.Any())
@@ -81,6 +74,13 @@ namespace Domain.Entities.Persons.Customers
             Document = document;
             Email = email;
             StateRegistration = stateRegistration;
+        }
+
+        private void SetDocument(string document)
+        {
+            Validator.ValidateValue(document, nameof(Document));
+
+            _document = document;
         }
 
         #endregion Public methods

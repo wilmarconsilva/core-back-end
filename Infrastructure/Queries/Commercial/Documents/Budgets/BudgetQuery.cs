@@ -4,7 +4,6 @@ using Application.Interfaces.Queries.Commercial.Documents.Budgets;
 using AutoMapper;
 using Domain.Entities.Commercial.Documents.Budgets;
 using Infrastructure.Persistece;
-using Infrastructure.Queries.Commercial.Documents;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Queries.Commercial.Documents.Budgets

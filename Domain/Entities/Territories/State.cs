@@ -8,7 +8,9 @@ namespace Domain.Entities.Territories
 
         public State(string acronym) : base(acronym) { }
 
-        public Country? Country { get; set; }
+        public Country? Country { get; private set; }
+
+        public long? CountryId { get; set; }
 
         public override string Description { get => _description; protected set => SetDescription(value); }
 

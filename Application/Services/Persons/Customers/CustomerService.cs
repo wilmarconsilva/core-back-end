@@ -1,4 +1,5 @@
 using Application.DataTransferObjects.Persons.Customers;
+using Application.DataTransferObjects.Persons.Customers.Listings;
 using Application.Interfaces.Queries.Persons.Customers;
 using Application.Interfaces.Services.Persons;
 using AutoMapper;
@@ -8,7 +9,7 @@ using Domain.Interfaces.Repositories;
 
 namespace Application.Services.Persons.Customers
 {
-    public class CustomerService : CrudService<Customer, CustomerSaveDto>, ICustomerService
+    public class CustomerService : CrudService<Customer, CustomerSaveDto, CustomerListing, CustomerListingFilter>, ICustomerService
     {
         private readonly IMapper _mapper;
 

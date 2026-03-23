@@ -4,7 +4,6 @@ using Application.Interfaces.Queries.Commercial.Documents.Orders;
 using AutoMapper;
 using Domain.Entities.Commercial.Documents.Orders;
 using Infrastructure.Persistece;
-using Infrastructure.Queries.Commercial.Documents;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Queries.Commercial.Documents.Orders

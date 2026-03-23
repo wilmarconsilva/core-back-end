@@ -1,4 +1,5 @@
 ﻿using Application.DataTransferObjects.Entities;
+using Application.DataTransferObjects.Listings;
 using Application.Interfaces.Queries;
 using AutoMapper;
 using Domain.Entities;
@@ -33,6 +34,15 @@ namespace Infrastructure.Queries
         protected virtual IQueryable<TEntity> ApplyIncludes(IQueryable<TEntity> query)
         {
             return query;
+        }
+
+        protected IQueryable<TEntity> ApplyPaging(IQueryable<TEntity> query, ListingFilter filter)
+        {
+            IOrderedQueryable<TEntity> ordered = query.OrderByDescending(e => e.Id);
+
+            return ordered
+                .Skip(filter.RegistersStart)
+                .Take(filter.RegistersEnd - filter.RegistersStart);
         }
     }
 }

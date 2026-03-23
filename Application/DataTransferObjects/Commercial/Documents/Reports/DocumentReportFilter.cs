@@ -4,15 +4,9 @@ namespace Application.DataTransferObjects.Commercial.Documents.Reports
 {
     public abstract class DocumentReportFilter : ListingFilter
     {
-        protected DocumentReportFilter() : base()
-        {
+        protected DocumentReportFilter(int registersStart, int registersEnd) : base(registersStart, registersEnd) { }
 
-        }
-
-        protected DocumentReportFilter(int registersStart, int registersEnd) : base(registersStart, registersEnd)
-        {
-
-        }
+        protected DocumentReportFilter() : base() { }
 
         public DateTime? CreationDateTimeStart { get; init; }
 

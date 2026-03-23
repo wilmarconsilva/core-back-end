@@ -4,10 +4,10 @@ namespace Application.DataTransferObjects.Commercial.Documents.Listings
 {
     public abstract class DocumentListing : EntityListing
     {
-        public required string CustormerName { get; init; }
+        public string CustormerName { get; init; } = null!;
 
-        public required string CustomerCityState { get; init; }
+        public string CustomerCityState { get; init; } = null!;
 
-        public required decimal ValueTotal { get; init; }
+        public decimal ValueTotal { get; init; }
     }
 }

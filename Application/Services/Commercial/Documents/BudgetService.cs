@@ -1,7 +1,6 @@
 using Application.DataTransferObjects.Commercial.Documents.Budgets;
 using Application.DataTransferObjects.Commercial.Documents.Budgets.Listings;
 using Application.DataTransferObjects.Commercial.Documents.Orders;
-using Application.DataTransferObjects.Entities;
 using Application.Interfaces.Queries.Commercial.Documents.Budgets;
 using Application.Interfaces.Services.Commercial.Documents;
 using Application.Interfaces.Services.Commercial.Documents.Orders;
@@ -14,27 +13,15 @@ using Domain.ValueObjects.Commercial.Documents.Payments;
 
 namespace Application.Services.Commercial.Documents
 {
-    public class BudgetService : DocumentService<Budget, BudgetSaveDto, BudgetProductSaveDto>, IBudgetService
+    public class BudgetService : DocumentService<Budget, BudgetSaveDto, BudgetProductSaveDto, BudgetListing, BudgetListingFilter>, IBudgetService
     {
         private readonly IMapper _mapper;
-        private readonly IBudgetQuery _budgetQuery;
         private readonly IOrderService _orderService;
 
         public BudgetService(IBudgetRepository repository, IBudgetQuery query, IUnitOfWork unitOfWork, IMapper mapper, IOrderService orderService) : base(repository, query, unitOfWork)
         {
-            _budgetQuery = query;
             _mapper = mapper;
             _orderService = orderService;
-        }
-
-        public override async Task<List<TListing>> GetAllAsync<TListing, TFilter>(TFilter filter, CancellationToken cancellationToken)
-        {
-            if (filter is not BudgetListingFilter budgetFilter || typeof(TListing) != typeof(BudgetListing))
-                throw new BusinessRuleException($"Listagem inválida para {nameof(BudgetService)}.");
-
-            List<BudgetListing> budgets = await _budgetQuery.GetAll(budgetFilter, cancellationToken);
-
-            return budgets.Cast<TListing>().ToList();
         }
 
         protected override Budget CreateEntity(BudgetSaveDto dto)

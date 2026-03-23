@@ -1,9 +1,13 @@
 using Application.DataTransferObjects.Entities;
+using Application.DataTransferObjects.Listings;
 using Domain.Entities;
 
 namespace Application.Interfaces.Services
 {
-    public interface ICrudService<TEntitySaveDto> where TEntitySaveDto : EntitySaveDto
+    public interface ICrudService<TEntitySaveDto, TListing, TFilter>
+        where TEntitySaveDto : EntitySaveDto
+        where TListing : EntityListing
+        where TFilter : ListingFilter
     {
         Task<IEnumerable<Entity>> CreateAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken);
 
@@ -15,8 +19,6 @@ namespace Application.Interfaces.Services
 
         Task DeleteAsync(long id, CancellationToken cancellationToken);
 
-        Task<List<TListing>> GetAllAsync<TListing, TFilter>(TFilter filter, CancellationToken cancellationToken)
-            where TListing : EntityListing
-            where TFilter : EntityListingFilter;
+        Task<List<TListing>> GetAllAsync(TFilter filter, CancellationToken cancellationToken);
     }
 }

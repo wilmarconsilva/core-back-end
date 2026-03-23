@@ -1,4 +1,5 @@
 ﻿using Domain.Exceptions;
+using System.ComponentModel;
 namespace Application.DataTransferObjects.Listings
 {
     public abstract class ListingFilter
@@ -7,23 +8,25 @@ namespace Application.DataTransferObjects.Listings
         private const int RegistersEndDefault = 50;
         private const int MaxRegistersLimit = 50;
 
-        private int _registersStart = RegistersStartDefault;
-        private int _registersEnd = RegistersEndDefault;
-
-        protected ListingFilter()
-        {
-
-        }
+        private int _registersStart;
+        private int _registersEnd;
 
         protected ListingFilter(int registersStart, int registersEnd)
         {
-            SetRegistersStart(registersStart);
-            SetRegistersEnd(registersEnd);
+            RegistersStart = registersStart;
+            RegistersEnd = registersEnd;
         }
 
-        public int RegistersStart { get => _registersStart; init => SetRegistersStart(value); }
+        protected ListingFilter() : this(RegistersStartDefault, RegistersEndDefault)
+        {
 
-        public int RegistersEnd { get => _registersEnd; init => SetRegistersEnd(value); }
+        }
+
+        [DefaultValue(RegistersStartDefault)]
+        public int RegistersStart { get => _registersStart; set => SetRegistersStart(value); }
+
+        [DefaultValue(RegistersEndDefault)]
+        public int RegistersEnd { get => _registersEnd; set => SetRegistersEnd(value); }
 
         public void SetRegistersStart(int registersStart)
         {
@@ -31,26 +34,30 @@ namespace Application.DataTransferObjects.Listings
                 _registersStart = registersStart;
             else
                 throw new BusinessRuleException(GetMinValueExceptionMessage(registersStart, RegistersStartDefault));
+
+            ValidateRegistersQuantity();
         }
 
         public void SetRegistersEnd(int registersEnd)
         {
             if (registersEnd < 1)
                 throw new BusinessRuleException(GetMinValueExceptionMessage(registersEnd, 1));
-            else if (registersEnd > MaxRegistersLimit)
-                throw new BusinessRuleException(GetMaxValueExceptionMessage(registersEnd, MaxRegistersLimit));
             else
                 _registersEnd = registersEnd;
+
+            ValidateRegistersQuantity();
+        }
+
+        private void ValidateRegistersQuantity()
+        {
+            int registersReturnedQuantity = Math.Abs(RegistersEnd - RegistersStart);
+            if (registersReturnedQuantity > MaxRegistersLimit)
+                throw new BusinessRuleException($"A quantidade de registros a ser retornada: {registersReturnedQuantity} excede a máxima permitida. A máxima permitida é de: {MaxRegistersLimit}");
         }
 
         private static string GetMinValueExceptionMessage(int value, int minAllowwed)
         {
             return $"O valor: {value} é menor que o mínimo permitido. O mínimo permitido é: {minAllowwed}";
-        }
-
-        private static string GetMaxValueExceptionMessage(int value, int maxAllowwed)
-        {
-            return $"O valor: {value} é maior que o máximo permitido. O máximo permitido é: {maxAllowwed}";
         }
     }
 }

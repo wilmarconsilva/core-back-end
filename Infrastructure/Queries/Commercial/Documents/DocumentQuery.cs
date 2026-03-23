@@ -21,22 +21,28 @@ namespace Infrastructure.Queries.Commercial.Documents
 
         public async Task<List<TListing>> GetAll(TFilter filter, CancellationToken cancellationToken)
         {
-            return await _query
-                .Where(document => filter.Id == 0 || document.Id == filter.Id)
-                .OrderByDescending(document => document.Id)
-                .Skip(filter.RegistersStart)
-                .Take(filter.RegistersEnd)
+            IQueryable<TEntity> query = _query;
+
+            if (filter.Id.HasValue)
+                query = query.Where(document => document.Id == filter.Id.Value);
+
+            if (filter.CustomerId.HasValue)
+                query = query.Where(document => document.CustomerId == filter.CustomerId.Value);
+
+            if (filter.CreationDateTimeStart.HasValue)
+                query = query.Where(document => document.CreationDateTime >= filter.CreationDateTimeStart.Value);
+
+            if (filter.CreationDateTimeEnd.HasValue)
+                query = query.Where(document => document.CreationDateTime <= filter.CreationDateTimeEnd.Value);
+
+            return await ApplyPaging(query, filter)
                 .Select(document => new TListing
                 {
                     Id = document.Id,
-                    CustormerName = document.Customer == null ? string.Empty : document.Customer.Name,
-                    CustomerCityState = document.Customer == null
-                        ? string.Empty
-                        : document.Customer.Addresses
+                    CustormerName = document.Customer!.Name,
+                    CustomerCityState = document.Customer!.Addresses
                             .OrderBy(address => address.Id)
-                            .Select(address => address.Locality == null
-                                ? string.Empty
-                                : address.Locality.Description + (address.Locality.State == null ? string.Empty : $" - {address.Locality.State.Acronym}"))
+                            .Select(address => address.Locality!.Description + (address.Locality.State == null ? string.Empty : $" - {address.Locality.State.Acronym}"))
                             .FirstOrDefault() ?? string.Empty,
                     ValueTotal = document.ValueTotal,
                 })

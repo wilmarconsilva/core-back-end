@@ -4,6 +4,10 @@ namespace Application.DataTransferObjects.Entities
 {
     public abstract class EntityListingFilter : ListingFilter
     {
-        public required long Id { get; init; }
+        protected EntityListingFilter(int registersStart, int registersEnd) : base(registersStart, registersEnd) { }
+
+        protected EntityListingFilter() : base() { }
+
+        public long? Id { get; init; }
     }
 }

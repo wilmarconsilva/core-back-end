@@ -39,13 +39,13 @@ namespace Domain.Entities.Persons.Customers
 
         public Locality? Locality { get; private init; }
 
-        public long LocalityId { get => _localityId; private set => SetLocalityId(value); }
+        public long LocalityId { get => _localityId; set => SetLocalityId(value); }
 
-        public long CustomerId { get => _customerId; }
+        public long CustomerId { get => _customerId; set => SetCustomerId(value); }
 
-        public string Neighborhood { get => _neighborhood; private set => SetNeighborhood(value); }
+        public string Neighborhood { get => _neighborhood; set => SetNeighborhood(value); }
 
-        public string Street { get => _street; private set => SetStreet(value); }
+        public string Street { get => _street; set => SetStreet(value); }
 
         public string? Complement { get; set; }
 
@@ -54,34 +54,6 @@ namespace Domain.Entities.Persons.Customers
         public string? Number { get; set; }
 
         #region Public methods
-
-        public void SetLocalityId(long localityId)
-        {
-            Validator.ValidateValue(localityId, nameof(LocalityId));
-
-            _localityId = localityId;
-        }
-
-        public void SetCustomerId(long customerId)
-        {
-            Validator.ValidateValue(customerId, nameof(customerId));
-
-            _customerId = customerId;
-        }
-
-        public void SetNeighborhood(string neighborhood)
-        {
-            Validator.ValidateValue(neighborhood, nameof(Neighborhood));
-
-            _neighborhood = neighborhood;
-        }
-
-        public void SetStreet(string street)
-        {
-            Validator.ValidateValue(street, nameof(Street));
-
-            _street = street;
-        }
 
         public void SetFatherEntityId(long id)
         {
@@ -122,6 +94,34 @@ namespace Domain.Entities.Persons.Customers
             Complement = complement;
             PostalCode = postalCode;
             Number = number;
+        }
+
+        private void SetLocalityId(long localityId)
+        {
+            Validator.ValidateValue(localityId, nameof(LocalityId));
+
+            _localityId = localityId;
+        }
+
+        private void SetCustomerId(long customerId)
+        {
+            Validator.ValidateValue(customerId, nameof(customerId));
+
+            _customerId = customerId;
+        }
+
+        private void SetNeighborhood(string neighborhood)
+        {
+            Validator.ValidateValue(neighborhood, nameof(Neighborhood));
+
+            _neighborhood = neighborhood;
+        }
+
+        private void SetStreet(string street)
+        {
+            Validator.ValidateValue(street, nameof(Street));
+
+            _street = street;
         }
 
         #endregion Private methods

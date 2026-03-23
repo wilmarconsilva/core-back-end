@@ -1,4 +1,5 @@
 using Application.DataTransferObjects.Entities;
+using Application.DataTransferObjects.Listings;
 using Application.Interfaces.Services;
 using Domain.Entities;
 using Domain.Interfaces.Data;
@@ -7,11 +8,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace REST.Controllers
 {
     [ApiController]
-    public abstract class CrudController<TEntitySaveDto> : Controller where TEntitySaveDto : EntitySaveDto
+    public abstract class CrudController<TEntitySaveDto, TListing, TFilter> : Controller
+        where TEntitySaveDto : EntitySaveDto
+        where TListing : EntityListing
+        where TFilter : ListingFilter
     {
-        private readonly ICrudService<TEntitySaveDto> _service;
+        private readonly ICrudService<TEntitySaveDto, TListing, TFilter> _service;
 
-        protected CrudController(ICrudService<TEntitySaveDto> service, ILogger logger, IUnitOfWork unitOfWork) : base(logger, unitOfWork)
+        protected CrudController(ICrudService<TEntitySaveDto, TListing, TFilter> service, ILogger logger, IUnitOfWork unitOfWork) : base(logger, unitOfWork)
         {
             _service = service;
         }
@@ -57,16 +61,6 @@ namespace REST.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<TListing>>> GetAll<TListing, TFilter>(TFilter filter, CancellationToken cancellationToken)
-            where TListing : EntityListing
-            where TFilter : EntityListingFilter
-        {
-            return await ProcessRequestAsync<List<TListing>>(async () =>
-            {
-                List<TListing> dto = await _service.GetAllAsync<TListing, TFilter>(filter, cancellationToken);
-                return Ok(dto);
-            }, cancellationToken);
-        }
-
+        public abstract Task<ActionResult<List<TListing>>> GetAll([FromQuery] TFilter filter, CancellationToken cancellationToken);
     }
 }

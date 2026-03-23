@@ -9,12 +9,17 @@ using Domain.Interfaces.Repositories;
 
 namespace Application.Services
 {
-    public abstract class CrudService<TEntity, TEntitySaveDto> : ICrudService<TEntitySaveDto> where TEntity : Entity where TEntitySaveDto : EntitySaveDto
+    public abstract class CrudService<TEntity, TEntitySaveDto, TListing, TFilter> : ICrudService<TEntitySaveDto, TListing, TFilter>
+        where TEntity : Entity
+        where TEntitySaveDto : EntitySaveDto
+        where TListing : EntityListing
+        where TFilter : ListingFilter
     {
         #region Attributes
 
         protected readonly IRepositoryCrud<TEntity> _repositoryCrud;
         protected readonly IEntitySaveDtoQuery<TEntitySaveDto> _query;
+        protected readonly IEntityListingQuery<TListing, TFilter> _listingQuery;
 
         private readonly IUnitOfWork _unitOfWork;
 
@@ -28,6 +33,7 @@ namespace Application.Services
         {
             this._repositoryCrud = repository;
             this._query = query;
+            this._listingQuery = (IEntityListingQuery<TListing, TFilter>)query;
             this._unitOfWork = unitOfWork;
             this._hasExternalTransactionActive = _unitOfWork.IsTransactionBegun();
         }
@@ -86,9 +92,10 @@ namespace Application.Services
             await DeleteAsync([id], cancellationToken);
         }
 
-        public abstract Task<List<TListing>> GetAllAsync<TListing, TFilter>(TFilter filter, CancellationToken cancellationToken)
-            where TListing : EntityListing
-            where TFilter : EntityListingFilter;
+        public Task<List<TListing>> GetAllAsync(TFilter filter, CancellationToken cancellationToken)
+        {
+            return _listingQuery.GetAll(filter, cancellationToken);
+        }
 
         #endregion Public methods
 

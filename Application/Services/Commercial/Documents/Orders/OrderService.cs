@@ -1,26 +1,22 @@
 using Application.DataTransferObjects.Commercial.Documents.Orders;
 using Application.DataTransferObjects.Commercial.Documents.Orders.Listings;
-using Application.DataTransferObjects.Entities;
 using Application.Interfaces.Queries.Commercial.Documents.Orders;
 using Application.Interfaces.Services.Commercial.Documents.Orders;
 using AutoMapper;
 using Domain.Entities.Commercial.Documents.Budgets;
 using Domain.Entities.Commercial.Documents.Orders;
-using Domain.Exceptions;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
 using Domain.ValueObjects.Commercial.Documents.Payments;
 
 namespace Application.Services.Commercial.Documents.Orders
 {
-    public class OrderService : DocumentService<Order, OrderSaveDto, OrderProductSaveDto>, IOrderService
+    public class OrderService : DocumentService<Order, OrderSaveDto, OrderProductSaveDto, OrderListing, OrderListingFilter>, IOrderService
     {
         private readonly IMapper _mapper;
-        private readonly IOrderQuery _orderQuery;
 
         public OrderService(IOrderRepository repository, IOrderQuery query, IUnitOfWork unitOfWork, IMapper mapper) : base(repository, query, unitOfWork)
         {
-            _orderQuery = query;
             _mapper = mapper;
         }
 
@@ -31,16 +27,6 @@ namespace Application.Services.Commercial.Documents.Orders
             await SaveAsync([order], cancellationToken);
 
             return _mapper.Map<Order, OrderSaveDto>(order);
-        }
-
-        public override async Task<List<TListing>> GetAllAsync<TListing, TFilter>(TFilter filter, CancellationToken cancellationToken)
-        {
-            if (filter is not OrderListingFilter orderFilter || typeof(TListing) != typeof(OrderListing))
-                throw new BusinessRuleException($"Listagem inválida para {nameof(OrderService)}.");
-
-            List<OrderListing> orders = await _orderQuery.GetAll(orderFilter, cancellationToken);
-
-            return orders.Cast<TListing>().ToList();
         }
 
         protected override Order CreateEntity(OrderSaveDto dto)
