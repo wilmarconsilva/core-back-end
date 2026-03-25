@@ -4,11 +4,25 @@ namespace Infrastructure.Security.JsonWebTokens
     {
         public const string SectionName = "Jwt";
 
-        public string Issuer { get; private set; } = string.Empty;
+        public Options()
+        {
 
-        public string Audience { get; private set; } = string.Empty;
+        }
 
-        public string SigningKey { get; private set; } = string.Empty;
+        public Options(string issuer, string audience, string signingKey, int? accessTokenExpirationMinutes, int? refreshTokenExpirationDays)
+        {
+            Issuer = issuer;
+            Audience = audience;
+            SigningKey = signingKey;
+            AccessTokenExpirationMinutes = accessTokenExpirationMinutes ?? 30;
+            RefreshTokenExpirationDays = refreshTokenExpirationDays ?? 7;
+        }
+
+        public string Issuer { get; private set; } = "Core.Api";
+
+        public string Audience { get; private set; } = "Core.Client";
+
+        public string SigningKey { get; private set; } = "CHANGE-ME-WITH-A-STRONG-KEY-AT-LEAST-32-CHARS";
 
         public int AccessTokenExpirationMinutes { get; private set; } = 30;
 

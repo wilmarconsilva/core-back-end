@@ -321,16 +321,19 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.Property<string>("Password")
+                    b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("password");
+                        .HasColumnName("password_hash");
 
                     b.Property<byte[]>("SignatureImage")
                         .HasColumnType("bytea")
                         .HasColumnName("signature_image");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("users", (string)null);
                 });
@@ -356,6 +359,50 @@ namespace Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("products", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Security.RefreshToken", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedDateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_date_time");
+
+                    b.Property<DateTime>("ExpirationDateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expires_date_time");
+
+                    b.Property<string>("ReplacedByTokenHash")
+                        .HasColumnType("text")
+                        .HasColumnName("replaced_by_token_hash");
+
+                    b.Property<DateTime?>("RevokedDateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("revoked_date_time");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("token_hash");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("refresh_tokens", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Territories.Country", b =>
@@ -397,12 +444,13 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("description");
 
-                    b.Property<long?>("state_id")
-                        .HasColumnType("bigint");
+                    b.Property<long>("StateId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("state_id");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("state_id");
+                    b.HasIndex("StateId");
 
                     b.ToTable("localities", (string)null);
                 });
@@ -422,17 +470,18 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(4)")
                         .HasColumnName("acronym");
 
+                    b.Property<long>("CountryId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("country_id");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("description");
 
-                    b.Property<long?>("country_id")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("country_id");
+                    b.HasIndex("CountryId");
 
                     b.ToTable("states", (string)null);
                 });
@@ -705,12 +754,24 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("Locality");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Security.RefreshToken", b =>
+                {
+                    b.HasOne("Domain.Entities.Persons.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Entities.Territories.Locality", b =>
                 {
                     b.HasOne("Domain.Entities.Territories.State", "State")
                         .WithMany()
-                        .HasForeignKey("state_id")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("StateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("State");
                 });
@@ -719,8 +780,9 @@ namespace Infrastructure.Persistence.Migrations
                 {
                     b.HasOne("Domain.Entities.Territories.Country", "Country")
                         .WithMany()
-                        .HasForeignKey("country_id")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Country");
                 });
