@@ -1,4 +1,3 @@
-using Domain.Entities.Persons.Customers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistece
@@ -9,8 +8,6 @@ namespace Infrastructure.Persistece
         {
 
         }
-
-        public DbSet<Customer> Customers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

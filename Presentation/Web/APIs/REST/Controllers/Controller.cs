@@ -1,9 +1,11 @@
 using Domain.Exceptions;
 using Domain.Interfaces.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace REST.Controllers
 {
+    [Authorize]
     public abstract class Controller : ControllerBase
     {
         protected readonly ILogger _logger;
@@ -31,10 +33,17 @@ namespace REST.Controllers
             {
                 return ProcessException(ex, cancellationToken);
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                return ProcessException(ex, cancellationToken);
+            }
             catch (Exception ex)
             {
                 if (ex.InnerException is BusinessRuleException businessRuleException)
                     return ProcessException(businessRuleException, cancellationToken);
+
+                if (ex.InnerException is UnauthorizedAccessException unauthorizedAccessException)
+                    return ProcessException(unauthorizedAccessException, cancellationToken);
 
                 return ProcessException(ex, cancellationToken);
             }
@@ -54,8 +63,18 @@ namespace REST.Controllers
             {
                 return ProcessException(ex, cancellationToken);
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                return ProcessException(ex, cancellationToken);
+            }
             catch (Exception ex)
             {
+                if (ex.InnerException is BusinessRuleException businessRuleException)
+                    return ProcessException(businessRuleException, cancellationToken);
+
+                if (ex.InnerException is UnauthorizedAccessException unauthorizedAccessException)
+                    return ProcessException(unauthorizedAccessException, cancellationToken);
+
                 return ProcessException(ex, cancellationToken);
             }
         }
@@ -76,6 +95,13 @@ namespace REST.Controllers
             _unitOfWork.RollbackAsync(cancellationToken);
             _logger.LogDebug(ex, "Not found");
             return NotFound();
+        }
+
+        private UnauthorizedObjectResult ProcessException(UnauthorizedAccessException ex, CancellationToken cancellationToken)
+        {
+            _unitOfWork.RollbackAsync(cancellationToken);
+            _logger.LogInformation(ex, "Unauthorized request");
+            return Unauthorized(ex.Message);
         }
 
         private ObjectResult ProcessException(Exception ex, CancellationToken cancellationToken)

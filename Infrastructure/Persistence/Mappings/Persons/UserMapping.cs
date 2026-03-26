@@ -18,12 +18,15 @@ namespace Infrastructure.Persistence.Mappings.Persons
                 .HasColumnName("email")
                 .IsRequired();
 
-            builder.Property(u => u.Password)
-                .HasColumnName("password")
+            builder.Property(u => u.PasswordHash)
+                .HasColumnName("password_hash")
                 .IsRequired();
 
             builder.Property(u => u.SignatureImage)
                 .HasColumnName("signature_image");
+
+            builder.HasIndex(u => u.Email)
+                .IsUnique();
         }
 
         protected override void MapDescription(EntityTypeBuilder<User> builder)
