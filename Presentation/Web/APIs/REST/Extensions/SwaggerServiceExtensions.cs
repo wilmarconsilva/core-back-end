@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 
 namespace Presentation.Web.APIs.REST.Extensions;
@@ -26,6 +27,26 @@ public static class SwaggerServiceExtensions
             string xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
             string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
             setup.IncludeXmlComments(xmlPath);
+
+            OpenApiSecurityScheme securityScheme = new()
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = JwtBearerDefaults.AuthenticationScheme
+                }
+            };
+
+            setup.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, securityScheme);
+            setup.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                [securityScheme] = []
+            });
         });
 
         return services;

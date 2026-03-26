@@ -1,9 +1,14 @@
+using Application.Interfaces.Security;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
 using Infrastructure.Persistece;
 using Infrastructure.Repositories.Commercial.Documents.Budgets;
 using Infrastructure.Repositories.Commercial.Documents.Orders;
+using Infrastructure.Repositories.Persons;
 using Infrastructure.Repositories.Persons.Customers;
+using Infrastructure.Repositories.Security;
+using Infrastructure.Security;
+using Infrastructure.Security.JsonWebTokens;
 using Microsoft.EntityFrameworkCore;
 
 namespace Presentation.Web.APIs.REST.Extensions;
@@ -19,6 +24,7 @@ public static class InfrastructureServiceExtensions
         ArgumentNullException.ThrowIfNull(configuration);
 
         AddPersistence(services, configuration);
+        AddSecurity(services, configuration);
         AddRepositories(services);
 
         return services;
@@ -32,11 +38,20 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 
+    private static void AddSecurity(IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<Options>(configuration.GetSection(Options.SectionName));
+        services.AddScoped<IJwtTokenGenerator, TokenGenerator>();
+        services.AddScoped<IPasswordHasherService, PasswordHasherService>();
+    }
+
     private static void AddRepositories(IServiceCollection services)
     {
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IBudgetRepository, BudgetRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
     }
 }

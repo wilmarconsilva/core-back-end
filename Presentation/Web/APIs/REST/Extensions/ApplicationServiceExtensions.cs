@@ -28,6 +28,8 @@ using Application.Interfaces.Services.Commercial.Documents.Orders;
 using Application.Interfaces.Services.Commercial.Documents.Budgets;
 using Application.Services.Commercial.Documents.Budgets;
 using Domain.Interfaces.Repositories;
+using Application.Interfaces.Services.Security;
+using Application.Services.Security;
 
 namespace Presentation.Web.APIs.REST.Extensions;
 
@@ -47,6 +49,7 @@ public static class ApplicationServiceExtensions
         AddBudgetServices(services);
         AddOrderServices(services);
         AddLocalityServices(services);
+        AddSecurityServices(services);
 
         return services;
     }
@@ -124,5 +127,10 @@ public static class ApplicationServiceExtensions
         services.AddScoped<ILocalityService, LocalityService>();
         services.AddScoped<ILocalityQuery, LocalityQuery>();
         services.AddScoped<ILocalityRepository, LocalityRepository>();
+    }
+
+    private static void AddSecurityServices(IServiceCollection services)
+    {
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
     }
 }
