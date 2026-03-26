@@ -10,14 +10,15 @@ namespace Domain.Entities.Security
 
         private RefreshToken() { }
 
-        public RefreshToken(long userId, string tokenHash, DateTime ExpirationDateTime)
+        public RefreshToken(long userId, string tokenHash, DateTime expirationDateTime)
         {
             CreatedDateTime = DateTime.UtcNow;
+
             SetUserId(userId);
             SetTokenHash(tokenHash);
 
-            Validator.ValidateValue(ExpirationDateTime, "Data de expiração");
-            ExpirationDateTime = ExpirationDateTime;
+            Validator.ValidateValue(expirationDateTime, "Data de expiração");
+            ExpirationDateTime = expirationDateTime;
         }
 
         public long UserId { get => _userId; set => SetUserId(value); }

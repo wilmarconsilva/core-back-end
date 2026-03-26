@@ -15,8 +15,15 @@ namespace Infrastructure.Security
 
         public bool VerifyPassword(User user, string passwordHash, string providedPassword)
         {
-            PasswordVerificationResult result = _passwordHasher.VerifyHashedPassword(user, passwordHash, providedPassword);
-            return result is PasswordVerificationResult.Success or PasswordVerificationResult.SuccessRehashNeeded;
+            try
+            {
+                PasswordVerificationResult result = _passwordHasher.VerifyHashedPassword(user, passwordHash, providedPassword);
+                return result is PasswordVerificationResult.Success or PasswordVerificationResult.SuccessRehashNeeded;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
         }
     }
 }

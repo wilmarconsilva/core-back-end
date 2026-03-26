@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class dev19 : Migration
+    public partial class dev_19 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -46,7 +46,7 @@ namespace Infrastructure.Persistence.Migrations
                     user_id = table.Column<long>(type: "bigint", nullable: false),
                     token_hash = table.Column<string>(type: "text", nullable: false),
                     created_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    expires_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    expiration_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     revoked_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     replaced_by_token_hash = table.Column<string>(type: "text", nullable: true)
                 },

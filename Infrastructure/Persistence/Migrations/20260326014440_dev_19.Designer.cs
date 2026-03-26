@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260325021716_dev-19")]
-    partial class dev19
+    [Migration("20260326014440_dev_19")]
+    partial class dev_19
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -379,7 +379,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.Property<DateTime>("ExpirationDateTime")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("expires_date_time");
+                        .HasColumnName("expiration_date_time");
 
                     b.Property<string>("ReplacedByTokenHash")
                         .HasColumnType("text")

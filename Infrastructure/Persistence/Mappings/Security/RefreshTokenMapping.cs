@@ -23,7 +23,7 @@ namespace Infrastructure.Persistence.Mappings.Security
                 .IsRequired();
 
             builder.Property(refreshToken => refreshToken.ExpirationDateTime)
-                .HasColumnName("expires_date_time")
+                .HasColumnName("expiration_date_time")
                 .IsRequired();
 
             builder.Property(refreshToken => refreshToken.RevokedDateTime)

@@ -376,7 +376,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.Property<DateTime>("ExpirationDateTime")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("expires_date_time");
+                        .HasColumnName("expiration_date_time");
 
                     b.Property<string>("ReplacedByTokenHash")
                         .HasColumnType("text")
