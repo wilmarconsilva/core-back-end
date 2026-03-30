@@ -1,7 +1,9 @@
 using Application.DataTransferObjects.Commercial.Documents.Budgets;
 using Application.DataTransferObjects.Commercial.Documents.Budgets.Listings;
 using Application.DataTransferObjects.Commercial.Documents.Orders;
+using Application.DataTransferObjects.Email;
 using Application.Interfaces.Queries.Commercial.Documents.Budgets;
+using Application.Interfaces.Services;
 using Application.Interfaces.Services.Commercial.Documents;
 using Application.Interfaces.Services.Commercial.Documents.Orders;
 using AutoMapper;
@@ -18,7 +20,7 @@ namespace Application.Services.Commercial.Documents
         private readonly IMapper _mapper;
         private readonly IOrderService _orderService;
 
-        public BudgetService(IBudgetRepository repository, IBudgetQuery query, IUnitOfWork unitOfWork, IMapper mapper, IOrderService orderService) : base(repository, query, unitOfWork)
+        public BudgetService(IBudgetRepository repository, IBudgetQuery query, IUnitOfWork unitOfWork, IMapper mapper, IOrderService orderService, IEmailService emailService, ICustomerRepository customerRepository) : base(repository, query, unitOfWork, emailService)
         {
             _mapper = mapper;
             _orderService = orderService;

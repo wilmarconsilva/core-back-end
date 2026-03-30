@@ -2,6 +2,7 @@ using Application.DataTransferObjects.Commercial.Documents;
 using Application.DataTransferObjects.Entities;
 using Application.DataTransferObjects.Listings;
 using Application.Interfaces.Queries;
+using Application.Interfaces.Services;
 using Domain.Entities;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
@@ -17,10 +18,12 @@ namespace Application.Services.Commercial.Documents
         where TListing : EntityListing
         where TFilter : ListingFilter
     {
-        protected DocumentService(IRepositoryCrud<TEntity> repository, IEntitySaveDtoQuery<TDocumentSaveDto> query, IUnitOfWork unitOfWork)
+        private readonly IEmailService _emailService;
+
+        protected DocumentService(IRepositoryCrud<TEntity> repository, IEntitySaveDtoQuery<TDocumentSaveDto> query, IUnitOfWork unitOfWork, IEmailService emailService)
             : base(repository, query, unitOfWork)
         {
-
+            _emailService = emailService;
         }
 
         protected Payment CreatePayment(TDocumentSaveDto dto)
