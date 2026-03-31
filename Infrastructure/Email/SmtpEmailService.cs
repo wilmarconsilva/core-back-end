@@ -33,6 +33,9 @@ namespace Infrastructure.Email
 
             mailMessage.To.Add(message.To);
 
+            foreach (var attachment in message.Attachments)
+                mailMessage.Attachments.Add(new Attachment(new MemoryStream(attachment.Content), attachment.FileName, attachment.MediaType));
+
             await client.SendMailAsync(mailMessage, cancellationToken);
         }
     }

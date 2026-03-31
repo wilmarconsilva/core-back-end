@@ -1,13 +1,13 @@
 using Application.DataTransferObjects.Commercial.Documents.Budgets;
 using Application.DataTransferObjects.Commercial.Documents.Budgets.Listings;
 using Application.DataTransferObjects.Commercial.Documents.Orders;
-using Application.DataTransferObjects.Email;
 using Application.Interfaces.Queries.Commercial.Documents.Budgets;
 using Application.Interfaces.Services;
 using Application.Interfaces.Services.Commercial.Documents;
 using Application.Interfaces.Services.Commercial.Documents.Orders;
 using AutoMapper;
 using Domain.Entities.Commercial.Documents.Budgets;
+using Domain.Entities.Persons.Customers;
 using Domain.Exceptions;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
@@ -20,11 +20,32 @@ namespace Application.Services.Commercial.Documents
         private readonly IMapper _mapper;
         private readonly IOrderService _orderService;
 
-        public BudgetService(IBudgetRepository repository, IBudgetQuery query, IUnitOfWork unitOfWork, IMapper mapper, IOrderService orderService, IEmailService emailService, ICustomerRepository customerRepository) : base(repository, query, unitOfWork, emailService)
+        public BudgetService(IBudgetRepository repository, IBudgetQuery query, IUnitOfWork unitOfWork, IMapper mapper, IOrderService orderService, IEmailService emailService, ICustomerRepository customerRepository, IPdfService pdfService, ITemplateRenderer templateRenderer) : base(repository, query, unitOfWork, emailService, customerRepository, pdfService, templateRenderer)
         {
             _mapper = mapper;
             _orderService = orderService;
         }
+
+        protected override long GetCustomerId(Budget entity) => entity.CustomerId;
+
+        protected override string GetEmailSubject(Budget entity) => "Orçamento recebido";
+
+        protected override string GetEmailBody(Budget entity) => $"Seu orçamento #{entity.Id} foi processado com sucesso.";
+
+        protected override string GetDocumentFileName(Budget entity) => $"orcamento-{entity.Id}.pdf";
+
+        protected override string GetTemplateName() => "budget";
+
+        protected override object GetTemplateModel(Budget entity, Customer customer) => new
+        {
+            entity.Id,
+            entity.ValueSubtotal,
+            entity.ValueTotal,
+            entity.Observations,
+            CreationDateTime = entity.CreationDateTime.ToString("dd/MM/yyyy HH:mm"),
+            CustomerName = customer.Name,
+            CustomerDocument = customer.Document,
+        };
 
         protected override Budget CreateEntity(BudgetSaveDto dto)
         {
