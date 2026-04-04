@@ -1,10 +1,13 @@
 ﻿using Domain.Exceptions;
 using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace Domain.Utilities.Entities
 {
     internal static class Validator
     {
+        private static readonly Regex _emailRegex = new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled);
+
         internal static void ValidateValue(string value, string propertyName)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -33,6 +36,12 @@ namespace Domain.Utilities.Entities
         {
             if (value == null || !value.Any())
                 throw new BusinessRuleException($"{propertyName} não pode ser vazio.");
+        }
+
+        internal static void ValidateEmail(string email, string propertyName)
+        {
+            if (!_emailRegex.IsMatch(email))
+                throw new BusinessRuleException($"{propertyName} não é um endereço de e-mail válido.");
         }
     }
 }

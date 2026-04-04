@@ -15,7 +15,7 @@ namespace Infrastructure.Repositories.Commercial.Documents
 
         protected override IQueryable<IDocument> ApplyIncludesForGetByIds(IQueryable<IDocument> query)
         {
-            return query.Include(d => d.Products);
+            return query.Include(d => d.Products).ThenInclude(p => p.Product);
         }
     }
 }
