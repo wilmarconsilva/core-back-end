@@ -1,6 +1,10 @@
 using Application.Interfaces.Security;
+using Application.Interfaces.Services;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
+using Infrastructure.Email;
+using Infrastructure.Pdf;
+using Infrastructure.Templates;
 using Infrastructure.Persistece;
 using Infrastructure.Repositories.Commercial.Documents.Budgets;
 using Infrastructure.Repositories.Commercial.Documents.Orders;
@@ -25,6 +29,7 @@ public static class InfrastructureServiceExtensions
 
         AddPersistence(services, configuration);
         AddSecurity(services, configuration);
+        AddEmail(services, configuration);
         AddRepositories(services);
 
         return services;
@@ -43,6 +48,14 @@ public static class InfrastructureServiceExtensions
         services.Configure<Options>(configuration.GetSection(Options.SectionName));
         services.AddScoped<IJwtTokenGenerator, TokenGenerator>();
         services.AddScoped<IPasswordHasherService, PasswordHasherService>();
+    }
+
+    private static void AddEmail(IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<EmailOptions>(configuration.GetSection(EmailOptions.SectionName));
+        services.AddScoped<IEmailService, SmtpEmailService>();
+        services.AddScoped<IPdfService, PdfService>();
+        services.AddSingleton<ITemplateRenderer, EmbeddedTemplateRenderer>();
     }
 
     private static void AddRepositories(IServiceCollection services)

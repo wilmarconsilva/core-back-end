@@ -1,12 +1,13 @@
 using Domain.Entities.Persons;
 using Domain.Entities.Persons.Customers;
 using Domain.Exceptions;
+using Domain.Interfaces.Entities.Commercial;
 using Domain.Utilities.Entities;
 using Domain.ValueObjects.Commercial.Documents.Payments;
 
 namespace Domain.Entities.Commercial.Documents
 {
-    public abstract class Document<TProduct> : EntityWithoutDescription where TProduct : DocumentProduct
+    public abstract class Document<TProduct> : EntityWithoutDescription, IDocument where TProduct : DocumentProduct
     {
         private Payment _payment = null!;
         private readonly List<TProduct> _products = new();

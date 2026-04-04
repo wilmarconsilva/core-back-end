@@ -23,8 +23,6 @@ namespace Application.Services
 
         private readonly IUnitOfWork _unitOfWork;
 
-        private readonly bool _hasExternalTransactionActive;
-
         #endregion Attributes
 
         #region Constructors
@@ -35,7 +33,6 @@ namespace Application.Services
             this._query = query;
             this._listingQuery = (IEntityListingQuery<TListing, TFilter>)query;
             this._unitOfWork = unitOfWork;
-            this._hasExternalTransactionActive = _unitOfWork.IsTransactionBegun();
         }
 
         #endregion Constructors
@@ -84,7 +81,7 @@ namespace Application.Services
 
             await _repositoryCrud.DeleteAsync(ids, cancellationToken);
 
-            await CommitAsync(cancellationToken);
+            await _unitOfWork.CommitAsync(cancellationToken);
         }
 
         public async Task DeleteAsync(long id, CancellationToken cancellationToken)
@@ -126,26 +123,18 @@ namespace Application.Services
             return entities;
         }
 
-        protected async Task SaveAsync(List<TEntity> entities, CancellationToken cancellationToken)
+        protected virtual async Task SaveAsync(List<TEntity> entities, CancellationToken cancellationToken)
         {
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             await _repositoryCrud.SaveAsync(entities, cancellationToken);
 
-            await CommitAsync(cancellationToken);
+            await _unitOfWork.CommitAsync(cancellationToken);
         }
 
         #endregion Protected methods
 
         #region Private methods
-
-        private Task CommitAsync(CancellationToken cancellationToken)
-        {
-            if (!_hasExternalTransactionActive)
-                return _unitOfWork.CommitAsync(cancellationToken);
-
-            return Task.CompletedTask;
-        }
 
         private async Task<IEnumerable<long>> GetNotExistingIds(IEnumerable<long> dtosIds, CancellationToken cancellationToken)
         {

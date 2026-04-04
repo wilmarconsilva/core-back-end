@@ -5,24 +5,29 @@ using Application.Interfaces.Queries.Commercial.Documents.Budgets;
 using Application.Interfaces.Services.Commercial.Documents;
 using Application.Interfaces.Services.Commercial.Documents.Orders;
 using AutoMapper;
+using Domain.Entities.Commercial.Documents;
 using Domain.Entities.Commercial.Documents.Budgets;
 using Domain.Exceptions;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
 using Domain.ValueObjects.Commercial.Documents.Payments;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Application.Services.Commercial.Documents
+namespace Application.Services.Commercial.Documents.Budgets
 {
     public class BudgetService : DocumentService<Budget, BudgetSaveDto, BudgetProductSaveDto, BudgetListing, BudgetListingFilter>, IBudgetService
     {
         private readonly IMapper _mapper;
         private readonly IOrderService _orderService;
 
-        public BudgetService(IBudgetRepository repository, IBudgetQuery query, IUnitOfWork unitOfWork, IMapper mapper, IOrderService orderService) : base(repository, query, unitOfWork)
+        public BudgetService(IBudgetRepository repository, IBudgetQuery query, IUnitOfWork unitOfWork, IMapper mapper, IOrderService orderService, ICustomerRepository customerRepository, IProductRepository productRepository, IServiceScopeFactory serviceScopeFactory)
+            : base(repository, query, unitOfWork, customerRepository, productRepository, serviceScopeFactory, new("Orçamento", "orcamento"))
         {
             _mapper = mapper;
             _orderService = orderService;
         }
+
+        protected override IEnumerable<DocumentProduct> GetProducts(Budget entity) => entity.Products;
 
         protected override Budget CreateEntity(BudgetSaveDto dto)
         {

@@ -3,11 +3,13 @@ using Application.DataTransferObjects.Commercial.Documents.Orders.Listings;
 using Application.Interfaces.Queries.Commercial.Documents.Orders;
 using Application.Interfaces.Services.Commercial.Documents.Orders;
 using AutoMapper;
+using Domain.Entities.Commercial.Documents;
 using Domain.Entities.Commercial.Documents.Budgets;
 using Domain.Entities.Commercial.Documents.Orders;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
 using Domain.ValueObjects.Commercial.Documents.Payments;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.Services.Commercial.Documents.Orders
 {
@@ -15,9 +17,18 @@ namespace Application.Services.Commercial.Documents.Orders
     {
         private readonly IMapper _mapper;
 
-        public OrderService(IOrderRepository repository, IOrderQuery query, IUnitOfWork unitOfWork, IMapper mapper) : base(repository, query, unitOfWork)
+        public OrderService(IOrderRepository repository, IOrderQuery query, IUnitOfWork unitOfWork, IMapper mapper, ICustomerRepository customerRepository, IProductRepository productRepository, IServiceScopeFactory serviceScopeFactory)
+            : base(repository, query, unitOfWork, customerRepository, productRepository, serviceScopeFactory, new("Pedido", "pedido"))
         {
             _mapper = mapper;
+        }
+
+        protected override IEnumerable<DocumentProduct> GetProducts(Order entity) => entity.Products;
+
+        protected override void AppendExtraTemplateFields(Order entity, Dictionary<string, object> model)
+        {
+            if (entity.BudgetId.HasValue)
+                model["BudgetId"] = entity.BudgetId.Value;
         }
 
         public async Task<OrderSaveDto> CreateByBudgetAsync(Budget budget, CancellationToken cancellationToken)

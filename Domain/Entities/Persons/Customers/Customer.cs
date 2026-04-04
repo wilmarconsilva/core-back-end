@@ -9,6 +9,7 @@ namespace Domain.Entities.Persons.Customers
         #region Fields
 
         private string _document = null!;
+        private string? _email = null;
         private readonly List<CustomerAddress> _addresses = new();
 
         #endregion Fields
@@ -35,7 +36,7 @@ namespace Domain.Entities.Persons.Customers
 
         public DocumentType DocumentType { get; private set; }
 
-        public string? Email { get; set; }
+        public string? Email { get => _email; set => SetEmail(value); }
 
         public string? StateRegistration { get; set; }
 
@@ -81,6 +82,16 @@ namespace Domain.Entities.Persons.Customers
             Validator.ValidateValue(document, nameof(Document));
 
             _document = document;
+        }
+
+        private void SetEmail(string? email)
+        {
+            if (email is null)
+                return;
+
+            Validator.ValidateEmail(email, nameof(Email));
+
+            _email = email;
         }
 
         #endregion Public methods
