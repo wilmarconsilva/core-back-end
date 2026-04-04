@@ -20,7 +20,7 @@ namespace Infrastructure.Templates
             string resourceName = $"Application.Templates.Documents.{templateName}.hbs";
 
             using Stream stream = _applicationAssembly.GetManifestResourceStream(resourceName)
-                ?? throw new FileNotFoundException($"Template '{templateName}' não encontrado como embedded resource.");
+                ?? throw new FileNotFoundException($"Template: {templateName} não encontrado como embedded resource.");
 
             using StreamReader reader = new(stream);
 

@@ -2,7 +2,7 @@ namespace Application.DataTransferObjects.Email
 {
     public class EmailAttachmentDto
     {
-        public EmailAttachmentDto(string fileName, byte[] content, string mediaType = "application/pdf")
+        public EmailAttachmentDto(string fileName, byte[] content, string mediaType)
         {
             FileName = fileName;
             Content = content;

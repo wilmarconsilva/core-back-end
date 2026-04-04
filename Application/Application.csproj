@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <EmbeddedResource Include="Templates\Documents\order.hbs" />
+    <EmbeddedResource Include="Templates\Documents\document.hbs" />
   </ItemGroup>
 
   <ItemGroup>

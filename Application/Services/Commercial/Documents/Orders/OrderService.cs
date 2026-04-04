@@ -1,15 +1,15 @@
 using Application.DataTransferObjects.Commercial.Documents.Orders;
 using Application.DataTransferObjects.Commercial.Documents.Orders.Listings;
 using Application.Interfaces.Queries.Commercial.Documents.Orders;
-using Application.Interfaces.Services;
 using Application.Interfaces.Services.Commercial.Documents.Orders;
 using AutoMapper;
+using Domain.Entities.Commercial.Documents;
 using Domain.Entities.Commercial.Documents.Budgets;
 using Domain.Entities.Commercial.Documents.Orders;
-using Domain.Entities.Persons.Customers;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
 using Domain.ValueObjects.Commercial.Documents.Payments;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.Services.Commercial.Documents.Orders
 {
@@ -17,32 +17,19 @@ namespace Application.Services.Commercial.Documents.Orders
     {
         private readonly IMapper _mapper;
 
-        public OrderService(IOrderRepository repository, IOrderQuery query, IUnitOfWork unitOfWork, IMapper mapper, IEmailService emailService, ICustomerRepository customerRepository, IPdfService pdfService, ITemplateRenderer templateRenderer) : base(repository, query, unitOfWork, emailService, customerRepository, pdfService, templateRenderer)
+        public OrderService(IOrderRepository repository, IOrderQuery query, IUnitOfWork unitOfWork, IMapper mapper, ICustomerRepository customerRepository, IProductRepository productRepository, IServiceScopeFactory serviceScopeFactory)
+            : base(repository, query, unitOfWork, customerRepository, productRepository, serviceScopeFactory, new("Pedido", "pedido"))
         {
             _mapper = mapper;
         }
 
-        protected override long GetCustomerId(Order entity) => entity.CustomerId;
+        protected override IEnumerable<DocumentProduct> GetProducts(Order entity) => entity.Products;
 
-        protected override string GetEmailSubject(Order entity) => "Pedido gerado";
-
-        protected override string GetEmailBody(Order entity) => $"Seu pedido de código: {entity.Id} foi processado com sucesso!";
-
-        protected override string GetDocumentFileName(Order entity) => $"pedido-{entity.Id}.pdf";
-
-        protected override string GetTemplateName() => "order";
-
-        protected override object GetTemplateModel(Order entity, Customer customer) => new
+        protected override void AppendExtraTemplateFields(Order entity, Dictionary<string, object> model)
         {
-            entity.Id,
-            entity.BudgetId,
-            entity.ValueSubtotal,
-            entity.ValueTotal,
-            entity.Observations,
-            CreationDateTime = entity.CreationDateTime.ToString("dd/MM/yyyy HH:mm"),
-            CustomerName = customer.Name,
-            CustomerDocument = customer.Document,
-        };
+            if (entity.BudgetId.HasValue)
+                model["BudgetId"] = entity.BudgetId.Value;
+        }
 
         public async Task<OrderSaveDto> CreateByBudgetAsync(Budget budget, CancellationToken cancellationToken)
         {
