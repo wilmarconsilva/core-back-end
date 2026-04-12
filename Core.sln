@@ -12,23 +12,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentatio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{479DC21E-91BE-4CD8-A7D1-8AD9BF9539AB}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{7F21766D-6D95-49CE-938A-72E92A7A6E4A}"
-	ProjectSection(SolutionItems) = preProject
-		Presentation\Web\Application\app.json = Presentation\Web\Application\app.json
-		Presentation\Web\Application\App.tsx = Presentation\Web\Application\App.tsx
-		Presentation\Web\Application\index.ts = Presentation\Web\Application\index.ts
-		Presentation\Web\Application\package.json = Presentation\Web\Application\package.json
-		Presentation\Web\Application\tsconfig.json = Presentation\Web\Application\tsconfig.json
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{8694AB15-E3C0-423A-83FC-4014367B4D98}"
-	ProjectSection(SolutionItems) = preProject
-		Presentation\Web\Application\assets\adaptive-icon.png = Presentation\Web\Application\assets\adaptive-icon.png
-		Presentation\Web\Application\assets\favicon.png = Presentation\Web\Application\assets\favicon.png
-		Presentation\Web\Application\assets\icon.png = Presentation\Web\Application\assets\icon.png
-		Presentation\Web\Application\assets\splash-icon.png = Presentation\Web\Application\assets\splash-icon.png
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "APIs", "APIs", "{C2D52972-E4B7-32FB-CA0B-2DDBD291A6AB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "REST", "Presentation\Web\APIs\REST\REST.csproj", "{A3B4C394-2447-457F-92F6-5A6AFA44E189}"
@@ -97,12 +80,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{479DC21E-91BE-4CD8-A7D1-8AD9BF9539AB} = {06CFFD70-14AA-A959-A3BA-1B15D094E3B1}
-		{7F21766D-6D95-49CE-938A-72E92A7A6E4A} = {479DC21E-91BE-4CD8-A7D1-8AD9BF9539AB}
-		{8694AB15-E3C0-423A-83FC-4014367B4D98} = {7F21766D-6D95-49CE-938A-72E92A7A6E4A}
 		{C2D52972-E4B7-32FB-CA0B-2DDBD291A6AB} = {479DC21E-91BE-4CD8-A7D1-8AD9BF9539AB}
 		{A3B4C394-2447-457F-92F6-5A6AFA44E189} = {C2D52972-E4B7-32FB-CA0B-2DDBD291A6AB}
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {E56488ED-07EA-42A4-AFCF-40C5296BBA17}
 	EndGlobalSection
 EndGlobal
