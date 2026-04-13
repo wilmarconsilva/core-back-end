@@ -1,4 +1,4 @@
-export type AccessTokenDto = {
+export interface AccessToken {
   accessToken: string;
   accessTokenExpirationDateTime: string;
-};
+}
