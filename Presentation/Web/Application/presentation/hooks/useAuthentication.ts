@@ -1,11 +1,9 @@
 import { useCallback, useState } from 'react';
-import { AuthenticationService } from '../../application/services/AuthenticationService';
-import {
-  AccessToken,
-  ApiError,
-  LoginRequest,
-  LoginValidationErrors,
-} from '../../application/interfaces/DataTransferObjects/authentication.types';
+import { AuthenticationService } from '../../Application/Services/AuthenticationService';
+import { AccessToken } from '../../Application/Interfaces/DataTransferObjects/AccessToken';
+import { ApiError } from '../../Application/Interfaces/DataTransferObjects/ApiError';
+import { LoginRequest } from '../../Application/Interfaces/DataTransferObjects/LoginRequest';
+import { LoginValidationErrors } from '../../Application/Interfaces/DataTransferObjects/LoginValidationErrors';
 
 const authenticationService = new AuthenticationService();
 
@@ -24,7 +22,7 @@ interface AuthenticationActions {
 
 export type UseAuthenticationResult = AuthenticationState & AuthenticationActions;
 
-export function useAuthentication(): UseAuthenticationResult {
+export function UseAuthentication(): UseAuthenticationResult {
   const [accessToken, setAccessToken] = useState<AccessToken | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

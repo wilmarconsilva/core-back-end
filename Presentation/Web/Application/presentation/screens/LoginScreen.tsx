@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { LoginScreenProps } from '../interfaces/LoginScreenProps';
+import { LoginScreenProps } from '../Interfaces/LoginScreenProps';
 
 export function LoginScreen({
   isLoading,

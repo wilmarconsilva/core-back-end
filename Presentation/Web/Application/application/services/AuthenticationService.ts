@@ -1,9 +1,10 @@
-import { IAuthenticationService } from '../interfaces/services/IAuthenticationService';
-import { AccessToken, ApiError, LoginRequest } from '../interfaces/DataTransferObjects/authentication.types';
+import { IAuthenticationService } from '../Interfaces/Services/IAuthenticationService';
+import { AccessToken } from '../Interfaces/DataTransferObjects/AccessToken';
+import { LoginRequest } from '../Interfaces/DataTransferObjects/LoginRequest';
+import { APIConsumerService } from './APIConsumerService';
 
-const API_BASE_URL = 'http://localhost:5000';
+export class AuthenticationService extends APIConsumerService implements IAuthenticationService {
 
-export class AuthenticationService implements IAuthenticationService {
   async login(request: LoginRequest): Promise<AccessToken> {
     return this.request<AccessToken>('/authentication/login', {
       method: 'POST',
@@ -20,19 +21,4 @@ export class AuthenticationService implements IAuthenticationService {
     await this.request<void>('/authentication/revoke', { method: 'POST' });
   }
 
-  private async request<T>(path: string, options: RequestInit): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
-      ...options,
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      const error: ApiError = await response.json().catch(() => ({ status: response.status }));
-      error.status = response.status;
-      throw error;
-    }
-
-    if (response.status === 204) return undefined as T;
-    return response.json() as Promise<T>;
-  }
 }

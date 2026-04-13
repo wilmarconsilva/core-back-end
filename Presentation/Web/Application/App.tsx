@@ -1,11 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import { Text, View, StyleSheet } from 'react-native';
-import { LoginScreen } from './presentation/screens/LoginScreen';
-import { useAuthentication } from './presentation/hooks/useAuthentication';
+import { LoginScreen } from './Presentation/Screens/LoginScreen';
+import { UseAuthentication } from './Presentation/Hooks/UseAuthentication';
 
 export default function App() {
   const { accessToken, isLoading, error, validationErrors, login, revoke, clearError } =
-    useAuthentication();
+    UseAuthentication();
 
   if (accessToken) {
     return (

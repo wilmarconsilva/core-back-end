@@ -1,4 +1,5 @@
-import { LoginRequest, LoginValidationErrors } from '../../application/interfaces/DataTransferObjects/authentication.types';
+import { LoginRequest } from '../../Application/Interfaces/DataTransferObjects/LoginRequest';
+import { LoginValidationErrors } from '../../Application/Interfaces/DataTransferObjects/LoginValidationErrors';
 
 export interface LoginScreenProps {
   isLoading: boolean;
