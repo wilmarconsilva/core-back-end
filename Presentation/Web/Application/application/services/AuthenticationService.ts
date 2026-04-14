@@ -14,11 +14,11 @@ export class AuthenticationService extends APIConsumerService implements IAuthen
   }
 
   async refresh(): Promise<AccessToken> {
-    return this.request<AccessToken>('/authentication/refresh', { method: 'POST' });
+    return this.request<AccessToken>('/authentication/refresh', { method: 'POST', credentials: 'include' });
   }
 
   async revoke(): Promise<void> {
-    await this.request<void>('/authentication/revoke', { method: 'POST' });
+    await this.request<void>('/authentication/revoke', { method: 'POST', credentials: 'include' });
   }
 
 }

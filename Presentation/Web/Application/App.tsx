@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { Text, View, StyleSheet } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { LoginScreen } from './Presentation/Screens/LoginScreen';
 import { UseAuthentication } from './Presentation/Hooks/UseAuthentication';
 
@@ -16,6 +17,7 @@ export default function App() {
           {new Date(accessToken.accessTokenExpirationDateTime).toLocaleString('pt-BR')}
         </Text>
         <StatusBar style="auto" />
+        <Toast position="bottom" />
       </View>
     );
   }
@@ -30,6 +32,7 @@ export default function App() {
         onLogin={login}
         onClearError={clearError}
       />
+      <Toast />
     </>
   );
 }

@@ -15,10 +15,8 @@ import { LoginScreenProps } from '../Interfaces/LoginScreenProps';
 
 export function LoginScreen({
   isLoading,
-  error,
   validationErrors,
   onLogin,
-  onClearError,
 }: LoginScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -40,15 +38,6 @@ export function LoginScreen({
         <View style={styles.card}>
           <Text style={styles.title}>Bem-vindo</Text>
           <Text style={styles.subtitle}>Faça login para continuar</Text>
-
-          {error ? (
-            <View style={styles.errorBanner}>
-              <Text style={styles.errorBannerText}>{error}</Text>
-              <TouchableOpacity onPress={onClearError} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <Text style={styles.errorBannerClose}>✕</Text>
-              </TouchableOpacity>
-            </View>
-          ) : null}
 
           <View style={styles.field}>
             <Text style={styles.label}>E-mail</Text>
