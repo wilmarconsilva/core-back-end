@@ -1,9 +1,9 @@
 import { useCallback, useState } from 'react';
-import { AuthenticationService } from '../../Application/Services/AuthenticationService';
-import { AccessToken } from '../../Application/Interfaces/DataTransferObjects/AccessToken';
-import { ApiError } from '../../Application/Interfaces/DataTransferObjects/ApiError';
-import { LoginRequest } from '../../Application/Interfaces/DataTransferObjects/LoginRequest';
-import { LoginValidationErrors } from '../../Application/Interfaces/DataTransferObjects/LoginValidationErrors';
+import { AuthenticationService } from '../Services/AuthenticationService';
+import { AccessToken } from '../Interfaces/DataTransferObjects/AccessToken';
+import { ApiError } from '../Interfaces/DataTransferObjects/ApiError';
+import { LoginRequest } from '../Interfaces/DataTransferObjects/LoginRequest';
+import { LoginValidationErrors } from '../Interfaces/DataTransferObjects/LoginValidationErrors';
 
 const authenticationService = new AuthenticationService();
 
