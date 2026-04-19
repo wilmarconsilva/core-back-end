@@ -11,6 +11,9 @@ namespace REST.Controllers
     [Route("authentication")]
     public class AuthenticationController : Controller
     {
+        private const string RefreshTokenCookieName = "refreshToken";
+        private const string RefreshTokenCookiePath = "/authentication";
+
         private readonly IAuthenticationService _authenticationService;
 
         public AuthenticationController(IAuthenticationService authenticationService, ILogger<AuthenticationController> logger, IUnitOfWork unitOfWork) : base(logger, unitOfWork)
@@ -20,35 +23,81 @@ namespace REST.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<ActionResult<ResponseDto>> Login([FromBody] LoginRequestDto request, CancellationToken cancellationToken)
+        public async Task<ActionResult<AccessTokenDto>> Login([FromBody] LoginRequestDto request, CancellationToken cancellationToken)
         {
-            return await ProcessRequestAsync<ResponseDto>(async () =>
+            return await ProcessRequestAsync<AccessTokenDto>(async () =>
             {
                 ResponseDto response = await _authenticationService.LoginAsync(request, cancellationToken);
-                return Ok(response);
+                AppendRefreshTokenCookie(response.RefreshTokenDto);
+                return Ok(response.AccessTokenDto);
             }, cancellationToken);
         }
 
         [AllowAnonymous]
         [HttpPost("refresh")]
-        public async Task<ActionResult<ResponseDto>> Refresh([FromBody] RefreshTokenRequestDto request, CancellationToken cancellationToken)
+        public async Task<ActionResult<AccessTokenDto>> Refresh(CancellationToken cancellationToken)
         {
-            return await ProcessRequestAsync<ResponseDto>(async () =>
+            return await ProcessRequestAsync<AccessTokenDto>(async () =>
             {
-                ResponseDto response = await _authenticationService.RefreshAsync(request, cancellationToken);
-                return Ok(response);
+                try
+                {
+                    ResponseDto response = await _authenticationService.RefreshAsync(new RefreshTokenRequestDto { RefreshToken = GetRefreshTokenFromCookie() }, cancellationToken);
+                    AppendRefreshTokenCookie(response.RefreshTokenDto);
+                    return Ok(response.AccessTokenDto);
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    DeleteRefreshTokenCookie();
+                    throw;
+                }
             }, cancellationToken);
         }
 
         [AllowAnonymous]
         [HttpPost("revoke")]
-        public async Task<IActionResult> Revoke([FromBody] RefreshTokenRequestDto request, CancellationToken cancellationToken)
+        public async Task<IActionResult> Revoke(CancellationToken cancellationToken)
         {
             return await ProcessRequestAsync(async () =>
             {
-                await _authenticationService.RevokeAsync(request, cancellationToken);
+                if (Request.Cookies.TryGetValue(RefreshTokenCookieName, out string? refreshToken) && !string.IsNullOrWhiteSpace(refreshToken))
+                    await _authenticationService.RevokeAsync(new RefreshTokenRequestDto { RefreshToken = refreshToken }, cancellationToken);
+
+                DeleteRefreshTokenCookie();
                 return NoContent();
             }, cancellationToken);
         }
+
+        private string GetRefreshTokenFromCookie()
+        {
+            return Request.Cookies.TryGetValue(RefreshTokenCookieName, out string? refreshToken) && !string.IsNullOrWhiteSpace(refreshToken)
+                ? refreshToken
+                : throw new UnauthorizedAccessException("Refresh Token não informado.");
+        }
+
+        private void AppendRefreshTokenCookie(RefreshTokenDto refreshToken)
+        {
+            Response.Cookies.Append(RefreshTokenCookieName, refreshToken.RefreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                IsEssential = true,
+                Path = RefreshTokenCookiePath,
+                SameSite = SameSiteMode.None,
+                Secure = true,
+                Expires = new DateTimeOffset(refreshToken.RefreshTokenExpirationDateTime)
+            });
+        }
+
+        private void DeleteRefreshTokenCookie()
+        {
+            Response.Cookies.Delete(RefreshTokenCookieName, new CookieOptions
+            {
+                HttpOnly = true,
+                IsEssential = true,
+                Path = RefreshTokenCookiePath,
+                SameSite = SameSiteMode.None,
+                Secure = true
+            });
+        }
+
     }
 }

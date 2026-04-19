@@ -15,7 +15,6 @@ using Application.Mappings.Persons.Customers;
 using Application.Services.Persons.Customers;
 using Application.Services.Territories;
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using Infrastructure.Queries;
 using Infrastructure.Queries.Commercial.Documents.Budgets;
 using Infrastructure.Queries.Commercial.Documents.Orders;
@@ -29,6 +28,8 @@ using Application.Services.Commercial.Documents.Budgets;
 using Domain.Interfaces.Repositories;
 using Application.Interfaces.Services.Security;
 using Application.Services.Security;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Presentation.Web.APIs.REST.Validations;
 
 namespace Presentation.Web.APIs.REST.Extensions;
 
@@ -55,8 +56,9 @@ public static class ApplicationServiceExtensions
 
     private static void AddValidation(IServiceCollection services)
     {
-        services.AddFluentValidationAutoValidation();
-        services.AddValidatorsFromAssemblyContaining<CustomerSaveDtoValidator>();
+        services.AddScoped<FluentValidationAction>();
+        services.Configure<MvcOptions>(options => options.Filters.AddService<FluentValidationAction>());
+        AddValidatorsFromAssemblyContaining<CustomerSaveDtoValidator>(services);
         services.Configure<ApiBehaviorOptions>(options =>
         {
             options.InvalidModelStateResponseFactory = context =>
@@ -76,6 +78,27 @@ public static class ApplicationServiceExtensions
         });
     }
 
+    private static void AddValidatorsFromAssemblyContaining<TValidator>(IServiceCollection services)
+    {
+        Type validatorInterface = typeof(IValidator<>);
+
+        IEnumerable<Type> validatorTypes = typeof(TValidator).Assembly
+            .GetTypes()
+            .Where(type => type is { IsAbstract: false, IsInterface: false })
+            .Where(type => type.GetInterfaces().Any(@interface => @interface.IsGenericType && @interface.GetGenericTypeDefinition() == validatorInterface));
+
+        foreach (Type validatorType in validatorTypes)
+        {
+            services.TryAddScoped(validatorType, validatorType);
+
+            foreach (Type serviceType in validatorType.GetInterfaces()
+                         .Where(@interface => @interface.IsGenericType && @interface.GetGenericTypeDefinition() == validatorInterface))
+            {
+                services.TryAddScoped(serviceType, validatorType);
+            }
+        }
+    }
+
     private static string GetErrorMessage(ModelError error)
     {
         Exception? exception = error.Exception;
@@ -90,7 +113,7 @@ public static class ApplicationServiceExtensions
 
     private static void AddAutoMapper(IServiceCollection services)
     {
-        services.AddAutoMapper(typeof(CustomerProfile));
+        services.AddAutoMapper(_ => { }, typeof(CustomerProfile).Assembly);
     }
 
     private static void AddCustomerServices(IServiceCollection services)

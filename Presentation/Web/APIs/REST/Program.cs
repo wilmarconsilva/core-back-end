@@ -8,6 +8,7 @@ builder.AddLoggingConfiguration();
 // Add Services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllers();
+builder.Services.AddCorsConfiguration(builder.Configuration);
 builder.Services.AddAuthenticationConfiguration(builder.Configuration);
 builder.Services.Configure<RouteOptions>(options =>
 {
@@ -23,6 +24,7 @@ WebApplication app = builder.Build();
 // Configure Middleware
 app.UseSwaggerConfiguration();
 app.UseHttpsRedirection();
+app.UseCorsConfiguration(app.Configuration);
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

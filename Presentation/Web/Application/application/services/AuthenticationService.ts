@@ -1,0 +1,24 @@
+import { IAuthenticationService } from '../Interfaces/Services/IAuthenticationService';
+import { AccessToken } from '../Interfaces/DataTransferObjects/AccessToken';
+import { LoginRequest } from '../Interfaces/DataTransferObjects/LoginRequest';
+import { APIConsumerService } from './APIConsumerService';
+
+export class AuthenticationService extends APIConsumerService implements IAuthenticationService {
+
+  async login(request: LoginRequest): Promise<AccessToken> {
+    return this.request<AccessToken>('/authentication/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request),
+    });
+  }
+
+  async refresh(): Promise<AccessToken> {
+    return this.request<AccessToken>('/authentication/refresh', { method: 'POST', credentials: 'include' });
+  }
+
+  async revoke(): Promise<void> {
+    await this.request<void>('/authentication/revoke', { method: 'POST', credentials: 'include' });
+  }
+
+}
