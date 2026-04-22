@@ -23,8 +23,11 @@ WebApplication app = builder.Build();
 
 // Configure Middleware
 app.UseSwaggerConfiguration();
-app.UseHttpsRedirection();
 app.UseCorsConfiguration(app.Configuration);
+if (app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

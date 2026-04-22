@@ -74,29 +74,27 @@ namespace REST.Controllers
                 : throw new UnauthorizedAccessException("Refresh Token não informado.");
         }
 
-        private void AppendRefreshTokenCookie(RefreshTokenDto refreshToken)
+        private CookieOptions GetCookieOptions(DateTime? refreshTokenExpirationDateTime)
         {
-            Response.Cookies.Append(RefreshTokenCookieName, refreshToken.RefreshToken, new CookieOptions
+            return new CookieOptions
             {
                 HttpOnly = true,
                 IsEssential = true,
                 Path = RefreshTokenCookiePath,
-                SameSite = SameSiteMode.None,
-                Secure = true,
-                Expires = new DateTimeOffset(refreshToken.RefreshTokenExpirationDateTime)
-            });
+                SameSite = Request.HttpContext.Request.IsHttps ? SameSiteMode.None : SameSiteMode.Lax,
+                Secure = Request.HttpContext.Request.IsHttps,
+                Expires = refreshTokenExpirationDateTime != null ? new DateTimeOffset(refreshTokenExpirationDateTime.Value) : null
+            };
+        }
+
+        private void AppendRefreshTokenCookie(RefreshTokenDto refreshToken)
+        {
+            Response.Cookies.Append(RefreshTokenCookieName, refreshToken.RefreshToken, GetCookieOptions(refreshToken.RefreshTokenExpirationDateTime));
         }
 
         private void DeleteRefreshTokenCookie()
         {
-            Response.Cookies.Delete(RefreshTokenCookieName, new CookieOptions
-            {
-                HttpOnly = true,
-                IsEssential = true,
-                Path = RefreshTokenCookiePath,
-                SameSite = SameSiteMode.None,
-                Secure = true
-            });
+            Response.Cookies.Delete(RefreshTokenCookieName, GetCookieOptions(null));
         }
 
     }

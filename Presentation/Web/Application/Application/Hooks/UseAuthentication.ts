@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AuthenticationService } from '../Services/AuthenticationService';
 import { AccessToken } from '../Interfaces/DataTransferObjects/AccessToken';
 import { ApiError } from '../Interfaces/DataTransferObjects/ApiError';
@@ -10,13 +10,13 @@ const authenticationService = new AuthenticationService();
 interface AuthenticationState {
   accessToken: AccessToken | null;
   isLoading: boolean;
+  isInitializing: boolean;
   error: string | null;
   validationErrors: LoginValidationErrors;
 }
 
 interface AuthenticationActions {
   login: (request: LoginRequest) => Promise<void>;
-  revoke: () => Promise<void>;
   clearError: () => void;
 }
 
@@ -25,8 +25,16 @@ export type UseAuthenticationResult = AuthenticationState & AuthenticationAction
 export function UseAuthentication(): UseAuthenticationResult {
   const [accessToken, setAccessToken] = useState<AccessToken | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<LoginValidationErrors>({});
+
+  useEffect(() => {
+    authenticationService.refresh()
+      .then(setAccessToken)
+      .catch(() => {})
+      .finally(() => setIsInitializing(false));
+  }, []);
 
   const login = useCallback(async (request: LoginRequest) => {
     setIsLoading(true);
@@ -52,20 +60,10 @@ export function UseAuthentication(): UseAuthenticationResult {
     }
   }, []);
 
-  const revoke = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      await authenticationService.revoke();
-    } finally {
-      setAccessToken(null);
-      setIsLoading(false);
-    }
-  }, []);
-
   const clearError = useCallback(() => {
     setError(null);
     setValidationErrors({});
   }, []);
 
-  return { accessToken, isLoading, error, validationErrors, login, revoke, clearError };
+  return { accessToken, isLoading, isInitializing, error, validationErrors, login, clearError };
 }

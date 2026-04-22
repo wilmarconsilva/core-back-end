@@ -41,6 +41,7 @@ export function LoginScreen({
             label="E-mail"
             placeholder="seu@email.com"
             keyboardType="email-address"
+            returnKeyType="next"
             value={email}
             onChangeText={setEmail}
             editable={!isLoading}
@@ -50,10 +51,12 @@ export function LoginScreen({
           <PasswordField
             label="Senha"
             placeholder="••••••••"
+            returnKeyType="go"
             value={password}
             onChangeText={setPassword}
             editable={!isLoading}
             error={validationErrors.password}
+            onSubmitEditing={handleLogin}
           />
 
           <PrimaryButton
