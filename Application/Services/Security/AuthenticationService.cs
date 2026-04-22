@@ -160,7 +160,7 @@ namespace Application.Services.Security
         {
             return new ResponseDto
             {
-                AccessTokenDto = new AccessTokenDto { AccessToken = accessToken.Token, AccessTokenExpirationDateTime = accessToken.ExpirationDateTime },
+                AccessTokenDto = new AccessTokenDto { AccessToken = accessToken.Token, AccessTokenExpirationDateTime = accessToken.ExpirationDateTime, UserName = accessToken.UserName },
                 RefreshTokenDto = new RefreshTokenDto { RefreshToken = refreshToken, RefreshTokenExpirationDateTime = refreshTokenExpirationDateTime }
             };
         }

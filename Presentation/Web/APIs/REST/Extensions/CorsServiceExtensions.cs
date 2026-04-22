@@ -19,6 +19,7 @@ public static class CorsServiceExtensions
             options.AddPolicy(FrontendPolicyName, policy =>
             {
                 policy.WithOrigins(origins)
+                    .SetIsOriginAllowedToAllowWildcardSubdomains()
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();

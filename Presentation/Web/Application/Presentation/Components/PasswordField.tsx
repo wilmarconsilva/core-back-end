@@ -1,13 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
-  Text,
   TextInput,
   TextInputProps,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { colors, formStyles } from '../Styles';
+import { FormField } from './FormField';
 
 interface PasswordFieldProps extends Omit<TextInputProps, 'secureTextEntry'> {
   label: string;
@@ -18,8 +18,7 @@ export function PasswordField({ label, error, ...inputProps }: PasswordFieldProp
   const [isVisible, setIsVisible] = useState(false);
 
   return (
-    <View style={formStyles.field}>
-      <Text style={formStyles.label}>{label}</Text>
+    <FormField label={label} error={error}>
       <View style={[formStyles.passwordContainer, error ? formStyles.inputError : null]}>
         <TextInput
           style={formStyles.passwordInput}
@@ -40,7 +39,6 @@ export function PasswordField({ label, error, ...inputProps }: PasswordFieldProp
           />
         </TouchableOpacity>
       </View>
-      {error ? <Text style={formStyles.fieldError}>{error}</Text> : null}
-    </View>
+    </FormField>
   );
 }
