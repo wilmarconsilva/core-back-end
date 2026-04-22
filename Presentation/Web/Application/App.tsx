@@ -1,18 +1,27 @@
 import { StatusBar } from 'expo-status-bar';
+import { ActivityIndicator, View } from 'react-native';
 import { LoginScreen } from './Presentation/Screens/LoginScreen';
 import { HomeScreen } from './Presentation/Screens/HomeScreen';
 import { AppToast } from './Presentation/Components/AppToast';
 import { UseAuthentication } from './Application/Hooks/UseAuthentication';
 
 export default function App() {
-  const { accessToken, isLoading, error, validationErrors, login, revoke, clearError } =
+  const { accessToken, isLoading, isInitializing, error, validationErrors, login, clearError } =
     UseAuthentication();
+
+  if (isInitializing) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   if (accessToken) {
     return (
       <>
         <StatusBar style="dark" />
-        <HomeScreen />
+        <HomeScreen userName={accessToken.userName} />
         <AppToast />
       </>
     );

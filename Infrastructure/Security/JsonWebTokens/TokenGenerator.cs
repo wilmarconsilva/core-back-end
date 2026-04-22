@@ -48,7 +48,8 @@ namespace Infrastructure.Security.JsonWebTokens
             return new AccessTokenResult
             {
                 Token = token,
-                ExpirationDateTime = expirationDateTime
+                ExpirationDateTime = expirationDateTime,
+                UserName = user.Name
             };
         }
 

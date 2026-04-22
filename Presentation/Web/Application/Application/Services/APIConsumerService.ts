@@ -10,8 +10,7 @@ const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL as string;
 export interface RequestOptions<T> {
   onSuccess?: (data: T) => void;
   onError?: (error: ApiError) => void;
-  successMessage?: string;
-  errorMessage?: string;
+  ignoreErrors?: boolean;
 }
 
 export class APIConsumerService {
@@ -33,21 +32,19 @@ export class APIConsumerService {
         ? undefined as T
         : await (response.json() as Promise<T>);
 
-      if (options?.successMessage) {
-        Toast.show({ type: 'success', text1: options.successMessage });
-      }
-
       options?.onSuccess?.(data);
 
       return data;
-    } catch (err: unknown) {
+    } 
+    catch (err: unknown) {
       const apiError = err as ApiError;
-      const message = options?.errorMessage
-        ?? apiError.detail
-        ?? apiError.title
-        ?? 'Ocorreu um erro inesperado.';
+      if (!options?.ignoreErrors) {
+        const message = apiError.detail
+          ?? apiError.title
+          ?? 'Ocorreu um erro inesperado.';
 
-      Toast.show({ type: 'error', text1: message });
+        Toast.show({ type: 'error', text1: message });
+      }
 
       options?.onError?.(apiError);
 

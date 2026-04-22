@@ -5,7 +5,11 @@ import { MenuItem } from '../Components/MenuItem';
 import { gridStyles, layoutStyles, typographyStyles } from '../Styles';
 import { ReportsScreen } from './ReportsScreen';
 
-export function HomeScreen() {
+interface HomeScreenProps {
+  userName: string;
+}
+
+export function HomeScreen({ userName }: HomeScreenProps) {
   const [currentScreen, setCurrentScreen] = useState<'home' | 'reports'>('home');
 
   if (currentScreen === 'reports') {
@@ -19,7 +23,7 @@ export function HomeScreen() {
       <ScrollView contentContainerStyle={layoutStyles.scrollContainer}>
         <Breadcrumb items={[{ label: 'Início' }]} />
 
-        <Text style={typographyStyles.title}>Olá, João!</Text>
+        <Text style={typographyStyles.title}>Olá, {userName}!</Text>
         <Text style={typographyStyles.subtitle}>O que deseja acessar?</Text>
 
         <View style={gridStyles.grid}>
