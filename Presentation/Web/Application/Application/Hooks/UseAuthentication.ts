@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AuthenticationService } from '../Services/AuthenticationService';
+import { TokenStorage } from '../Services/TokenStorage';
 import { AccessToken } from '../Interfaces/DataTransferObjects/AccessToken';
 import { ApiError } from '../Interfaces/DataTransferObjects/ApiError';
 import { LoginRequest } from '../Interfaces/DataTransferObjects/LoginRequest';
@@ -29,12 +30,17 @@ export function UseAuthentication(): UseAuthenticationResult {
   const [error, setError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<LoginValidationErrors>({});
 
+  const storeToken = useCallback((token: AccessToken) => {
+    TokenStorage.setToken(token.accessToken);
+    setAccessToken(token);
+  }, []);
+
   useEffect(() => {
     authenticationService.refresh()
-      .then(setAccessToken)
+      .then(storeToken)
       .catch(() => {})
       .finally(() => setIsInitializing(false));
-  }, []);
+  }, [storeToken]);
 
   const login = useCallback(async (request: LoginRequest) => {
     setIsLoading(true);
@@ -43,7 +49,7 @@ export function UseAuthentication(): UseAuthenticationResult {
 
     try {
       const token = await authenticationService.login(request);
-      setAccessToken(token);
+      storeToken(token);
     } catch (err: unknown) {
       const apiError = err as ApiError;
 

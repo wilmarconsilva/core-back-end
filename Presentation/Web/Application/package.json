@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
+    "setup": "node setup.js",
     "reorganize": "node reorganize.js",
     "start": "expo start",
     "android": "expo start --android",

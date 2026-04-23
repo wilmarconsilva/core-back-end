@@ -6,9 +6,11 @@ import { gridStyles, layoutStyles, typographyStyles } from '../Styles';
 
 interface ReportsScreenProps {
   onGoBack: () => void;
+  onNavigateToBudgetReport: () => void;
+  onNavigateToOrderReport: () => void;
 }
 
-export function ReportsScreen({ onGoBack }: ReportsScreenProps) {
+export function ReportsScreen({ onGoBack, onNavigateToBudgetReport, onNavigateToOrderReport }: ReportsScreenProps) {
   return (
     <View style={layoutStyles.screenWrapper}>
       <ScrollView contentContainerStyle={layoutStyles.scrollContainer}>
@@ -28,15 +30,16 @@ export function ReportsScreen({ onGoBack }: ReportsScreenProps) {
           <MenuItem
             icon="cash-outline"
             label="Orçamentos"
-            onPress={() => console.log('Navegar → Relatório de Orçamentos')}
+            onPress={onNavigateToBudgetReport}
           />
           <MenuItem
             icon="clipboard-outline"
             label="Pedidos"
-            onPress={() => console.log('Navegar → Relatório de Pedidos')}
+            onPress={onNavigateToOrderReport}
           />
         </View>
       </ScrollView>
     </View>
   );
 }
+

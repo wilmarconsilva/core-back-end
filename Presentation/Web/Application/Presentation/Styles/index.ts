@@ -5,3 +5,5 @@ export { layoutStyles } from './layoutStyles';
 export { typographyStyles } from './typographyStyles';
 export { gridStyles } from './gridStyles';
 export { breadcrumbStyles } from './breadcrumbStyles';
+export { tableStyles } from './tableStyles';
+export { modalStyles } from './modalStyles';
