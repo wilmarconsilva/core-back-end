@@ -57,7 +57,7 @@ export function CustomersListScreen({ onGoBack, onNavigateToForm }: CustomersLis
 
   return (
     <View style={layoutStyles.screenWrapper}>
-      <ScrollView contentContainerStyle={layoutStyles.scrollContainerList}>
+      <ScrollView contentContainerStyle={layoutStyles.scrollContainer}>
         <Breadcrumb items={[{ label: 'Início', onPress: onGoBack }, { label: 'Clientes' }]} />
         <Text style={typographyStyles.title}>Clientes</Text>
 

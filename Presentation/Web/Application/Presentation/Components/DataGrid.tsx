@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { ReactNode } from 'react';
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import React, { ReactNode, useState } from 'react';
+import { ActivityIndicator, LayoutChangeEvent, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { colors, tableStyles } from '../Styles';
 
 export interface Column<T> {
@@ -42,11 +42,16 @@ export function DataGrid<T>({
   extraActions,
 }: DataGridProps<T>) {
   const hasActions = onEdit || onDelete || extraActions;
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  const onLayout = (e: LayoutChangeEvent) => {
+    setContainerWidth(e.nativeEvent.layout.width);
+  };
 
   return (
-    <View style={{ width: '100%' }}>
+    <View style={{ width: '100%' }} onLayout={onLayout}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <View style={{ minWidth: '100%' }}>
+        <View style={{ minWidth: containerWidth || '100%' }}>
           {/* Header */}
           <View style={tableStyles.header}>
             {columns.map((col, idx) => (

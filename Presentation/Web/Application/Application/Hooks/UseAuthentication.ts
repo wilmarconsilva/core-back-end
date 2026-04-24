@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AuthenticationService } from '../Services/AuthenticationService';
 import { TokenStorage } from '../Services/TokenStorage';
+import { registerRefreshFn } from '../Services/HttpClient';
 import { AccessToken } from '../Interfaces/DataTransferObjects/AccessToken';
 import { ApiError } from '../Interfaces/DataTransferObjects/ApiError';
 import { LoginRequest } from '../Interfaces/DataTransferObjects/LoginRequest';
@@ -31,16 +32,20 @@ export function UseAuthentication(): UseAuthenticationResult {
   const [validationErrors, setValidationErrors] = useState<LoginValidationErrors>({});
 
   const storeToken = useCallback((token: AccessToken) => {
-    TokenStorage.setToken(token.accessToken);
+    TokenStorage.setToken(token);
     setAccessToken(token);
   }, []);
 
-  // Register a global logout callback so the HTTP client can redirect to login
-  // when a token refresh fails (e.g. session fully expired).
   useEffect(() => {
-    TokenStorage.registerLogoutCallback(() => {
-      setAccessToken(null);
-    });
+    // Inject the refresh function into the HTTP client to avoid a circular import
+    // (AuthenticationService → APIConsumerService → HttpClient → AuthenticationService).
+    registerRefreshFn(() => authenticationService.refresh());
+
+    // Keep React state in sync when the HTTP interceptor silently refreshes the token.
+    TokenStorage.registerTokenRefreshedCallback(setAccessToken);
+
+    // Clear React state when the HTTP interceptor triggers logout after a failed refresh.
+    TokenStorage.registerLogoutCallback(() => setAccessToken(null));
   }, []);
 
   useEffect(() => {

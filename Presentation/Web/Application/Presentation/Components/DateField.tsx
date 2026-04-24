@@ -31,7 +31,7 @@ export function DateField({ label, error, style, ...inputProps }: DateFieldProps
             width: '100%',
             boxSizing: 'border-box',
             outline: 'none',
-            fontFamily: 'inherit',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, System',
           } as React.CSSProperties}
           disabled={inputProps.editable === false}
         />

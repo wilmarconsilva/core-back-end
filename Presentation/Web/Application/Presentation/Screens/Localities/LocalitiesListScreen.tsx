@@ -69,7 +69,7 @@ export function LocalitiesListScreen({ onGoBack, onNavigateToForm }: LocalitiesL
 
   return (
     <View style={layoutStyles.screenWrapper}>
-      <ScrollView contentContainerStyle={layoutStyles.scrollContainerList}>
+      <ScrollView contentContainerStyle={layoutStyles.scrollContainer}>
         <Breadcrumb
           items={[{ label: 'Início', onPress: onGoBack }, { label: 'Localidades' }]}
         />

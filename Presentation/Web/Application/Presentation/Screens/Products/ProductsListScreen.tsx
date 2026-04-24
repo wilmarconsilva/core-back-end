@@ -57,7 +57,7 @@ export function ProductsListScreen({ onGoBack, onNavigateToForm }: ProductsListS
 
   return (
     <View style={layoutStyles.screenWrapper}>
-      <ScrollView contentContainerStyle={layoutStyles.scrollContainerList}>
+      <ScrollView contentContainerStyle={layoutStyles.scrollContainer}>
         <Breadcrumb items={[{ label: 'Início', onPress: onGoBack }, { label: 'Produtos' }]} />
         <Text style={typographyStyles.title}>Produtos</Text>
 

@@ -1,3 +1,4 @@
+import { AccessToken } from '../Interfaces/DataTransferObjects/AccessToken';
 import { TokenStorage } from './TokenStorage';
 
 if (!process.env?.EXPO_PUBLIC_API_BASE_URL?.trim()) {
@@ -14,14 +15,26 @@ export class SessionExpiredError extends Error {
   }
 }
 
+type RefreshFn = () => Promise<AccessToken>;
+
 type PendingEntry = {
   retryFn: () => Promise<Response>;
   resolve: (value: Response) => void;
   reject: (reason: unknown) => void;
 };
 
+let _refreshFn: RefreshFn | null = null;
 let _isRefreshing = false;
 let _pendingQueue: PendingEntry[] = [];
+
+/**
+ * Registers the function used to refresh the access token on 401.
+ * Must be called once at app startup (see UseAuthentication).
+ * Injected instead of imported to avoid a circular dependency with AuthenticationService.
+ */
+export function registerRefreshFn(fn: RefreshFn): void {
+  _refreshFn = fn;
+}
 
 function _processQueue(error: unknown): void {
   const queue = _pendingQueue.splice(0);
@@ -37,19 +50,16 @@ function _processQueue(error: unknown): void {
 // Arrow wrapper avoids "Illegal invocation" on Hermes — native fetch polyfills cannot be bound.
 const _nativeFetch = (input: RequestInfo | URL, init?: RequestInit) => fetch(input, init);
 
-async function _refreshToken(): Promise<string> {
-  const response = await _nativeFetch(`${API_BASE_URL}/authentication/refresh`, {
-    method: 'POST',
-    credentials: 'include',
-  });
-  if (!response.ok) {
-    throw new Error('Token refresh failed');
+async function _doRefresh(): Promise<void> {
+  if (!_refreshFn) {
+    throw new Error('No refresh function registered. Call registerRefreshFn() at startup.');
   }
-  const data = await response.json() as { accessToken: string };
-  return data.accessToken;
+  const newToken = await _refreshFn();
+  TokenStorage.setToken(newToken);
+  TokenStorage.triggerTokenRefreshed(newToken);
 }
 
-function _handle401(retryFn: () => Promise<Response>): Promise<Response> {
+async function _handle401(retryFn: () => Promise<Response>): Promise<Response> {
   if (_isRefreshing) {
     return new Promise<Response>((resolve, reject) => {
       _pendingQueue.push({ retryFn, resolve, reject });
@@ -57,22 +67,18 @@ function _handle401(retryFn: () => Promise<Response>): Promise<Response> {
   }
 
   _isRefreshing = true;
-
-  return _refreshToken()
-    .then((newToken) => {
-      TokenStorage.setToken(newToken);
-      _processQueue(null);
-      return retryFn();
-    })
-    .catch((err) => {
-      _processQueue(err);
-      TokenStorage.clearToken();
-      TokenStorage.triggerLogout();
-      return Promise.reject(new SessionExpiredError());
-    })
-    .finally(() => {
-      _isRefreshing = false;
-    });
+  try {
+    await _doRefresh();
+    _processQueue(null);
+    return retryFn();
+  } catch (err) {
+    _processQueue(err);
+    TokenStorage.clearToken();
+    TokenStorage.triggerLogout();
+    throw new SessionExpiredError();
+  } finally {
+    _isRefreshing = false;
+  }
 }
 
 async function _internalFetch(
@@ -103,7 +109,7 @@ async function _internalFetch(
 /**
  * Authorized fetch: drops in as a replacement for the native `fetch`.
  * - Automatically injects `Authorization: Bearer <token>` header.
- * - On 401, attempts a single token refresh then retries the original request.
+ * - On 401, delegates to the registered refresh function, then retries the original request.
  * - Multiple concurrent 401s share a single refresh call (queue-based).
  * - If refresh fails, clears tokens and triggers logout.
  */

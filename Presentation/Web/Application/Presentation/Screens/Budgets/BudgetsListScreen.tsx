@@ -66,7 +66,7 @@ export function BudgetsListScreen({ onGoBack, onNavigateToForm }: BudgetsListScr
 
   return (
     <View style={layoutStyles.screenWrapper}>
-      <ScrollView contentContainerStyle={layoutStyles.scrollContainerList}>
+      <ScrollView contentContainerStyle={layoutStyles.scrollContainer}>
         <Breadcrumb items={[{ label: 'Início', onPress: onGoBack }, { label: 'Orçamentos' }]} />
         <Text style={typographyStyles.title}>Orçamentos</Text>
 
@@ -120,7 +120,7 @@ export function BudgetsListScreen({ onGoBack, onNavigateToForm }: BudgetsListScr
       <ConfirmDialog
         visible={!!deleteTarget}
         title="Excluir Orçamento"
-        message={`Deseja excluir o orçamento #${deleteTarget?.id}?`}
+        message={`Deseja excluir o orçamento ${deleteTarget?.id}?`}
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
         isLoading={isDeleting}

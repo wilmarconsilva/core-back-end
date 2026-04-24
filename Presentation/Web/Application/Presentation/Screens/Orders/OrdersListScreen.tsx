@@ -60,7 +60,7 @@ export function OrdersListScreen({ onGoBack, onNavigateToForm }: OrdersListScree
 
   return (
     <View style={layoutStyles.screenWrapper}>
-      <ScrollView contentContainerStyle={layoutStyles.scrollContainerList}>
+      <ScrollView contentContainerStyle={layoutStyles.scrollContainer}>
         <Breadcrumb items={[{ label: 'Início', onPress: onGoBack }, { label: 'Pedidos' }]} />
         <Text style={typographyStyles.title}>Pedidos</Text>
 
@@ -105,7 +105,7 @@ export function OrdersListScreen({ onGoBack, onNavigateToForm }: OrdersListScree
       <ConfirmDialog
         visible={!!deleteTarget}
         title="Excluir Pedido"
-        message={`Deseja excluir o pedido #${deleteTarget?.id}?`}
+        message={`Deseja excluir o pedido ${deleteTarget?.id}?`}
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
         isLoading={isDeleting}

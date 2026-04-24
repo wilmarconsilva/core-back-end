@@ -8,14 +8,10 @@ export const layoutStyles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: 'center',
-    padding: 24,
-  },
-  scrollContainerList: {
-    flexGrow: 1,
     justifyContent: 'flex-start',
     padding: 24,
     width: '100%',
+    maxWidth: 1000,
     alignSelf: 'center',
   },
   card: {
