@@ -6,9 +6,9 @@ import { APIConsumerService } from './APIConsumerService';
 export class AuthenticationService extends APIConsumerService implements IAuthenticationService {
 
   constructor() {
-    // Use plain fetch so auth endpoints are never intercepted by the 401 handler,
-    // preventing circular refresh loops.
-    super(fetch);
+    // Arrow wrapper avoids "Illegal invocation" on Hermes — native fetch cannot be detached.
+    // Plain fetch (no auth interceptor) prevents circular refresh loops on auth endpoints.
+    super((input, init) => fetch(input, init));
   }
 
   async login(request: LoginRequest): Promise<AccessToken> {

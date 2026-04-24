@@ -18,7 +18,7 @@ export function ScreenTransition({ screenKey, children }: ScreenTransitionProps)
     opacity.setValue(0);
     Animated.timing(opacity, {
       toValue: 1,
-      duration: 220,
+      duration: 200,
       useNativeDriver: true,
     }).start();
   // eslint-disable-next-line react-hooks/exhaustive-deps
