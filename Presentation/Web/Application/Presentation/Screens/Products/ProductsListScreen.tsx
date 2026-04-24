@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Breadcrumb } from '../Components/Breadcrumb';
-import { ConfirmDialog } from '../Components/ConfirmDialog';
-import { DataGrid } from '../Components/DataGrid';
-import { FormField } from '../Components/FormField';
-import { PrimaryButton } from '../Components/PrimaryButton';
-import { UseProducts } from '../../Application/Hooks/UseProducts';
-import { ProductListing } from '../../Application/Interfaces/DataTransferObjects/ProductListing';
-import { ProductListingFilter } from '../../Application/Interfaces/DataTransferObjects/ProductListingFilter';
-import { colors, layoutStyles, typographyStyles } from '../Styles';
+import { Breadcrumb } from '../../Components/Breadcrumb';
+import { ConfirmDialog } from '../../Components/ConfirmDialog';
+import { DataGrid } from '../../Components/DataGrid';
+import { FilterActionBar } from '../../Components/FilterActionBar';
+import { FormField } from '../../Components/FormField';
+import { UseProducts } from '../../../Application/Hooks/UseProducts';
+import { ProductListing } from '../../../Application/Interfaces/DataTransferObjects/ProductListing';
+import { ProductListingFilter } from '../../../Application/Interfaces/DataTransferObjects/ProductListingFilter';
+import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
 
@@ -18,18 +18,12 @@ interface ProductsListScreenProps {
 }
 
 const styles = StyleSheet.create({
-  filterRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 12,
-    alignItems: 'flex-end',
-  },
-  filterField: { flex: 1, marginBottom: 0 },
-  actionBtn: { marginTop: 0, paddingHorizontal: 16, paddingVertical: 12 },
+  filterField: { flex: 1, minWidth: 180 },
   sectionCard: {
     backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
+    width: '100%',
     shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
@@ -63,12 +57,12 @@ export function ProductsListScreen({ onGoBack, onNavigateToForm }: ProductsListS
 
   return (
     <View style={layoutStyles.screenWrapper}>
-      <ScrollView contentContainerStyle={[layoutStyles.scrollContainer, { justifyContent: 'flex-start' }]}>
+      <ScrollView contentContainerStyle={layoutStyles.scrollContainerList}>
         <Breadcrumb items={[{ label: 'Início', onPress: onGoBack }, { label: 'Produtos' }]} />
         <Text style={typographyStyles.title}>Produtos</Text>
 
         <View style={styles.sectionCard}>
-          <View style={styles.filterRow}>
+          <FilterActionBar onSearch={handleSearch} onNew={() => onNavigateToForm()}>
             <View style={styles.filterField}>
               <FormField
                 label="Descrição"
@@ -78,9 +72,7 @@ export function ProductsListScreen({ onGoBack, onNavigateToForm }: ProductsListS
                 onSubmitEditing={handleSearch}
               />
             </View>
-            <PrimaryButton title="Buscar" onPress={handleSearch} style={styles.actionBtn} />
-            <PrimaryButton title="+ Novo" onPress={() => onNavigateToForm()} style={styles.actionBtn} />
-          </View>
+          </FilterActionBar>
 
           <DataGrid<ProductListing>
             columns={[

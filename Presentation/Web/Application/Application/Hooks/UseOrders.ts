@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { OrderService } from '../Services/OrderService';
+import { OrderService } from '../Services/Orders/OrderService';
 import { OrderSaveDto } from '../Interfaces/DataTransferObjects/OrderSaveDto';
 import { OrderListing } from '../Interfaces/DataTransferObjects/OrderListing';
 import { OrderListingFilter } from '../Interfaces/DataTransferObjects/OrderListingFilter';

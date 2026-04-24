@@ -44,7 +44,7 @@ export function DataGrid<T>({
   const hasActions = onEdit || onDelete || extraActions;
 
   return (
-    <View>
+    <View style={{ width: '100%' }}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={{ minWidth: '100%' }}>
           {/* Header */}

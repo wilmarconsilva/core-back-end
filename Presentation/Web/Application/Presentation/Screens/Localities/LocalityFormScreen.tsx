@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Breadcrumb } from '../Components/Breadcrumb';
-import { FormField } from '../Components/FormField';
-import { NumberField } from '../Components/NumberField';
-import { PrimaryButton } from '../Components/PrimaryButton';
-import { SecondaryButton } from '../Components/SecondaryButton';
-import { UseLocalities } from '../../Application/Hooks/UseLocalities';
-import { LocalitySaveDto } from '../../Application/Interfaces/DataTransferObjects/LocalitySaveDto';
-import { colors, layoutStyles, typographyStyles } from '../Styles';
+import { Breadcrumb } from '../../Components/Breadcrumb';
+import { FormField } from '../../Components/FormField';
+import { NumberField } from '../../Components/NumberField';
+import { PrimaryButton } from '../../Components/PrimaryButton';
+import { SecondaryButton } from '../../Components/SecondaryButton';
+import { UseLocalities } from '../../../Application/Hooks/UseLocalities';
+import { LocalitySaveDto } from '../../../Application/Interfaces/DataTransferObjects/LocalitySaveDto';
+import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 interface LocalityFormScreenProps {
   id?: number;

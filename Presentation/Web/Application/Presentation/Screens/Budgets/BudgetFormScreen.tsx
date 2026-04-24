@@ -1,24 +1,23 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Breadcrumb } from '../Components/Breadcrumb';
-import { FormField } from '../Components/FormField';
-import { NumberField } from '../Components/NumberField';
-import { PrimaryButton } from '../Components/PrimaryButton';
-import { SecondaryButton } from '../Components/SecondaryButton';
-import { SelectField } from '../Components/SelectField';
-import { SignatureCanvas } from '../Components/SignatureCanvas';
-import { TextAreaField } from '../Components/TextAreaField';
-import { UseCustomers } from '../../Application/Hooks/UseCustomers';
-import { UseOrders } from '../../Application/Hooks/UseOrders';
-import { UseProducts } from '../../Application/Hooks/UseProducts';
-import { OrderProductSaveDto } from '../../Application/Interfaces/DataTransferObjects/OrderProductSaveDto';
-import { OrderSaveDto } from '../../Application/Interfaces/DataTransferObjects/OrderSaveDto';
-import { PaymentMethod, PaymentMethodLabels } from '../../Application/Interfaces/DataTransferObjects/PaymentMethod';
-import { PaymentSaveDto } from '../../Application/Interfaces/DataTransferObjects/PaymentSaveDto';
-import { colors, layoutStyles, typographyStyles } from '../Styles';
+import { Breadcrumb } from '../../Components/Breadcrumb';
+import { NumberField } from '../../Components/NumberField';
+import { PrimaryButton } from '../../Components/PrimaryButton';
+import { SecondaryButton } from '../../Components/SecondaryButton';
+import { SelectField } from '../../Components/SelectField';
+import { SignatureCanvas } from '../../Components/SignatureCanvas';
+import { TextAreaField } from '../../Components/TextAreaField';
+import { UseBudgets } from '../../../Application/Hooks/UseBudgets';
+import { UseCustomers } from '../../../Application/Hooks/UseCustomers';
+import { UseProducts } from '../../../Application/Hooks/UseProducts';
+import { BudgetProductSaveDto } from '../../../Application/Interfaces/DataTransferObjects/BudgetProductSaveDto';
+import { BudgetSaveDto } from '../../../Application/Interfaces/DataTransferObjects/BudgetSaveDto';
+import { PaymentMethod, PaymentMethodLabels } from '../../../Application/Interfaces/DataTransferObjects/PaymentMethod';
+import { PaymentSaveDto } from '../../../Application/Interfaces/DataTransferObjects/PaymentSaveDto';
+import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
-interface OrderFormScreenProps {
+interface BudgetFormScreenProps {
   id?: number;
   onGoBack: () => void;
 }
@@ -70,28 +69,28 @@ const styles = StyleSheet.create({
   summaryRow: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 12 },
   summaryText: { fontSize: 15, fontWeight: '700', color: colors.textPrimary },
   actionRow: { flexDirection: 'row', gap: 12, marginTop: 8, marginBottom: 24 },
+  row: { flexDirection: 'row', gap: 12 },
   flex1: { flex: 1 },
 });
 
-function createEmptyProduct(): OrderProductSaveDto {
+function createEmptyProduct(): BudgetProductSaveDto {
   return { id: 0, productId: 0, quantity: 1, valueUnit: 0, valueTotal: 0 };
 }
 
-export function OrderFormScreen({ id, onGoBack }: OrderFormScreenProps) {
-  const { currentItem, isLoadingItem, isSaving, loadById, save, clearCurrentItem } = UseOrders();
+export function BudgetFormScreen({ id, onGoBack }: BudgetFormScreenProps) {
+  const { currentItem, isLoadingItem, isSaving, loadById, save, clearCurrentItem } = UseBudgets();
   const { listings: customers, loadAll: loadCustomers } = UseCustomers();
   const { listings: products, loadAllForSelect: loadProducts } = UseProducts();
   const isEditing = !!id;
 
   const [customerId, setCustomerId] = useState<number>(0);
   const [userId, setUserId] = useState('');
-  const [budgetId, setBudgetId] = useState('');
   const [observations, setObservations] = useState('');
-  const [signature, setSignature] = useState<string | undefined>(undefined);
+  const [signature, setSignature] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.Money);
   const [discountValue, setDiscountValue] = useState('0');
   const [installmentQty, setInstallmentQty] = useState('');
-  const [productLines, setProductLines] = useState<OrderProductSaveDto[]>([createEmptyProduct()]);
+  const [productLines, setProductLines] = useState<BudgetProductSaveDto[]>([createEmptyProduct()]);
 
   useEffect(() => {
     loadCustomers({ registersStart: 0, registersEnd: 200 });
@@ -104,9 +103,8 @@ export function OrderFormScreen({ id, onGoBack }: OrderFormScreenProps) {
     if (currentItem) {
       setCustomerId(currentItem.customerId);
       setUserId(String(currentItem.userId));
-      setBudgetId(currentItem.budgetId ? String(currentItem.budgetId) : '');
       setObservations(currentItem.observations ?? '');
-      setSignature(currentItem.customerSignatureImage);
+      setSignature(currentItem.customerSignatureImage ?? null);
       setPaymentMethod(currentItem.payment?.method ?? PaymentMethod.Money);
       setDiscountValue(String(currentItem.payment?.discountValue ?? 0));
       setInstallmentQty(String(currentItem.payment?.installment?.quantity ?? ''));
@@ -117,7 +115,7 @@ export function OrderFormScreen({ id, onGoBack }: OrderFormScreenProps) {
   const customerOptions = customers.map((c) => ({ label: `${c.name} - ${c.document}`, value: c.id }));
   const productOptions = products.map((p) => ({ label: p.description, value: p.id }));
 
-  const updateProductLine = (index: number, field: keyof OrderProductSaveDto, value: number) => {
+  const updateProductLine = (index: number, field: keyof BudgetProductSaveDto, value: number) => {
     setProductLines(prev => prev.map((p, i) => {
       if (i !== index) return p;
       const updated = { ...p, [field]: value };
@@ -144,14 +142,13 @@ export function OrderFormScreen({ id, onGoBack }: OrderFormScreenProps) {
   });
 
   const handleSave = async () => {
-    const dto: OrderSaveDto = {
+    const dto: BudgetSaveDto = {
       id: id ?? 0,
       userId: parseInt(userId) || 0,
       customerId,
-      budgetId: budgetId ? parseInt(budgetId) : undefined,
       payment: buildPayment(),
       observations: observations.trim() || undefined,
-      customerSignatureImage: signature,
+      customerSignatureImage: signature ?? undefined,
       products: productLines.filter(p => p.productId > 0),
     };
     const success = await save(id ?? null, dto);
@@ -163,10 +160,10 @@ export function OrderFormScreen({ id, onGoBack }: OrderFormScreenProps) {
       <ScrollView contentContainerStyle={[layoutStyles.scrollContainer, { justifyContent: 'flex-start' }]}>
         <Breadcrumb items={[
           { label: 'Início', onPress: onGoBack },
-          { label: 'Pedidos', onPress: onGoBack },
-          { label: isEditing ? 'Editar' : 'Novo Pedido' },
+          { label: 'Orçamentos', onPress: onGoBack },
+          { label: isEditing ? 'Editar' : 'Novo Orçamento' },
         ]} />
-        <Text style={typographyStyles.title}>{isEditing ? 'Editar Pedido' : 'Novo Pedido'}</Text>
+        <Text style={typographyStyles.title}>{isEditing ? 'Editar Orçamento' : 'Novo Orçamento'}</Text>
 
         {/* General */}
         <View style={styles.card}>
@@ -186,16 +183,9 @@ export function OrderFormScreen({ id, onGoBack }: OrderFormScreenProps) {
             onChangeText={setUserId}
             editable={!isSaving}
           />
-          <NumberField
-            label="Código do Orçamento"
-            placeholder="Opcional"
-            value={budgetId}
-            onChangeText={setBudgetId}
-            editable={!isSaving}
-          />
           <TextAreaField
             label="Observações"
-            placeholder="Observações do pedido..."
+            placeholder="Observações do orçamento..."
             value={observations}
             onChangeText={setObservations}
             editable={!isSaving}

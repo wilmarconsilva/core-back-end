@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Breadcrumb } from '../Components/Breadcrumb';
-import { ConfirmDialog } from '../Components/ConfirmDialog';
-import { DataGrid } from '../Components/DataGrid';
-import { FormField } from '../Components/FormField';
-import { PrimaryButton } from '../Components/PrimaryButton';
-import { UseLocalities } from '../../Application/Hooks/UseLocalities';
-import { LocalityListing } from '../../Application/Interfaces/DataTransferObjects/LocalityListing';
-import { LocalityListingFilter } from '../../Application/Interfaces/DataTransferObjects/LocalityListingFilter';
-import { colors, layoutStyles, typographyStyles } from '../Styles';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Breadcrumb } from '../../Components/Breadcrumb';
+import { ConfirmDialog } from '../../Components/ConfirmDialog';
+import { DataGrid } from '../../Components/DataGrid';
+import { FilterActionBar } from '../../Components/FilterActionBar';
+import { FormField } from '../../Components/FormField';
+import { UseLocalities } from '../../../Application/Hooks/UseLocalities';
+import { LocalityListing } from '../../../Application/Interfaces/DataTransferObjects/LocalityListing';
+import { LocalityListingFilter } from '../../../Application/Interfaces/DataTransferObjects/LocalityListingFilter';
+import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
 
@@ -18,25 +18,12 @@ interface LocalitiesListScreenProps {
 }
 
 const styles = StyleSheet.create({
-  filterRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 12,
-    alignItems: 'flex-end',
-  },
-  filterField: {
-    flex: 1,
-    marginBottom: 0,
-  },
-  newButton: {
-    marginTop: 0,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
+  filterField: { flex: 1, marginBottom: 0 },
   sectionCard: {
     backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
+    width: '100%',
     shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
@@ -82,14 +69,14 @@ export function LocalitiesListScreen({ onGoBack, onNavigateToForm }: LocalitiesL
 
   return (
     <View style={layoutStyles.screenWrapper}>
-      <ScrollView contentContainerStyle={[layoutStyles.scrollContainer, { justifyContent: 'flex-start' }]}>
+      <ScrollView contentContainerStyle={layoutStyles.scrollContainerList}>
         <Breadcrumb
           items={[{ label: 'Início', onPress: onGoBack }, { label: 'Localidades' }]}
         />
         <Text style={typographyStyles.title}>Localidades</Text>
 
         <View style={styles.sectionCard}>
-          <View style={styles.filterRow}>
+          <FilterActionBar onSearch={handleSearch} onNew={() => onNavigateToForm()} newLabel="+ Nova">
             <View style={styles.filterField}>
               <FormField
                 label="Descrição"
@@ -99,13 +86,7 @@ export function LocalitiesListScreen({ onGoBack, onNavigateToForm }: LocalitiesL
                 onSubmitEditing={handleSearch}
               />
             </View>
-            <PrimaryButton title="Buscar" onPress={handleSearch} style={styles.newButton} />
-            <PrimaryButton
-              title="+ Nova"
-              onPress={() => onNavigateToForm()}
-              style={[styles.newButton, { backgroundColor: colors.primary }]}
-            />
-          </View>
+          </FilterActionBar>
 
           <DataGrid<LocalityListing>
             columns={[

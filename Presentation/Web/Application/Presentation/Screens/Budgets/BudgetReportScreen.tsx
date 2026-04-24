@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Breadcrumb } from '../Components/Breadcrumb';
-import { DateField } from '../Components/DateField';
-import { PrimaryButton } from '../Components/PrimaryButton';
-import { BudgetReportService } from '../../Application/Services/BudgetReportService';
-import { TemplateService } from '../../Application/Services/TemplateService';
-import { renderTemplate } from '../../Application/Services/SimpleTemplateRenderer';
-import { BudgetReportFilter } from '../../Application/Interfaces/DataTransferObjects/BudgetReportFilter';
-import { BudgetReportListing } from '../../Application/Interfaces/DataTransferObjects/BudgetReportListing';
-import { BudgetReport } from '../../Application/Interfaces/DataTransferObjects/BudgetReport';
-import { colors, layoutStyles, tableStyles, typographyStyles } from '../Styles';
+import { Breadcrumb } from '../../Components/Breadcrumb';
+import { DateField } from '../../Components/DateField';
+import { PrimaryButton } from '../../Components/PrimaryButton';
+import { BudgetReportService } from '../../../Application/Services/Budgets/BudgetReportService';
+import { TemplateService } from '../../../Application/Services/TemplateService';
+import { renderTemplate } from '../../../Application/Services/SimpleTemplateRenderer';
+import { BudgetReportFilter } from '../../../Application/Interfaces/DataTransferObjects/BudgetReportFilter';
+import { BudgetReportListing } from '../../../Application/Interfaces/DataTransferObjects/BudgetReportListing';
+import { BudgetReport } from '../../../Application/Interfaces/DataTransferObjects/BudgetReport';
+import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 interface BudgetReportScreenProps {
   onGoBack: () => void;

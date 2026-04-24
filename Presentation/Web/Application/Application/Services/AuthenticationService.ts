@@ -5,6 +5,12 @@ import { APIConsumerService } from './APIConsumerService';
 
 export class AuthenticationService extends APIConsumerService implements IAuthenticationService {
 
+  constructor() {
+    // Use plain fetch so auth endpoints are never intercepted by the 401 handler,
+    // preventing circular refresh loops.
+    super(fetch);
+  }
+
   async login(request: LoginRequest): Promise<AccessToken> {
     return this.request<AccessToken>('/authentication/login', {
       method: 'POST',

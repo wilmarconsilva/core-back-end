@@ -2,21 +2,22 @@ import React from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { Breadcrumb } from '../Components/Breadcrumb';
 import { MenuItem } from '../Components/MenuItem';
+import { ScreenTransition } from '../Components/ScreenTransition';
 import { gridStyles, layoutStyles, typographyStyles } from '../Styles';
 import { UseNavigation, Screen } from '../../Application/Hooks/UseNavigation';
 import { ReportsScreen } from './ReportsScreen';
-import { CustomersListScreen } from './CustomersListScreen';
-import { CustomerFormScreen } from './CustomerFormScreen';
-import { ProductsListScreen } from './ProductsListScreen';
-import { ProductFormScreen } from './ProductFormScreen';
-import { LocalitiesListScreen } from './LocalitiesListScreen';
-import { LocalityFormScreen } from './LocalityFormScreen';
-import { BudgetsListScreen } from './BudgetsListScreen';
-import { BudgetFormScreen } from './BudgetFormScreen';
-import { OrdersListScreen } from './OrdersListScreen';
-import { OrderFormScreen } from './OrderFormScreen';
-import { BudgetReportScreen } from './BudgetReportScreen';
-import { OrderReportScreen } from './OrderReportScreen';
+import { CustomersListScreen } from './Customers/CustomersListScreen';
+import { CustomerFormScreen } from './Customers/CustomerFormScreen';
+import { ProductsListScreen } from './Products/ProductsListScreen';
+import { ProductFormScreen } from './Products/ProductFormScreen';
+import { LocalitiesListScreen } from './Localities/LocalitiesListScreen';
+import { LocalityFormScreen } from './Localities/LocalityFormScreen';
+import { BudgetsListScreen } from './Budgets/BudgetsListScreen';
+import { BudgetFormScreen } from './Budgets/BudgetFormScreen';
+import { OrdersListScreen } from './Orders/OrdersListScreen';
+import { OrderFormScreen } from './Orders/OrderFormScreen';
+import { BudgetReportScreen } from './Budgets/BudgetReportScreen';
+import { OrderReportScreen } from './Orders/OrderReportScreen';
 
 interface HomeScreenProps {
   userName: string;
@@ -47,50 +48,62 @@ function HomeMenuScreen({ userName, navigate }: HomeMenuProps) {
   );
 }
 
+function screenKey(screen: Screen): string {
+  return 'id' in screen ? `${screen.name}-${screen.id ?? 'new'}` : screen.name;
+}
+
 export function HomeScreen({ userName }: HomeScreenProps) {
   const { currentScreen, navigate, goBack } = UseNavigation();
 
-  switch (currentScreen.name) {
-    case 'customers':
-      return <CustomersListScreen onGoBack={goBack} onNavigateToForm={(id) => navigate({ name: 'customerForm', id })} />;
-    case 'customerForm':
-      return <CustomerFormScreen id={currentScreen.id} onGoBack={goBack} />;
+  function renderScreen() {
+    switch (currentScreen.name) {
+      case 'customers':
+        return <CustomersListScreen onGoBack={goBack} onNavigateToForm={(id) => navigate({ name: 'customerForm', id })} />;
+      case 'customerForm':
+        return <CustomerFormScreen id={currentScreen.id} onGoBack={goBack} />;
 
-    case 'products':
-      return <ProductsListScreen onGoBack={goBack} onNavigateToForm={(id) => navigate({ name: 'productForm', id })} />;
-    case 'productForm':
-      return <ProductFormScreen id={currentScreen.id} onGoBack={goBack} />;
+      case 'products':
+        return <ProductsListScreen onGoBack={goBack} onNavigateToForm={(id) => navigate({ name: 'productForm', id })} />;
+      case 'productForm':
+        return <ProductFormScreen id={currentScreen.id} onGoBack={goBack} />;
 
-    case 'budgets':
-      return <BudgetsListScreen onGoBack={goBack} onNavigateToForm={(id) => navigate({ name: 'budgetForm', id })} />;
-    case 'budgetForm':
-      return <BudgetFormScreen id={currentScreen.id} onGoBack={goBack} />;
+      case 'budgets':
+        return <BudgetsListScreen onGoBack={goBack} onNavigateToForm={(id) => navigate({ name: 'budgetForm', id })} />;
+      case 'budgetForm':
+        return <BudgetFormScreen id={currentScreen.id} onGoBack={goBack} />;
 
-    case 'orders':
-      return <OrdersListScreen onGoBack={goBack} onNavigateToForm={(id) => navigate({ name: 'orderForm', id })} />;
-    case 'orderForm':
-      return <OrderFormScreen id={currentScreen.id} onGoBack={goBack} />;
+      case 'orders':
+        return <OrdersListScreen onGoBack={goBack} onNavigateToForm={(id) => navigate({ name: 'orderForm', id })} />;
+      case 'orderForm':
+        return <OrderFormScreen id={currentScreen.id} onGoBack={goBack} />;
 
-    case 'localities':
-      return <LocalitiesListScreen onGoBack={goBack} onNavigateToForm={(id) => navigate({ name: 'localityForm', id })} />;
-    case 'localityForm':
-      return <LocalityFormScreen id={currentScreen.id} onGoBack={goBack} />;
+      case 'localities':
+        return <LocalitiesListScreen onGoBack={goBack} onNavigateToForm={(id) => navigate({ name: 'localityForm', id })} />;
+      case 'localityForm':
+        return <LocalityFormScreen id={currentScreen.id} onGoBack={goBack} />;
 
-    case 'reports':
-      return (
-        <ReportsScreen
-          onGoBack={goBack}
-          onNavigateToBudgetReport={() => navigate({ name: 'budgetReport' })}
-          onNavigateToOrderReport={() => navigate({ name: 'orderReport' })}
-        />
-      );
-    case 'budgetReport':
-      return <BudgetReportScreen onGoBack={goBack} />;
-    case 'orderReport':
-      return <OrderReportScreen onGoBack={goBack} />;
+      case 'reports':
+        return (
+          <ReportsScreen
+            onGoBack={goBack}
+            onNavigateToBudgetReport={() => navigate({ name: 'budgetReport' })}
+            onNavigateToOrderReport={() => navigate({ name: 'orderReport' })}
+          />
+        );
+      case 'budgetReport':
+        return <BudgetReportScreen onGoBack={goBack} />;
+      case 'orderReport':
+        return <OrderReportScreen onGoBack={goBack} />;
 
-    default:
-      return <HomeMenuScreen userName={userName} navigate={navigate} />;
+      default:
+        return <HomeMenuScreen userName={userName} navigate={navigate} />;
+    }
   }
+
+  return (
+    <ScreenTransition screenKey={screenKey(currentScreen)}>
+      {renderScreen()}
+    </ScreenTransition>
+  );
 }
 

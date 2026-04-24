@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Breadcrumb } from '../Components/Breadcrumb';
-import { ConfirmDialog } from '../Components/ConfirmDialog';
-import { DataGrid } from '../Components/DataGrid';
-import { FormField } from '../Components/FormField';
-import { PrimaryButton } from '../Components/PrimaryButton';
-import { UseCustomers } from '../../Application/Hooks/UseCustomers';
-import { CustomerListing } from '../../Application/Interfaces/DataTransferObjects/CustomerListing';
-import { CustomerListingFilter } from '../../Application/Interfaces/DataTransferObjects/CustomerListingFilter';
-import { colors, layoutStyles, typographyStyles } from '../Styles';
+import { Breadcrumb } from '../../Components/Breadcrumb';
+import { ConfirmDialog } from '../../Components/ConfirmDialog';
+import { DataGrid } from '../../Components/DataGrid';
+import { FilterActionBar } from '../../Components/FilterActionBar';
+import { FormField } from '../../Components/FormField';
+import { UseCustomers } from '../../../Application/Hooks/UseCustomers';
+import { CustomerListing } from '../../../Application/Interfaces/DataTransferObjects/CustomerListing';
+import { CustomerListingFilter } from '../../../Application/Interfaces/DataTransferObjects/CustomerListingFilter';
+import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
 
@@ -18,13 +18,12 @@ interface CustomersListScreenProps {
 }
 
 const styles = StyleSheet.create({
-  filterRow: { flexDirection: 'row', gap: 8, marginBottom: 12, alignItems: 'flex-end' },
-  filterField: { flex: 1 },
-  actionBtn: { marginTop: 0, paddingHorizontal: 16, paddingVertical: 12 },
+  filterField: { flex: 1, minWidth: 180 },
   sectionCard: {
     backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
+    width: '100%',
     shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
@@ -58,12 +57,12 @@ export function CustomersListScreen({ onGoBack, onNavigateToForm }: CustomersLis
 
   return (
     <View style={layoutStyles.screenWrapper}>
-      <ScrollView contentContainerStyle={[layoutStyles.scrollContainer, { justifyContent: 'flex-start' }]}>
+      <ScrollView contentContainerStyle={layoutStyles.scrollContainerList}>
         <Breadcrumb items={[{ label: 'Início', onPress: onGoBack }, { label: 'Clientes' }]} />
         <Text style={typographyStyles.title}>Clientes</Text>
 
         <View style={styles.sectionCard}>
-          <View style={styles.filterRow}>
+          <FilterActionBar onSearch={handleSearch} onNew={() => onNavigateToForm()}>
             <View style={styles.filterField}>
               <FormField
                 label="Nome"
@@ -73,9 +72,7 @@ export function CustomersListScreen({ onGoBack, onNavigateToForm }: CustomersLis
                 onSubmitEditing={handleSearch}
               />
             </View>
-            <PrimaryButton title="Buscar" onPress={handleSearch} style={styles.actionBtn} />
-            <PrimaryButton title="+ Novo" onPress={() => onNavigateToForm()} style={styles.actionBtn} />
-          </View>
+          </FilterActionBar>
 
           <DataGrid<CustomerListing>
             columns={[

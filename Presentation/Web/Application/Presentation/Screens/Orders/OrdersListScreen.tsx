@@ -1,15 +1,14 @@
-import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Breadcrumb } from '../Components/Breadcrumb';
-import { ConfirmDialog } from '../Components/ConfirmDialog';
-import { DataGrid } from '../Components/DataGrid';
-import { DateField } from '../Components/DateField';
-import { PrimaryButton } from '../Components/PrimaryButton';
-import { UseOrders } from '../../Application/Hooks/UseOrders';
-import { OrderListing } from '../../Application/Interfaces/DataTransferObjects/OrderListing';
-import { OrderListingFilter } from '../../Application/Interfaces/DataTransferObjects/OrderListingFilter';
-import { colors, layoutStyles, typographyStyles } from '../Styles';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Breadcrumb } from '../../Components/Breadcrumb';
+import { ConfirmDialog } from '../../Components/ConfirmDialog';
+import { DataGrid } from '../../Components/DataGrid';
+import { DateField } from '../../Components/DateField';
+import { FilterActionBar } from '../../Components/FilterActionBar';
+import { UseOrders } from '../../../Application/Hooks/UseOrders';
+import { OrderListing } from '../../../Application/Interfaces/DataTransferObjects/OrderListing';
+import { OrderListingFilter } from '../../../Application/Interfaces/DataTransferObjects/OrderListingFilter';
+import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
 
@@ -19,13 +18,12 @@ interface OrdersListScreenProps {
 }
 
 const styles = StyleSheet.create({
-  filterRow: { flexDirection: 'row', gap: 8, marginBottom: 12, alignItems: 'flex-end', flexWrap: 'wrap' },
   filterField: { flex: 1, minWidth: 140 },
-  actionBtn: { marginTop: 0, paddingHorizontal: 16, paddingVertical: 12 },
   sectionCard: {
     backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
+    width: '100%',
     shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
@@ -62,21 +60,19 @@ export function OrdersListScreen({ onGoBack, onNavigateToForm }: OrdersListScree
 
   return (
     <View style={layoutStyles.screenWrapper}>
-      <ScrollView contentContainerStyle={[layoutStyles.scrollContainer, { justifyContent: 'flex-start' }]}>
+      <ScrollView contentContainerStyle={layoutStyles.scrollContainerList}>
         <Breadcrumb items={[{ label: 'Início', onPress: onGoBack }, { label: 'Pedidos' }]} />
         <Text style={typographyStyles.title}>Pedidos</Text>
 
         <View style={styles.sectionCard}>
-          <View style={styles.filterRow}>
+          <FilterActionBar onSearch={handleSearch} onNew={() => onNavigateToForm()}>
             <View style={styles.filterField}>
               <DateField label="Data início" value={startDate} onChangeText={setStartDate} />
             </View>
             <View style={styles.filterField}>
               <DateField label="Data fim" value={endDate} onChangeText={setEndDate} />
             </View>
-            <PrimaryButton title="Buscar" onPress={handleSearch} style={styles.actionBtn} />
-            <PrimaryButton title="+ Novo" onPress={() => onNavigateToForm()} style={styles.actionBtn} />
-          </View>
+          </FilterActionBar>
 
           <DataGrid<OrderListing>
             columns={[
@@ -118,3 +114,4 @@ export function OrdersListScreen({ onGoBack, onNavigateToForm }: OrdersListScree
     </View>
   );
 }
+

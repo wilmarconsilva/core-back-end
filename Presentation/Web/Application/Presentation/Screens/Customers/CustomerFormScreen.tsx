@@ -1,17 +1,17 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Breadcrumb } from '../Components/Breadcrumb';
-import { FormField } from '../Components/FormField';
-import { PrimaryButton } from '../Components/PrimaryButton';
-import { SecondaryButton } from '../Components/SecondaryButton';
-import { SelectField } from '../Components/SelectField';
-import { UseCustomers } from '../../Application/Hooks/UseCustomers';
-import { UseLocalities } from '../../Application/Hooks/UseLocalities';
-import { CustomerAddressSaveDto } from '../../Application/Interfaces/DataTransferObjects/CustomerAddressSaveDto';
-import { CustomerSaveDto } from '../../Application/Interfaces/DataTransferObjects/CustomerSaveDto';
-import { PersonType, PersonTypeLabels } from '../../Application/Interfaces/DataTransferObjects/PersonType';
-import { colors, layoutStyles, typographyStyles } from '../Styles';
+import { Breadcrumb } from '../../Components/Breadcrumb';
+import { FormField } from '../../Components/FormField';
+import { PrimaryButton } from '../../Components/PrimaryButton';
+import { SecondaryButton } from '../../Components/SecondaryButton';
+import { SelectField } from '../../Components/SelectField';
+import { UseCustomers } from '../../../Application/Hooks/UseCustomers';
+import { UseLocalities } from '../../../Application/Hooks/UseLocalities';
+import { CustomerAddressSaveDto } from '../../../Application/Interfaces/DataTransferObjects/CustomerAddressSaveDto';
+import { CustomerSaveDto } from '../../../Application/Interfaces/DataTransferObjects/CustomerSaveDto';
+import { PersonType, PersonTypeLabels } from '../../../Application/Interfaces/DataTransferObjects/PersonType';
+import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 interface CustomerFormScreenProps {
   id?: number;

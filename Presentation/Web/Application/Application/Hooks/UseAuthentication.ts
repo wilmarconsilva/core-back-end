@@ -35,6 +35,14 @@ export function UseAuthentication(): UseAuthenticationResult {
     setAccessToken(token);
   }, []);
 
+  // Register a global logout callback so the HTTP client can redirect to login
+  // when a token refresh fails (e.g. session fully expired).
+  useEffect(() => {
+    TokenStorage.registerLogoutCallback(() => {
+      setAccessToken(null);
+    });
+  }, []);
+
   useEffect(() => {
     authenticationService.refresh()
       .then(storeToken)
@@ -64,7 +72,7 @@ export function UseAuthentication(): UseAuthenticationResult {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [storeToken]);
 
   const clearError = useCallback(() => {
     setError(null);

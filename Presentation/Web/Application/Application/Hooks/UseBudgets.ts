@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { BudgetService } from '../Services/BudgetService';
+import { BudgetService } from '../Services/Budgets/BudgetService';
 import { BudgetSaveDto } from '../Interfaces/DataTransferObjects/BudgetSaveDto';
 import { BudgetListing } from '../Interfaces/DataTransferObjects/BudgetListing';
 import { BudgetListingFilter } from '../Interfaces/DataTransferObjects/BudgetListingFilter';

@@ -1,11 +1,7 @@
 import Toast from 'react-native-toast-message';
 import { ApiError } from '../Interfaces/DataTransferObjects/ApiError';
-
-if (!process.env?.EXPO_PUBLIC_API_BASE_URL?.trim()) {
-  throw new Error('EXPO_PUBLIC_API_BASE_URL is not defined in the .env file.');
-}
-
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL as string;
+import { API_BASE_URL, authorizedFetch, SessionExpiredError } from './HttpClient';
+import { TokenStorage } from './TokenStorage';
 
 export interface RequestOptions<T> {
   onSuccess?: (data: T) => void;
@@ -13,7 +9,11 @@ export interface RequestOptions<T> {
   ignoreErrors?: boolean;
 }
 
+type FetchFn = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+
 export class APIConsumerService {
+
+  constructor(private readonly fetchFn: FetchFn = authorizedFetch) {}
 
   protected async request<T>(
     path: string,
@@ -21,11 +21,11 @@ export class APIConsumerService {
     options?: RequestOptions<T>,
   ): Promise<T> {
     try {
-      const response = await fetch(`${API_BASE_URL}${path}`, requestInit);
+      const response = await this.fetchFn(`${API_BASE_URL}${path}`, requestInit);
 
       if (!response.ok) {
-        const error: ApiError = await response.json().finally(() => ({ status: response.status }));
-        throw error;
+        const error = await response.json().catch(() => ({})) as ApiError;
+        throw { ...error, status: response.status };
       }
 
       const data: T = response.status === 204
@@ -35,10 +35,15 @@ export class APIConsumerService {
       options?.onSuccess?.(data);
 
       return data;
-    } 
+    }
     catch (err: unknown) {
+      if (err instanceof SessionExpiredError) {
+        throw err;
+      }
+
       const apiError = err as ApiError;
-      if (!options?.ignoreErrors) {
+
+      if (!options?.ignoreErrors && !TokenStorage.isLoggingOut()) {
         const message = apiError.detail
           ?? apiError.title
           ?? 'Ocorreu um erro inesperado.';
