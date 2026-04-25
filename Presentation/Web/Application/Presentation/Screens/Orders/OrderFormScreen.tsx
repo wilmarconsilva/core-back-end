@@ -93,7 +93,7 @@ export function OrderFormScreen({ id, onGoBack }: OrderFormScreenProps) {
   const [productLines, setProductLines] = useState<OrderProductSaveDto[]>([createEmptyProduct()]);
 
   useEffect(() => {
-    loadCustomers({ registersStart: 0, registersEnd: 200 });
+    loadCustomers({ registersStart: 0, registersEnd: 50 });
     loadProducts();
     if (isEditing) loadById(id);
     return () => clearCurrentItem();

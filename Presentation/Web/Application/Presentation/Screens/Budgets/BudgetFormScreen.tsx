@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Breadcrumb } from '../../Components/Breadcrumb';
+import { EntitySelectField } from '../../Components/EntitySelectField';
 import { NumberField } from '../../Components/NumberField';
 import { PrimaryButton } from '../../Components/PrimaryButton';
 import { SecondaryButton } from '../../Components/SecondaryButton';
@@ -13,9 +14,13 @@ import { UseCustomers } from '../../../Application/Hooks/UseCustomers';
 import { UseProducts } from '../../../Application/Hooks/UseProducts';
 import { BudgetProductSaveDto } from '../../../Application/Interfaces/DataTransferObjects/BudgetProductSaveDto';
 import { BudgetSaveDto } from '../../../Application/Interfaces/DataTransferObjects/BudgetSaveDto';
+import { CustomerListingFilter } from '../../../Application/Interfaces/DataTransferObjects/CustomerListingFilter';
 import { PaymentMethod, PaymentMethodLabels } from '../../../Application/Interfaces/DataTransferObjects/PaymentMethod';
 import { PaymentSaveDto } from '../../../Application/Interfaces/DataTransferObjects/PaymentSaveDto';
-import { colors, layoutStyles, typographyStyles } from '../../Styles';
+import { ProductListingFilter } from '../../../Application/Interfaces/DataTransferObjects/ProductListingFilter';
+import { CustomerService } from '../../../Application/Services/CustomerService';
+import { ProductService } from '../../../Application/Services/ProductService';
+import { colors, formStyles, layoutStyles, typographyStyles } from '../../Styles';
 
 interface BudgetFormScreenProps {
   id?: number;
@@ -93,7 +98,7 @@ export function BudgetFormScreen({ id, onGoBack }: BudgetFormScreenProps) {
   const [productLines, setProductLines] = useState<BudgetProductSaveDto[]>([createEmptyProduct()]);
 
   useEffect(() => {
-    loadCustomers({ registersStart: 0, registersEnd: 200 });
+    loadCustomers({ registersStart: 0, registersEnd: 50 });
     loadProducts();
     if (isEditing) loadById(id);
     return () => clearCurrentItem();

@@ -17,7 +17,7 @@ export function UseProducts(): UseProductsResult {
   const { loadAll } = crud;
 
   const loadAllForSelect = useCallback(async () => {
-    await loadAll({ registersStart: 0, registersEnd: 200 });
+    await loadAll({ registersStart: 0, registersEnd: 50 });
   }, [loadAll]);
 
   return { ...crud, loadAllForSelect };

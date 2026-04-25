@@ -1,5 +1,14 @@
 import { StyleSheet } from 'react-native';
 import { colors } from './colors';
+import { ViewStyle } from 'react-native';
+
+const container: ViewStyle = {
+    flexGrow: 1,
+    padding: 24,
+    width: '100%',
+    maxWidth: 1000,
+    alignSelf: 'center',
+};
 
 export const layoutStyles = StyleSheet.create({
   screenWrapper: {
@@ -7,12 +16,12 @@ export const layoutStyles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'flex-start',
-    padding: 24,
-    width: '100%',
-    maxWidth: 1000,
-    alignSelf: 'center',
+    ...container,
+    justifyContent: 'flex-start'
+  },
+  loginContainer: {
+    ...container,
+    justifyContent: 'center',
   },
   card: {
     backgroundColor: colors.surface,

@@ -4,6 +4,7 @@ import { LoginScreen } from './Presentation/Screens/LoginScreen';
 import { HomeScreen } from './Presentation/Screens/HomeScreen';
 import { AppToast } from './Presentation/Components/AppToast';
 import { UseAuthentication } from './Application/Hooks/UseAuthentication';
+import { colors } from './Presentation/Styles';
 
 export default function App() {
   const { accessToken, isLoading, isInitializing, error, validationErrors, login, clearError } =
@@ -12,7 +13,7 @@ export default function App() {
   if (isInitializing) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }

@@ -30,7 +30,7 @@ export function LoginScreen({
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
-        contentContainerStyle={layoutStyles.scrollContainer}
+        contentContainerStyle={layoutStyles.loginContainer}
         keyboardShouldPersistTaps="handled"
       >
         <View style={layoutStyles.card}>

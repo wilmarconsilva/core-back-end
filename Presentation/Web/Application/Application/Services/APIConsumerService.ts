@@ -43,12 +43,23 @@ export class APIConsumerService {
 
       const apiError = err as ApiError;
 
-      if (!options?.ignoreErrors && !TokenStorage.isLoggingOut()) {
-        const message = apiError.detail
+      if (!options?.ignoreErrors && !TokenStorage.isLoggingOut()) 
+      {
+        const errorsMessages = apiError.errors
+          ? Object.values(apiError.errors).flat().join('\n')
+          : null;
+        
+        const message = errorsMessages
+          ?? apiError.detail
           ?? apiError.title
           ?? 'Ocorreu um erro inesperado.';
-
-        Toast.show({ type: 'error', text1: message });
+        
+        const isServerError: boolean = apiError.status !== undefined &&
+          apiError.status !== null &&
+          apiError.status >= 500 &&
+          apiError.status < 600;
+          
+        Toast.show({ type: isServerError ? 'error' : 'info', text1: message });
       }
 
       options?.onError?.(apiError);
