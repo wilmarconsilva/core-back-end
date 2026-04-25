@@ -2,7 +2,7 @@ import { APIConsumerService } from '../APIConsumerService';
 import { IOrderReportService } from '../../Interfaces/Services/IOrderReportService';
 import { OrderReportFilter } from '../../Interfaces/DataTransferObjects/OrderReportFilter';
 import { OrderReportListing } from '../../Interfaces/DataTransferObjects/OrderReportListing';
-import { buildQueryParams } from '../QueryUtils';
+import { buildQueryParams } from '../Utilities/QueryUtilities';
 
 export class OrderReportService extends APIConsumerService implements IOrderReportService {
   async getReport(filter: OrderReportFilter): Promise<OrderReportListing> {

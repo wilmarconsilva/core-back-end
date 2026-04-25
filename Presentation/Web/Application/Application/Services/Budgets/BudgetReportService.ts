@@ -2,7 +2,7 @@ import { APIConsumerService } from '../APIConsumerService';
 import { IBudgetReportService } from '../../Interfaces/Services/IBudgetReportService';
 import { BudgetReportFilter } from '../../Interfaces/DataTransferObjects/BudgetReportFilter';
 import { BudgetReportListing } from '../../Interfaces/DataTransferObjects/BudgetReportListing';
-import { buildQueryParams } from '../QueryUtils';
+import { buildQueryParams } from '../Utilities/QueryUtilities';
 
 export class BudgetReportService extends APIConsumerService implements IBudgetReportService {
   async getReport(filter: BudgetReportFilter): Promise<BudgetReportListing> {

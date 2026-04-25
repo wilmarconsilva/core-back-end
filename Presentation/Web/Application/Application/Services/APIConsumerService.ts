@@ -24,7 +24,20 @@ export class APIConsumerService {
       const response = await this.fetchFn(`${API_BASE_URL}${path}`, requestInit);
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({})) as ApiError;
+        let error: ApiError = {};
+
+        try {
+          const text = await response.text();
+          try {
+            error = JSON.parse(text);
+          } catch {
+            error = { detail: text };
+          }
+        } catch {
+          // Se tudo falhar, erro vazio
+          error = {};
+        }
+
         throw { ...error, status: response.status };
       }
 
@@ -52,14 +65,14 @@ export class APIConsumerService {
         const message = errorsMessages
           ?? apiError.detail
           ?? apiError.title
-          ?? 'Ocorreu um erro inesperado.';
+          ?? `${new Date().toLocaleString('pt-BR')} - Ocorreu um erro inesperado. Por favor, contate o suporte.`;
         
-        const isServerError: boolean = apiError.status !== undefined &&
+        const isBadRequest: boolean = apiError.status !== undefined &&
           apiError.status !== null &&
-          apiError.status >= 500 &&
-          apiError.status < 600;
+          apiError.status >= 400 &&
+          apiError.status < 500;
           
-        Toast.show({ type: isServerError ? 'error' : 'info', text1: message });
+        Toast.show({ type: isBadRequest ? 'info' : 'error', text1: message });
       }
 
       options?.onError?.(apiError);

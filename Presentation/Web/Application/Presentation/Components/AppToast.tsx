@@ -42,7 +42,6 @@ export function AppToast() {
       position="bottom"
       bottomOffset={40}
       config={toastConfig}
-      autoHide={false}
     />
   );
 }
