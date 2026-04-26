@@ -1,6 +1,6 @@
 import { ICrudService } from './ICrudService';
-import { OrderSaveDto } from '../DataTransferObjects/OrderSaveDto';
-import { OrderListing } from '../DataTransferObjects/OrderListing';
-import { OrderListingFilter } from '../DataTransferObjects/OrderListingFilter';
+import { IOrderSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderSaveDto';
+import { IOrderListing } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderListing';
+import { IOrderListingFilter } from '../IListingFilter';
 
-export interface IOrderService extends ICrudService<OrderSaveDto, OrderListing, OrderListingFilter> {}
+export interface IOrderService extends ICrudService<IOrderSaveDto, IIOrderListing, IOrderListingFilter> {}

@@ -6,7 +6,7 @@ import { NumberField } from '../../Components/NumberField';
 import { PrimaryButton } from '../../Components/PrimaryButton';
 import { SecondaryButton } from '../../Components/SecondaryButton';
 import { UseLocalities } from '../../../Application/Hooks/UseLocalities';
-import { LocalitySaveDto } from '../../../Application/Interfaces/DataTransferObjects/LocalitySaveDto';
+import { ILocalitySaveDto } from '../Interfaces/DataTransferObjects/Localities/ILocalitySaveDto';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 interface LocalityFormScreenProps {
@@ -54,7 +54,7 @@ export function LocalityFormScreen({ id, onGoBack }: LocalityFormScreenProps) {
   }, [currentItem]);
 
   const handleSave = async () => {
-    const dto: LocalitySaveDto = {
+    const dto: ILocalitySaveDto = {
       id: id ?? 0,
       description: description.trim(),
       stateId: stateId ? Number(stateId) : undefined,

@@ -1,4 +1,4 @@
-import { APIConsumerService, RequestOptions } from './APIConsumerService';
+import { APIConsumerService } from './APIConsumerService';
 import { ICrudService } from '../Interfaces/Services/ICrudService';
 import { buildQueryParams } from './Utilities/QueryUtilities';
 
@@ -25,12 +25,12 @@ export class CrudService<TSaveDto, TListing, TFilter>
     });
   }
 
-  async create(dto: TSaveDto, options?: RequestOptions<TSaveDto>): Promise<TSaveDto> {
+  async create(dto: TSaveDto): Promise<TSaveDto> {
     return this.request<TSaveDto>(this.basePath, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dto),
-    }, options);
+    });
   }
 
   async update(id: number, dto: TSaveDto): Promise<TSaveDto> {

@@ -6,7 +6,7 @@ import { PrimaryButton } from '../../Components/PrimaryButton';
 import { SecondaryButton } from '../../Components/SecondaryButton';
 import { SelectField } from '../../Components/SelectField';
 import { UseProducts } from '../../../Application/Hooks/UseProducts';
-import { MeasureUnit, MeasureUnitLabels } from '../../../Application/Interfaces/DataTransferObjects/MeasureUnit';
+import { MeasureUnit, MeasureUnitLabels } from '../../../Application/Domain/ValueObjects/Enums/Products/MeasureUnit';
 import { ProductSaveDto } from '../../../Application/Interfaces/DataTransferObjects/ProductSaveDto';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 

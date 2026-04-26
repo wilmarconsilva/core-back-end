@@ -1,5 +1,5 @@
-import { AccessToken } from '../Interfaces/DataTransferObjects/AccessToken';
-import { TokenStorage } from './TokenStorage';
+import { IAccessToken } from '../Interfaces/DataTransferObjects/Authentication/IAccessToken';
+import { TokenStorageService } from './TokenStorageService';
 
 if (!process.env?.EXPO_PUBLIC_API_BASE_URL?.trim()) {
   throw new Error('EXPO_PUBLIC_API_BASE_URL is not defined in the .env file.');
@@ -15,7 +15,7 @@ export class SessionExpiredError extends Error {
   }
 }
 
-type RefreshFn = () => Promise<AccessToken>;
+type RefreshFn = () => Promise<IAccessToken>;
 
 type PendingEntry = {
   retryFn: () => Promise<Response>;
@@ -55,8 +55,8 @@ async function _doRefresh(): Promise<void> {
     throw new Error('No refresh function registered. Call registerRefreshFn() at startup.');
   }
   const newToken = await _refreshFn();
-  TokenStorage.setToken(newToken);
-  TokenStorage.triggerTokenRefreshed(newToken);
+  TokenStorageService.setToken(newToken);
+  TokenStorageService.triggerTokenRefreshed(newToken);
 }
 
 async function _handle401(retryFn: () => Promise<Response>): Promise<Response> {
@@ -73,8 +73,8 @@ async function _handle401(retryFn: () => Promise<Response>): Promise<Response> {
     return retryFn();
   } catch (err) {
     _processQueue(err);
-    TokenStorage.clearToken();
-    TokenStorage.triggerLogout();
+    TokenStorageService.clearToken();
+    TokenStorageService.triggerLogout();
     throw new SessionExpiredError();
   } finally {
     _isRefreshing = false;
@@ -86,7 +86,7 @@ async function _internalFetch(
   init: RequestInit | undefined,
   isRetry: boolean,
 ): Promise<Response> {
-  const token = TokenStorage.getToken();
+  const token = TokenStorageService.getToken();
   const initHeaders = (init?.headers as Record<string, string>) ?? {};
   const headers: Record<string, string> = {
     ...initHeaders,

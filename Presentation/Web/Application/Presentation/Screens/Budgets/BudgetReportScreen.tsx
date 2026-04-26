@@ -5,10 +5,10 @@ import { DateField } from '../../Components/DateField';
 import { PrimaryButton } from '../../Components/PrimaryButton';
 import { BudgetReportService } from '../../../Application/Services/Budgets/BudgetReportService';
 import { TemplateService } from '../../../Application/Services/TemplateService';
-import { renderTemplate } from '../../../Application/Services/SimpleTemplateRenderer';
-import { BudgetReportFilter } from '../../../Application/Interfaces/DataTransferObjects/BudgetReportFilter';
-import { BudgetReportListing } from '../../../Application/Interfaces/DataTransferObjects/BudgetReportListing';
-import { BudgetReport } from '../../../Application/Interfaces/DataTransferObjects/BudgetReport';
+import { renderTemplate } from '../../../Application/Services/TemplateRendererService';
+import { BudgetReportFilter } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetReportFilter';
+import { BudgetReportListing } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetReportListing';
+import { BudgetReport } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetReport';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 interface BudgetReportScreenProps {

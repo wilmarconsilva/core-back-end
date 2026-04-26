@@ -16,13 +16,13 @@ export type Screen =
   | { name: 'budgetReport' }
   | { name: 'orderReport' };
 
-export interface UseNavigationResult {
+export interface IUseNavigationResult {
   currentScreen: Screen;
   navigate: (screen: Screen) => void;
   goBack: () => void;
 }
 
-export function UseNavigation(): UseNavigationResult {
+export function UseNavigation(): IUseNavigationResult {
   const [stack, setStack] = useState<Screen[]>([{ name: 'home' }]);
 
   const currentScreen = stack[stack.length - 1];

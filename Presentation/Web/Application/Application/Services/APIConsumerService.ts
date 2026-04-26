@@ -1,13 +1,7 @@
 import Toast from 'react-native-toast-message';
-import { ApiError } from '../Interfaces/DataTransferObjects/ApiError';
+import { IApiError } from '../Interfaces/DataTransferObjects/Authentication/IApiError';
 import { API_BASE_URL, authorizedFetch, SessionExpiredError } from './HttpClient';
-import { TokenStorage } from './TokenStorage';
-
-export interface RequestOptions<T> {
-  onSuccess?: (data: T) => void;
-  onError?: (error: ApiError) => void;
-  ignoreErrors?: boolean;
-}
+import { TokenStorageService } from './TokenStorageService';
 
 type FetchFn = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 
@@ -18,13 +12,13 @@ export class APIConsumerService {
   protected async request<T>(
     path: string,
     requestInit: RequestInit,
-    options?: RequestOptions<T>,
   ): Promise<T> {
     try {
       const response = await this.fetchFn(`${API_BASE_URL}${path}`, requestInit);
 
-      if (!response.ok) {
-        let error: ApiError = {};
+      if (!response.ok) 
+      {
+        let error: IApiError = {};
 
         try {
           const text = await response.text();
@@ -45,38 +39,29 @@ export class APIConsumerService {
         ? undefined as T
         : await (response.json() as Promise<T>);
 
-      options?.onSuccess?.(data);
-
       return data;
     }
-    catch (err: unknown) {
+    catch (err: any) {
       if (err instanceof SessionExpiredError) {
         throw err;
       }
 
       const apiError = err as ApiError;
 
-      if (!options?.ignoreErrors && !TokenStorage.isLoggingOut()) 
-      {
-        const errorsMessages = apiError.errors
-          ? Object.values(apiError.errors).flat().join('\n')
-          : null;
-        
-        const message = errorsMessages
-          ?? apiError.detail
-          ?? apiError.title
-          ?? `${new Date().toLocaleString('pt-BR')} - Ocorreu um erro inesperado. Por favor, contate o suporte.`;
-        
+      if (!TokenStorageService.isLoggingOut()) 
+      {        
         const isBadRequest: boolean = apiError.status !== undefined &&
           apiError.status !== null &&
           apiError.status >= 400 &&
           apiError.status < 500;
+
+        const genericErrorMessage = `Status: ${apiError.status ?? "não definido."} - ${new Date().toLocaleString('pt-BR')} - Ocorreu um erro inesperado. Por favor, contate o suporte.`;
+
+        const message = isBadRequest ? apiError.detail ?? genericErrorMessage : genericErrorMessage;
           
         Toast.show({ type: isBadRequest ? 'info' : 'error', text1: message });
       }
-
-      options?.onError?.(apiError);
-
+      
       throw apiError;
     }
   }

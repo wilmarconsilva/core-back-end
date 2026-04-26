@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
 import { OrderService } from '../Services/Orders/OrderService';
-import { OrderSaveDto } from '../Interfaces/DataTransferObjects/OrderSaveDto';
-import { OrderListing } from '../Interfaces/DataTransferObjects/OrderListing';
-import { OrderListingFilter } from '../Interfaces/DataTransferObjects/OrderListingFilter';
+import { IOrderSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderSaveDto';
+import { IOrderListing } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderListing';
+import { IOrderListingFilter } from '../IListingFilter';
 import { UseCrud, UseCrudResult } from './UseCrud';
 
 const orderService = new OrderService();
 
-export function UseOrders(): UseCrudResult<OrderSaveDto, OrderListing, OrderListingFilter> {
+export function UseOrders(): UseCrudResult<IOrderSaveDto, IIOrderListing, IOrderListingFilter> {
   const service = useMemo(() => orderService, []);
   return UseCrud(service);
 }

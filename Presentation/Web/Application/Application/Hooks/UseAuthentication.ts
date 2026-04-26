@@ -1,38 +1,38 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AuthenticationService } from '../Services/AuthenticationService';
-import { TokenStorage } from '../Services/TokenStorage';
+import { TokenStorageService } from '../Services/TokenStorageService';
 import { registerRefreshFn } from '../Services/HttpClient';
-import { AccessToken } from '../Interfaces/DataTransferObjects/AccessToken';
-import { ApiError } from '../Interfaces/DataTransferObjects/ApiError';
-import { LoginRequest } from '../Interfaces/DataTransferObjects/LoginRequest';
-import { LoginValidationErrors } from '../Interfaces/DataTransferObjects/LoginValidationErrors';
+import { IAccessToken } from '../Interfaces/DataTransferObjects/Authentication/IAccessToken';
+import { IApiError } from '../Interfaces/DataTransferObjects/Authentication/IApiError';
+import { ILoginRequest } from '../Interfaces/DataTransferObjects/Authentication/ILoginRequest';
+import { ILoginValidationErrors } from '../Interfaces/DataTransferObjects/Authentication/ILoginValidationErrors';
 
 const authenticationService = new AuthenticationService();
 
 interface AuthenticationState {
-  accessToken: AccessToken | null;
+  accessToken: IAccessToken | null;
   isLoading: boolean;
   isInitializing: boolean;
   error: string | null;
-  validationErrors: LoginValidationErrors;
+  validationErrors: ILoginValidationErrors;
 }
 
 interface AuthenticationActions {
-  login: (request: LoginRequest) => Promise<void>;
+  login: (request: ILoginRequest) => Promise<void>;
   clearError: () => void;
 }
 
 export type UseAuthenticationResult = AuthenticationState & AuthenticationActions;
 
 export function UseAuthentication(): UseAuthenticationResult {
-  const [accessToken, setAccessToken] = useState<AccessToken | null>(null);
+  const [accessToken, setAccessToken] = useState<IAccessToken | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [validationErrors, setValidationErrors] = useState<LoginValidationErrors>({});
+  const [validationErrors, setValidationErrors] = useState<ILoginValidationErrors>({});
 
-  const storeToken = useCallback((token: AccessToken) => {
-    TokenStorage.setToken(token);
+  const storeToken = useCallback((token: IAccessToken) => {
+    TokenStorageService.setToken(token);
     setAccessToken(token);
   }, []);
 
@@ -42,10 +42,10 @@ export function UseAuthentication(): UseAuthenticationResult {
     registerRefreshFn(() => authenticationService.refresh());
 
     // Keep React state in sync when the HTTP interceptor silently refreshes the token.
-    TokenStorage.registerTokenRefreshedCallback(setAccessToken);
+    TokenStorageService.registerTokenRefreshedCallback(setAccessToken);
 
     // Clear React state when the HTTP interceptor triggers logout after a failed refresh.
-    TokenStorage.registerLogoutCallback(() => setAccessToken(null));
+    TokenStorageService.registerLogoutCallback(() => setAccessToken(null));
   }, []);
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export function UseAuthentication(): UseAuthenticationResult {
       .finally(() => setIsInitializing(false));
   }, [storeToken]);
 
-  const login = useCallback(async (request: LoginRequest) => {
+  const login = useCallback(async (request: ILoginRequest) => {
     setIsLoading(true);
     setError(null);
     setValidationErrors({});
@@ -64,10 +64,10 @@ export function UseAuthentication(): UseAuthenticationResult {
       const token = await authenticationService.login(request);
       storeToken(token);
     } catch (err: unknown) {
-      const apiError = err as ApiError;
+      const apiError = err as IApiError;
 
       if (apiError.status === 400 && apiError.errors) {
-        const mapped: LoginValidationErrors = {};
+        const mapped: ILoginValidationErrors = {};
         if (apiError.errors['Email']?.[0]) mapped.email = apiError.errors['Email'][0];
         if (apiError.errors['Password']?.[0]) mapped.password = apiError.errors['Password'][0];
         setValidationErrors(mapped);

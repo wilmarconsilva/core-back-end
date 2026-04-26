@@ -1,9 +1,9 @@
 import { ICrudService } from './ICrudService';
-import { BudgetSaveDto } from '../DataTransferObjects/BudgetSaveDto';
-import { BudgetListing } from '../DataTransferObjects/BudgetListing';
-import { BudgetListingFilter } from '../DataTransferObjects/BudgetListingFilter';
-import { OrderSaveDto } from '../DataTransferObjects/OrderSaveDto';
+import { IBudgetSaveDto } from '../DataTransferObjects/Commercial/Documents/Budgets/IBudgetSaveDto';
+import { IBudgetListing } from '../DataTransferObjects/IBudgetListing';
+import { IBudgetListingFilter } from '../IListingFilter';
+import { IOrderSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderSaveDto';
 
-export interface IBudgetService extends ICrudService<BudgetSaveDto, BudgetListing, BudgetListingFilter> {
-  createOrderByBudget(id: number): Promise<OrderSaveDto>;
+export interface IBudgetService extends ICrudService<IBudgetSaveDto, IBudgetListing, IBudgetListingFilter> {
+  createOrderByBudget(id: number): Promise<IOrderSaveDto>;
 }

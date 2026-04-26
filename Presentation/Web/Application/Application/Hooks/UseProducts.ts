@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { ProductService } from '../Services/ProductService';
 import { ProductSaveDto } from '../Interfaces/DataTransferObjects/ProductSaveDto';
 import { ProductListing } from '../Interfaces/DataTransferObjects/ProductListing';
-import { ProductListingFilter } from '../Interfaces/DataTransferObjects/ProductListingFilter';
+import { ProductListingFilter } from '../IListingFilter';
 import { UseCrud, UseCrudResult } from './UseCrud';
 
 const productService = new ProductService();

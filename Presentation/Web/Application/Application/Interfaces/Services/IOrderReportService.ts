@@ -1,6 +1,6 @@
-import { OrderReportFilter } from '../DataTransferObjects/OrderReportFilter';
-import { OrderReportListing } from '../DataTransferObjects/OrderReportListing';
+import { IOrderReportFilter } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReportFilter';
+import { IOrderReportListing } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReportListing';
 
 export interface IOrderReportService {
-  getReport(filter: OrderReportFilter): Promise<OrderReportListing>;
+  getReport(filter: IOrderReportFilter): Promise<IOrderReportListing>;
 }

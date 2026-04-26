@@ -1,6 +1,6 @@
 import { ICrudService } from './ICrudService';
-import { CustomerSaveDto } from '../DataTransferObjects/CustomerSaveDto';
-import { CustomerListing } from '../DataTransferObjects/CustomerListing';
-import { CustomerListingFilter } from '../DataTransferObjects/CustomerListingFilter';
+import { ICustomerSaveDto } from '../Interfaces/DataTransferObjects/Persons/Customers/ICustomerSaveDto';
+import { ICustomerListing } from '../Interfaces/DataTransferObjects/Persons/Customers/ICustomerListing';
+import { ICustomerListingFilter } from '../IListingFilter';
 
-export interface ICustomerService extends ICrudService<CustomerSaveDto, CustomerListing, CustomerListingFilter> {}
+export interface ICustomerService extends ICrudService<ICustomerSaveDto, IICustomerListing, ICustomerListingFilter> {}

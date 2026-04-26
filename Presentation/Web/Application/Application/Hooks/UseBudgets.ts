@@ -1,9 +1,9 @@
 import { useCallback, useMemo, useState } from 'react';
 import { BudgetService } from '../Services/Budgets/BudgetService';
-import { BudgetSaveDto } from '../Interfaces/DataTransferObjects/BudgetSaveDto';
+import { BudgetSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetSaveDto';
 import { BudgetListing } from '../Interfaces/DataTransferObjects/BudgetListing';
-import { BudgetListingFilter } from '../Interfaces/DataTransferObjects/BudgetListingFilter';
-import { OrderSaveDto } from '../Interfaces/DataTransferObjects/OrderSaveDto';
+import { BudgetListingFilter } from '../IListingFilter';
+import { IOrderSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderSaveDto';
 import { UseCrud, UseCrudResult } from './UseCrud';
 import Toast from 'react-native-toast-message';
 
@@ -11,7 +11,7 @@ const budgetService = new BudgetService();
 
 export type UseBudgetsResult = UseCrudResult<BudgetSaveDto, BudgetListing, BudgetListingFilter> & {
   isCreatingOrder: boolean;
-  createdOrder: OrderSaveDto | null;
+  createdOrder: IOrderSaveDto | null;
   createOrderByBudget: (budgetId: number) => Promise<boolean>;
 };
 
@@ -19,7 +19,7 @@ export function UseBudgets(): UseBudgetsResult {
   const service = useMemo(() => budgetService, []);
   const crud = UseCrud(service);
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
-  const [createdOrder, setCreatedOrder] = useState<OrderSaveDto | null>(null);
+  const [createdOrder, setCreatedOrder] = useState<IOrderSaveDto | null>(null);
 
   const createOrderByBudget = useCallback(async (budgetId: number): Promise<boolean> => {
     setIsCreatingOrder(true);

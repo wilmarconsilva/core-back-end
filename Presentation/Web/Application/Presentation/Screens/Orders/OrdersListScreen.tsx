@@ -6,8 +6,8 @@ import { DataGrid } from '../../Components/DataGrid';
 import { DateField } from '../../Components/DateField';
 import { FilterActionBar } from '../../Components/FilterActionBar';
 import { UseOrders } from '../../../Application/Hooks/UseOrders';
-import { OrderListing } from '../../../Application/Interfaces/DataTransferObjects/OrderListing';
-import { OrderListingFilter } from '../../../Application/Interfaces/DataTransferObjects/OrderListingFilter';
+import { IOrderListing } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/OrderListing';
+import { IOrderListingFilter } from '../IListingFilter';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
@@ -38,9 +38,9 @@ export function OrdersListScreen({ onGoBack, onNavigateToForm }: OrdersListScree
   const [page, setPage] = useState(1);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [deleteTarget, setDeleteTarget] = useState<OrderListing | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<IOrderListing | null>(null);
 
-  const buildFilter = useCallback((p: number): OrderListingFilter => ({
+  const buildFilter = useCallback((p: number): IOrderListingFilter => ({
     registersStart: (p - 1) * PAGE_SIZE,
     registersEnd: p * PAGE_SIZE,
     creationDateTimeStart: startDate || undefined,
@@ -74,7 +74,7 @@ export function OrdersListScreen({ onGoBack, onNavigateToForm }: OrdersListScree
             </View>
           </FilterActionBar>
 
-          <DataGrid<OrderListing>
+          <DataGrid<IOrderListing>
             columns={[
               { key: 'id', label: 'Código', flex: 0.4 },
               { key: 'custormerName', label: 'Cliente', flex: 2 },

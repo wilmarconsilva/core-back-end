@@ -1,6 +1,6 @@
 import { IAuthenticationService } from '../Interfaces/Services/IAuthenticationService';
-import { AccessToken } from '../Interfaces/DataTransferObjects/AccessToken';
-import { LoginRequest } from '../Interfaces/DataTransferObjects/LoginRequest';
+import { IAccessToken } from '../Interfaces/DataTransferObjects/Authentication/IAccessToken';
+import { ILoginRequest } from '../Interfaces/DataTransferObjects/Authentication/ILoginRequest';
 import { APIConsumerService } from './APIConsumerService';
 
 export class AuthenticationService extends APIConsumerService implements IAuthenticationService {
@@ -11,8 +11,8 @@ export class AuthenticationService extends APIConsumerService implements IAuthen
     super((input, init) => fetch(input, init));
   }
 
-  async login(request: LoginRequest): Promise<AccessToken> {
-    return this.request<AccessToken>('/authentication/login', {
+  async login(request: ILoginRequest): Promise<IAccessToken> {
+    return this.request<IAccessToken>('/authentication/login', {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
@@ -20,8 +20,8 @@ export class AuthenticationService extends APIConsumerService implements IAuthen
     });
   }
 
-  async refresh(): Promise<AccessToken> {
-    return this.request<AccessToken>('/authentication/refresh', { method: 'POST', credentials: 'include' }, { ignoreErrors: true });
+  async refresh(): Promise<IAccessToken> {
+    return this.request<IAccessToken>('/authentication/refresh', { method: 'POST', credentials: 'include' });
   }
 
   async revoke(): Promise<void> {

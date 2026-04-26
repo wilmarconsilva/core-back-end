@@ -9,14 +9,14 @@ import {
 import { FormField } from '../Components/FormField';
 import { PasswordField } from '../Components/PasswordField';
 import { PrimaryButton } from '../Components/PrimaryButton';
-import { LoginScreenProps } from '../Interfaces/LoginScreenProps';
+import { ILoginScreenProps } from '../Interfaces/DataTransferObjects/ILoginScreenProps';
 import { layoutStyles, typographyStyles } from '../Styles';
 
 export function LoginScreen({
   isLoading,
   validationErrors,
   onLogin,
-}: LoginScreenProps) {
+}: ILoginScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 

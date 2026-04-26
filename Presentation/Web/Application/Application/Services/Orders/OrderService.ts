@@ -1,11 +1,11 @@
 import { CrudService } from '../CrudService';
 import { IOrderService } from '../../Interfaces/Services/IOrderService';
-import { OrderSaveDto } from '../../Interfaces/DataTransferObjects/OrderSaveDto';
-import { OrderListing } from '../../Interfaces/DataTransferObjects/OrderListing';
-import { OrderListingFilter } from '../../Interfaces/DataTransferObjects/OrderListingFilter';
+import { IOrderSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderSaveDto';
+import { IOrderListing } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderListing';
+import { IOrderListingFilter } from '../IListingFilter';
 
 export class OrderService
-  extends CrudService<OrderSaveDto, OrderListing, OrderListingFilter>
+  extends CrudService<IOrderSaveDto, IIOrderListing, IOrderListingFilter>
   implements IOrderService
 {
   constructor() {

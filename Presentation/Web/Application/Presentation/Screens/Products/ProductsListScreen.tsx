@@ -7,7 +7,7 @@ import { FilterActionBar } from '../../Components/FilterActionBar';
 import { FormField } from '../../Components/FormField';
 import { UseProducts } from '../../../Application/Hooks/UseProducts';
 import { ProductListing } from '../../../Application/Interfaces/DataTransferObjects/ProductListing';
-import { ProductListingFilter } from '../../../Application/Interfaces/DataTransferObjects/ProductListingFilter';
+import { ProductListingFilter } from '../IListingFilter';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;

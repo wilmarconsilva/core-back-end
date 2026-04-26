@@ -8,7 +8,7 @@ import { DateField } from '../../Components/DateField';
 import { FilterActionBar } from '../../Components/FilterActionBar';
 import { UseBudgets } from '../../../Application/Hooks/UseBudgets';
 import { BudgetListing } from '../../../Application/Interfaces/DataTransferObjects/BudgetListing';
-import { BudgetListingFilter } from '../../../Application/Interfaces/DataTransferObjects/BudgetListingFilter';
+import { BudgetListingFilter } from '../IListingFilter';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;

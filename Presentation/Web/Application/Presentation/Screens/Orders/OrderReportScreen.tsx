@@ -5,10 +5,10 @@ import { DateField } from '../../Components/DateField';
 import { PrimaryButton } from '../../Components/PrimaryButton';
 import { OrderReportService } from '../../../Application/Services/Orders/OrderReportService';
 import { TemplateService } from '../../../Application/Services/TemplateService';
-import { renderTemplate } from '../../../Application/Services/SimpleTemplateRenderer';
-import { OrderReportFilter } from '../../../Application/Interfaces/DataTransferObjects/OrderReportFilter';
-import { OrderReportListing } from '../../../Application/Interfaces/DataTransferObjects/OrderReportListing';
-import { OrderReport } from '../../../Application/Interfaces/DataTransferObjects/OrderReport';
+import { renderTemplate } from '../../../Application/Services/TemplateRendererService';
+import { IOrderReportFilter } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReportFilter';
+import { IOrderReportListing } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReportListing';
+import { IOrderReport } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReport';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 interface OrderReportScreenProps {
@@ -76,12 +76,12 @@ export function OrderReportScreen({ onGoBack }: OrderReportScreenProps) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState<OrderReportListing | null>(null);
+  const [data, setData] = useState<IOrderReportListing | null>(null);
 
   const handleSearch = async () => {
     setIsLoading(true);
     try {
-      const filter: OrderReportFilter = {
+      const filter: IOrderReportFilter = {
         registersStart: 0,
         registersEnd: 50,
         creationDateTimeStart: startDate || undefined,
@@ -96,7 +96,7 @@ export function OrderReportScreen({ onGoBack }: OrderReportScreenProps) {
     }
   };
 
-  const handleGeneratePdf = async (report: OrderReport) => {
+  const handleGeneratePdf = async (report: IOrderReport) => {
     if (Platform.OS !== 'web') return;
     try {
       const template = await templateService.getTemplate('document');

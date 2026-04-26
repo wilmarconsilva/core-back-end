@@ -12,9 +12,9 @@ import { UseBudgets } from '../../../Application/Hooks/UseBudgets';
 import { UseCustomers } from '../../../Application/Hooks/UseCustomers';
 import { UseProducts } from '../../../Application/Hooks/UseProducts';
 import { BudgetProductSaveDto } from '../../../Application/Interfaces/DataTransferObjects/BudgetProductSaveDto';
-import { BudgetSaveDto } from '../../../Application/Interfaces/DataTransferObjects/BudgetSaveDto';
-import { PaymentMethod, PaymentMethodLabels } from '../../../Application/Interfaces/DataTransferObjects/PaymentMethod';
-import { PaymentSaveDto } from '../../../Application/Interfaces/DataTransferObjects/PaymentSaveDto';
+import { BudgetSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetSaveDto';
+import { PaymentMethod, PaymentMethodLabels } from '../../../Application/Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
+import { IPaymentSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/IPaymentSaveDto';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 interface BudgetFormScreenProps {
@@ -133,7 +133,7 @@ export function BudgetFormScreen({ id, onGoBack }: BudgetFormScreenProps) {
   const discount = parseFloat(discountValue) || 0;
   const valueTotal = Math.max(0, valueSubtotal - discount);
 
-  const buildPayment = (): PaymentSaveDto => ({
+  const buildPayment = (): IPaymentSaveDto => ({
     method: paymentMethod,
     discountValue: discount,
     installment: paymentMethod === PaymentMethod.CreditCard && installmentQty

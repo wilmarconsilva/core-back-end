@@ -6,8 +6,8 @@ import { DataGrid } from '../../Components/DataGrid';
 import { FilterActionBar } from '../../Components/FilterActionBar';
 import { FormField } from '../../Components/FormField';
 import { UseCustomers } from '../../../Application/Hooks/UseCustomers';
-import { CustomerListing } from '../../../Application/Interfaces/DataTransferObjects/CustomerListing';
-import { CustomerListingFilter } from '../../../Application/Interfaces/DataTransferObjects/CustomerListingFilter';
+import { ICustomerListing } from '../Interfaces/DataTransferObjects/Persons/Customers/ICustomerListing';
+import { ICustomerListingFilter } from '../IListingFilter';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
@@ -36,9 +36,9 @@ export function CustomersListScreen({ onGoBack, onNavigateToForm }: CustomersLis
   const { listings, isLoadingList, isDeleting, loadAll, remove } = UseCustomers();
   const [page, setPage] = useState(1);
   const [name, setName] = useState('');
-  const [deleteTarget, setDeleteTarget] = useState<CustomerListing | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ICustomerListing | null>(null);
 
-  const buildFilter = useCallback((p: number): CustomerListingFilter => ({
+  const buildFilter = useCallback((p: number): ICustomerListingFilter => ({
     registersStart: (p - 1) * PAGE_SIZE,
     registersEnd: p * PAGE_SIZE,
     name: name.trim() || undefined,
@@ -74,7 +74,7 @@ export function CustomersListScreen({ onGoBack, onNavigateToForm }: CustomersLis
             </View>
           </FilterActionBar>
 
-          <DataGrid<CustomerListing>
+          <DataGrid<ICustomerListing>
             columns={[
               { key: 'id', label: 'Código', flex: 0.4 },
               { key: 'name', label: 'Nome', flex: 2 },

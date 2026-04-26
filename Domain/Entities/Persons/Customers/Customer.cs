@@ -52,7 +52,7 @@ namespace Domain.Entities.Persons.Customers
             {
                 PersonType.Natural => DocumentType.CPF,
                 PersonType.Legal => DocumentType.CNPJ,
-                _ => throw new BusinessRuleException($"Tipo de pessoa inválido para determinar o tipo de documento para o Cliente: {this.Description}.")
+                _ => throw new BusinessRuleException($"Tipo de pessoa inválido para determinar o tipo de documento para o cliente: {this.Description}.")
             };
 
             PersonType = personType;
@@ -61,20 +61,20 @@ namespace Domain.Entities.Persons.Customers
         public void SetAddresses(IReadOnlyCollection<CustomerAddress> addresses)
         {
             if (addresses == null || !addresses.Any())
-                throw new BusinessRuleException($"O Cliente: {this.Description} deve possuir ao menos um endereço.");
+                throw new BusinessRuleException($"O cliente: {this.Description} deve possuir ao menos um endereço.");
 
             EntityCollection.Sync(_addresses, addresses, this.Id);
         }
 
         public void Fill(string name, PersonType personType, string document, string? email, string? stateRegistration, IReadOnlyCollection<CustomerAddress> addresses)
         {
-            SetPersonType(personType);
-            SetAddresses(addresses);
-
             Name = name;
             Document = document;
             Email = email;
             StateRegistration = stateRegistration;
+
+            SetPersonType(personType);
+            SetAddresses(addresses);
         }
 
         private void SetDocument(string document)

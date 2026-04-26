@@ -6,8 +6,8 @@ import { DataGrid } from '../../Components/DataGrid';
 import { FilterActionBar } from '../../Components/FilterActionBar';
 import { FormField } from '../../Components/FormField';
 import { UseLocalities } from '../../../Application/Hooks/UseLocalities';
-import { LocalityListing } from '../../../Application/Interfaces/DataTransferObjects/LocalityListing';
-import { LocalityListingFilter } from '../../../Application/Interfaces/DataTransferObjects/LocalityListingFilter';
+import { ILocalityListing } from '../Interfaces/DataTransferObjects/Localities/ILocalityListing';
+import { ILocalityListingFilter } from '../IListingFilter';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
@@ -36,9 +36,9 @@ export function LocalitiesListScreen({ onGoBack, onNavigateToForm }: LocalitiesL
   const { listings, isLoadingList, isDeleting, loadAll, remove } = UseLocalities();
   const [page, setPage] = useState(1);
   const [description, setDescription] = useState('');
-  const [deleteTarget, setDeleteTarget] = useState<LocalityListing | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ILocalityListing | null>(null);
 
-  const buildFilter = useCallback((p: number): LocalityListingFilter => ({
+  const buildFilter = useCallback((p: number): ILocalityListingFilter => ({
     registersStart: (p - 1) * PAGE_SIZE,
     registersEnd: p * PAGE_SIZE,
     description: description.trim() || undefined,
@@ -88,7 +88,7 @@ export function LocalitiesListScreen({ onGoBack, onNavigateToForm }: LocalitiesL
             </View>
           </FilterActionBar>
 
-          <DataGrid<LocalityListing>
+          <DataGrid<ILocalityListing>
             columns={[
               { key: 'id', label: 'Código', flex: 0.4 },
               { key: 'description', label: 'Descrição', flex: 2 },

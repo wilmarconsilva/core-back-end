@@ -1,6 +1,6 @@
-import { BudgetReportFilter } from '../DataTransferObjects/BudgetReportFilter';
-import { BudgetReportListing } from '../DataTransferObjects/BudgetReportListing';
+import { IBudgetReportFilter } from '../DataTransferObjects/Commercial/Documents/Budgets/IBudgetReportFilter';
+import { IBudgetReportListing } from '../DataTransferObjects/Commercial/Documents/Budgets/IBudgetReportListing';
 
 export interface IBudgetReportService {
-  getReport(filter: BudgetReportFilter): Promise<BudgetReportListing>;
+  getReport(filter: IBudgetReportFilter): Promise<IBudgetReportListing>;
 }

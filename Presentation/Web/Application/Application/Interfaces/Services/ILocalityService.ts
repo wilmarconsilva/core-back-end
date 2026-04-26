@@ -1,6 +1,6 @@
 import { ICrudService } from './ICrudService';
-import { LocalitySaveDto } from '../DataTransferObjects/LocalitySaveDto';
-import { LocalityListing } from '../DataTransferObjects/LocalityListing';
-import { LocalityListingFilter } from '../DataTransferObjects/LocalityListingFilter';
+import { ILocalitySaveDto } from '../Interfaces/DataTransferObjects/Localities/ILocalitySaveDto';
+import { ILocalityListing } from '../Interfaces/DataTransferObjects/Localities/ILocalityListing';
+import { ILocalityListingFilter } from '../IListingFilter';
 
-export interface ILocalityService extends ICrudService<LocalitySaveDto, LocalityListing, LocalityListingFilter> {}
+export interface ILocalityService extends ICrudService<ILocalitySaveDto, IILocalityListing, ILocalityListingFilter> {}

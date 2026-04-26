@@ -11,10 +11,10 @@ import { TextAreaField } from '../../Components/TextAreaField';
 import { UseCustomers } from '../../../Application/Hooks/UseCustomers';
 import { UseOrders } from '../../../Application/Hooks/UseOrders';
 import { UseProducts } from '../../../Application/Hooks/UseProducts';
-import { OrderProductSaveDto } from '../../../Application/Interfaces/DataTransferObjects/OrderProductSaveDto';
-import { OrderSaveDto } from '../../../Application/Interfaces/DataTransferObjects/OrderSaveDto';
-import { PaymentMethod, PaymentMethodLabels } from '../../../Application/Interfaces/DataTransferObjects/PaymentMethod';
-import { PaymentSaveDto } from '../../../Application/Interfaces/DataTransferObjects/PaymentSaveDto';
+import { IOrderProductSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderProductSaveDto';
+import { IOrderSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/OrderSaveDto';
+import { PaymentMethod, PaymentMethodLabels } from '../../../Application/Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
+import { IPaymentSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/PaymentSaveDto';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 interface OrderFormScreenProps {
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   flex1: { flex: 1 },
 });
 
-function createEmptyProduct(): OrderProductSaveDto {
+function createEmptyProduct(): IOrderProductSaveDto {
   return { id: 0, productId: 0, quantity: 1, valueUnit: 0, valueTotal: 0 };
 }
 
@@ -90,7 +90,7 @@ export function OrderFormScreen({ id, onGoBack }: OrderFormScreenProps) {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.Money);
   const [discountValue, setDiscountValue] = useState('0');
   const [installmentQty, setInstallmentQty] = useState('');
-  const [productLines, setProductLines] = useState<OrderProductSaveDto[]>([createEmptyProduct()]);
+  const [productLines, setProductLines] = useState<IOrderProductSaveDto[]>([createEmptyProduct()]);
 
   useEffect(() => {
     loadCustomers({ registersStart: 0, registersEnd: 50 });
@@ -116,7 +116,7 @@ export function OrderFormScreen({ id, onGoBack }: OrderFormScreenProps) {
   const customerOptions = customers.map((c) => ({ label: `${c.name} - ${c.document}`, value: c.id }));
   const productOptions = products.map((p) => ({ label: p.description, value: p.id }));
 
-  const updateProductLine = (index: number, field: keyof OrderProductSaveDto, value: number) => {
+  const updateProductLine = (index: number, field: keyof IOrderProductSaveDto, value: number) => {
     setProductLines(prev => prev.map((p, i) => {
       if (i !== index) return p;
       const updated = { ...p, [field]: value };
@@ -134,7 +134,7 @@ export function OrderFormScreen({ id, onGoBack }: OrderFormScreenProps) {
   const discount = parseFloat(discountValue) || 0;
   const valueTotal = Math.max(0, valueSubtotal - discount);
 
-  const buildPayment = (): PaymentSaveDto => ({
+  const buildPayment = (): IPaymentSaveDto => ({
     method: paymentMethod,
     discountValue: discount,
     installment: paymentMethod === PaymentMethod.CreditCard && installmentQty
@@ -143,7 +143,7 @@ export function OrderFormScreen({ id, onGoBack }: OrderFormScreenProps) {
   });
 
   const handleSave = async () => {
-    const dto: OrderSaveDto = {
+    const dto: IOrderSaveDto = {
       id: id ?? 0,
       userId: parseInt(userId) || 0,
       customerId,

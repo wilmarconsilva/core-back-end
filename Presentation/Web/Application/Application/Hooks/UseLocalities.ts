@@ -1,13 +1,13 @@
 import { useCallback, useMemo } from 'react';
 import { LocalityService } from '../Services/LocalityService';
-import { LocalitySaveDto } from '../Interfaces/DataTransferObjects/LocalitySaveDto';
-import { LocalityListing } from '../Interfaces/DataTransferObjects/LocalityListing';
-import { LocalityListingFilter } from '../Interfaces/DataTransferObjects/LocalityListingFilter';
+import { ILocalitySaveDto } from '../Interfaces/DataTransferObjects/Localities/ILocalitySaveDto';
+import { ILocalityListing } from '../Interfaces/DataTransferObjects/Localities/ILocalityListing';
+import { ILocalityListingFilter } from '../Interfaces/DataTransferObjects/Localities/ILocalityListingFilter';
 import { UseCrud, UseCrudResult } from './UseCrud';
 
 const localityService = new LocalityService();
 
-export type UseLocalitiesResult = UseCrudResult<LocalitySaveDto, LocalityListing, LocalityListingFilter> & {
+export type UseLocalitiesResult = UseCrudResult<ILocalitySaveDto, IILocalityListing, ILocalityListingFilter> & {
   loadAllForSelect: () => Promise<void>;
 };
 

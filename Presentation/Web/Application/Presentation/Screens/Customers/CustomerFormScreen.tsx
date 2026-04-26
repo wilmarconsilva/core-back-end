@@ -8,9 +8,9 @@ import { SecondaryButton } from '../../Components/SecondaryButton';
 import { SelectField } from '../../Components/SelectField';
 import { UseCustomers } from '../../../Application/Hooks/UseCustomers';
 import { UseLocalities } from '../../../Application/Hooks/UseLocalities';
-import { CustomerAddressSaveDto } from '../../../Application/Interfaces/DataTransferObjects/CustomerAddressSaveDto';
-import { CustomerSaveDto } from '../../../Application/Interfaces/DataTransferObjects/CustomerSaveDto';
-import { PersonType, PersonTypeLabels } from '../../../Application/Interfaces/DataTransferObjects/PersonType';
+import { ICustomerAddressSaveDto } from '../Interfaces/DataTransferObjects/Persons/Customers/ICustomerAddressSaveDto';
+import { ICustomerSaveDto } from '../Interfaces/DataTransferObjects/Persons/Customers/ICustomerSaveDto';
+import { PersonType, PersonTypeLabels } from '../../../Application/Interfaces/DataTransferObjects/Persons/PersonType';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 interface CustomerFormScreenProps {
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
   flex1: { flex: 1 },
 });
 
-function createEmptyAddress(): CustomerAddressSaveDto {
+function createEmptyAddress(): ICustomerAddressSaveDto {
   return { id: 0, neighborhood: '', street: '', localityId: 0 };
 }
 
@@ -95,7 +95,7 @@ export function CustomerFormScreen({ id, onGoBack }: CustomerFormScreenProps) {
   const [document, setDocument] = useState('');
   const [email, setEmail] = useState('');
   const [stateRegistration, setStateRegistration] = useState('');
-  const [addresses, setAddresses] = useState<CustomerAddressSaveDto[]>([createEmptyAddress()]);
+  const [addresses, setAddresses] = useState<ICustomerAddressSaveDto[]>([createEmptyAddress()]);
 
   useEffect(() => {
     loadAllForSelect();
@@ -116,7 +116,7 @@ export function CustomerFormScreen({ id, onGoBack }: CustomerFormScreenProps) {
 
   const localityOptions = localities.map((l) => ({ label: l.description, value: l.id }));
 
-  const updateAddress = (index: number, field: keyof CustomerAddressSaveDto, value: string | number) => {
+  const updateAddress = (index: number, field: keyof ICustomerAddressSaveDto, value: string | number) => {
     setAddresses(prev => prev.map((a, i) => i === index ? { ...a, [field]: value } : a));
   };
 
@@ -124,7 +124,7 @@ export function CustomerFormScreen({ id, onGoBack }: CustomerFormScreenProps) {
   const removeAddress = (index: number) => setAddresses(prev => prev.filter((_, i) => i !== index));
 
   const handleSave = async () => {
-    const dto: CustomerSaveDto = {
+    const dto: ICustomerSaveDto = {
       id: id ?? 0,
       name: name.trim(),
       personType,

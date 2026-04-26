@@ -1,7 +1,7 @@
 import { APIConsumerService } from '../APIConsumerService';
 import { IBudgetReportService } from '../../Interfaces/Services/IBudgetReportService';
-import { BudgetReportFilter } from '../../Interfaces/DataTransferObjects/BudgetReportFilter';
-import { BudgetReportListing } from '../../Interfaces/DataTransferObjects/BudgetReportListing';
+import { BudgetReportFilter } from '../../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetReportFilter';
+import { BudgetReportListing } from '../../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetReportListing';
 import { buildQueryParams } from '../Utilities/QueryUtilities';
 
 export class BudgetReportService extends APIConsumerService implements IBudgetReportService {

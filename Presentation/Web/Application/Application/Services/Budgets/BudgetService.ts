@@ -1,9 +1,9 @@
 import { CrudService } from '../CrudService';
 import { IBudgetService } from '../../Interfaces/Services/IBudgetService';
-import { BudgetSaveDto } from '../../Interfaces/DataTransferObjects/BudgetSaveDto';
+import { BudgetSaveDto } from '../../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetSaveDto';
 import { BudgetListing } from '../../Interfaces/DataTransferObjects/BudgetListing';
-import { BudgetListingFilter } from '../../Interfaces/DataTransferObjects/BudgetListingFilter';
-import { OrderSaveDto } from '../../Interfaces/DataTransferObjects/OrderSaveDto';
+import { BudgetListingFilter } from '../IListingFilter';
+import { IOrderSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderSaveDto';
 
 export class BudgetService
   extends CrudService<BudgetSaveDto, BudgetListing, BudgetListingFilter>
