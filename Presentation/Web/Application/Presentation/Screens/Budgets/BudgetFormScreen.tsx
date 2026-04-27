@@ -10,11 +10,12 @@ import { SignatureCanvas } from '../../Components/SignatureCanvas';
 import { TextAreaField } from '../../Components/TextAreaField';
 import { UseBudgets } from '../../../Application/Hooks/UseBudgets';
 import { UseCustomers } from '../../../Application/Hooks/UseCustomers';
+import { UseFormValidation } from '../../../Application/Hooks/UseFormValidation';
 import { UseProducts } from '../../../Application/Hooks/UseProducts';
-import { BudgetProductSaveDto } from '../../../Application/Interfaces/DataTransferObjects/BudgetProductSaveDto';
-import { BudgetSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetSaveDto';
+import { IBudgetProductSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetProductSaveDto';
+import { IBudgetSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetSaveDto';
 import { PaymentMethod, PaymentMethodLabels } from '../../../Application/Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
-import { IPaymentSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/IPaymentSaveDto';
+import { IPaymentSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Payments/IPaymentSaveDto';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 interface BudgetFormScreenProps {
@@ -73,7 +74,7 @@ const styles = StyleSheet.create({
   flex1: { flex: 1 },
 });
 
-function createEmptyProduct(): BudgetProductSaveDto {
+function createEmptyProduct(): IBudgetProductSaveDto {
   return { id: 0, productId: 0, quantity: 1, valueUnit: 0, valueTotal: 0 };
 }
 
@@ -81,6 +82,7 @@ export function BudgetFormScreen({ id, onGoBack }: BudgetFormScreenProps) {
   const { currentItem, isLoadingItem, isSaving, loadById, save, clearCurrentItem } = UseBudgets();
   const { listings: customers, loadAll: loadCustomers } = UseCustomers();
   const { listings: products, loadAllForSelect: loadProducts } = UseProducts();
+  const { errors, validate, clearError, bindChange } = UseFormValidation();
   const isEditing = !!id;
 
   const [customerId, setCustomerId] = useState<number>(0);
@@ -90,7 +92,7 @@ export function BudgetFormScreen({ id, onGoBack }: BudgetFormScreenProps) {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.Money);
   const [discountValue, setDiscountValue] = useState('0');
   const [installmentQty, setInstallmentQty] = useState('');
-  const [productLines, setProductLines] = useState<BudgetProductSaveDto[]>([createEmptyProduct()]);
+  const [productLines, setProductLines] = useState<IBudgetProductSaveDto[]>([createEmptyProduct()]);
 
   useEffect(() => {
     loadCustomers({ registersStart: 0, registersEnd: 50 });
@@ -115,7 +117,7 @@ export function BudgetFormScreen({ id, onGoBack }: BudgetFormScreenProps) {
   const customerOptions = customers.map((c) => ({ label: `${c.name} - ${c.document}`, value: c.id }));
   const productOptions = products.map((p) => ({ label: p.description, value: p.id }));
 
-  const updateProductLine = (index: number, field: keyof BudgetProductSaveDto, value: number) => {
+  const updateProductLine = (index: number, field: keyof IBudgetProductSaveDto, value: number) => {
     setProductLines(prev => prev.map((p, i) => {
       if (i !== index) return p;
       const updated = { ...p, [field]: value };
@@ -142,7 +144,13 @@ export function BudgetFormScreen({ id, onGoBack }: BudgetFormScreenProps) {
   });
 
   const handleSave = async () => {
-    const dto: BudgetSaveDto = {
+    const isValid = validate([
+      { key: 'customerId', isValid: !!customerId },
+      { key: 'userId', isValid: !!userId.trim() },
+    ]);
+    if (!isValid) return;
+
+    const dto: IBudgetSaveDto = {
       id: id ?? 0,
       userId: parseInt(userId) || 0,
       customerId,
@@ -172,16 +180,18 @@ export function BudgetFormScreen({ id, onGoBack }: BudgetFormScreenProps) {
             label="Cliente *"
             value={customerId || undefined}
             options={customerOptions}
-            onValueChange={(v) => setCustomerId(v as number)}
+            onValueChange={(v) => { setCustomerId(v as number); clearError('customerId'); }}
             placeholder="Selecione o cliente..."
             disabled={isSaving}
+            error={errors.customerId}
           />
           <NumberField
             label="Código do Vendedor *"
             placeholder="Código do usuário"
             value={userId}
-            onChangeText={setUserId}
+            onChangeText={bindChange('userId', setUserId)}
             editable={!isSaving}
+            error={errors.userId}
           />
           <TextAreaField
             label="Observações"
@@ -285,7 +295,6 @@ export function BudgetFormScreen({ id, onGoBack }: BudgetFormScreenProps) {
             isLoading={isSaving || isLoadingItem}
             onPress={handleSave}
             style={{ flex: 1 }}
-            disabled={!customerId || !userId.trim()}
           />
         </View>
       </ScrollView>

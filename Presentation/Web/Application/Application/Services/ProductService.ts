@@ -1,11 +1,11 @@
 import { CrudService } from './CrudService';
 import { IProductService } from '../Interfaces/Services/IProductService';
-import { ProductSaveDto } from '../Interfaces/DataTransferObjects/ProductSaveDto';
-import { ProductListing } from '../Interfaces/DataTransferObjects/ProductListing';
-import { ProductListingFilter } from '../IListingFilter';
+import { IProductSaveDto } from '../Interfaces/DataTransferObjects/Products/IProductSaveDto';
+import { IProductListing } from '../Interfaces/DataTransferObjects/Products/IProductListing';
+import { IProductListingFilter } from '../Interfaces/DataTransferObjects/Products/IProductListingFilter';
 
 export class ProductService
-  extends CrudService<ProductSaveDto, ProductListing, ProductListingFilter>
+  extends CrudService<IProductSaveDto, IProductListing, IProductListingFilter>
   implements IProductService
 {
   constructor() {

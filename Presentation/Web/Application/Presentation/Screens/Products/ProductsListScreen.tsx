@@ -6,8 +6,8 @@ import { DataGrid } from '../../Components/DataGrid';
 import { FilterActionBar } from '../../Components/FilterActionBar';
 import { FormField } from '../../Components/FormField';
 import { UseProducts } from '../../../Application/Hooks/UseProducts';
-import { ProductListing } from '../../../Application/Interfaces/DataTransferObjects/ProductListing';
-import { ProductListingFilter } from '../IListingFilter';
+import { IProductListing } from '../../../Application/Interfaces/DataTransferObjects/Products/IProductListing';
+import { IProductListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Products/IProductListingFilter';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
@@ -36,9 +36,9 @@ export function ProductsListScreen({ onGoBack, onNavigateToForm }: ProductsListS
   const { listings, isLoadingList, isDeleting, loadAll, remove } = UseProducts();
   const [page, setPage] = useState(1);
   const [description, setDescription] = useState('');
-  const [deleteTarget, setDeleteTarget] = useState<ProductListing | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<IProductListing | null>(null);
 
-  const buildFilter = useCallback((p: number): ProductListingFilter => ({
+  const buildFilter = useCallback((p: number): IProductListingFilter => ({
     registersStart: (p - 1) * PAGE_SIZE,
     registersEnd: p * PAGE_SIZE,
     description: description.trim() || undefined,
@@ -74,7 +74,7 @@ export function ProductsListScreen({ onGoBack, onNavigateToForm }: ProductsListS
             </View>
           </FilterActionBar>
 
-          <DataGrid<ProductListing>
+          <DataGrid<IProductListing>
             columns={[
               { key: 'id', label: 'Código', flex: 0.4 },
               { key: 'description', label: 'Descrição', flex: 2 },

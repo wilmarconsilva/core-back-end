@@ -6,8 +6,8 @@ import { DataGrid } from '../../Components/DataGrid';
 import { FilterActionBar } from '../../Components/FilterActionBar';
 import { FormField } from '../../Components/FormField';
 import { UseCustomers } from '../../../Application/Hooks/UseCustomers';
-import { ICustomerListing } from '../Interfaces/DataTransferObjects/Persons/Customers/ICustomerListing';
-import { ICustomerListingFilter } from '../IListingFilter';
+import { ICustomerListing } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerListing';
+import { ICustomerListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerListingFilter';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;

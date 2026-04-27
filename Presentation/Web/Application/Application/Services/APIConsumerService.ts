@@ -20,16 +20,11 @@ export class APIConsumerService {
       {
         let error: IApiError = {};
 
+        const text = await response.text();
         try {
-          const text = await response.text();
-          try {
-            error = JSON.parse(text);
-          } catch {
-            error = { detail: text };
-          }
+          error = JSON.parse(text);
         } catch {
-          // Se tudo falhar, erro vazio
-          error = {};
+          error = { detail: text };
         }
 
         throw { ...error, status: response.status };
@@ -39,6 +34,8 @@ export class APIConsumerService {
         ? undefined as T
         : await (response.json() as Promise<T>);
 
+      Toast.show({ type: 'success', text1: 'Operação realizada com sucesso!' });
+
       return data;
     }
     catch (err: any) {
@@ -46,7 +43,7 @@ export class APIConsumerService {
         throw err;
       }
 
-      const apiError = err as ApiError;
+      const apiError = err as IApiError;
 
       if (!TokenStorageService.isLoggingOut()) 
       {        

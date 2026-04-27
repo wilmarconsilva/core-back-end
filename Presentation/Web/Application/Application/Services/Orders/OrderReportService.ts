@@ -1,7 +1,7 @@
 import { APIConsumerService } from '../APIConsumerService';
 import { IOrderReportService } from '../../Interfaces/Services/IOrderReportService';
-import { IOrderReportFilter } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReportFilter';
-import { IOrderReportListing } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReportListing';
+import { IOrderReportFilter } from '../../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReportFilter';
+import { IOrderReportListing } from '../../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReportListing';
 import { buildQueryParams } from '../Utilities/QueryUtilities';
 
 export class OrderReportService extends APIConsumerService implements IOrderReportService {

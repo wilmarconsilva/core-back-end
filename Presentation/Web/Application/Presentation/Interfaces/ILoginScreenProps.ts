@@ -1,10 +1,6 @@
-import { ILoginRequest } from '../Interfaces/DataTransferObjects/Authentication/ILoginRequest';
-import { ILoginValidationErrors } from '../Interfaces/DataTransferObjects/Authentication/ILoginValidationErrors';
+import { ILoginRequest } from '../../Application/Interfaces/DataTransferObjects/Authentication/ILoginRequest';
 
 export interface ILoginScreenProps {
   isLoading: boolean;
-  error: string | null;
-  validationErrors: ILoginValidationErrors;
-  onLogin: (request: ILoginRequest) => void;
-  onClearError: () => void;
+  onLogin: (request: ILoginRequest) => Promise<void>;
 }

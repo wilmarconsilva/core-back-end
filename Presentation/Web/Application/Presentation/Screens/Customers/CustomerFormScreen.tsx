@@ -7,9 +7,10 @@ import { PrimaryButton } from '../../Components/PrimaryButton';
 import { SecondaryButton } from '../../Components/SecondaryButton';
 import { SelectField } from '../../Components/SelectField';
 import { UseCustomers } from '../../../Application/Hooks/UseCustomers';
+import { UseFormValidation } from '../../../Application/Hooks/UseFormValidation';
 import { UseLocalities } from '../../../Application/Hooks/UseLocalities';
-import { ICustomerAddressSaveDto } from '../Interfaces/DataTransferObjects/Persons/Customers/ICustomerAddressSaveDto';
-import { ICustomerSaveDto } from '../Interfaces/DataTransferObjects/Persons/Customers/ICustomerSaveDto';
+import { ICustomerAddressSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerAddressSaveDto';
+import { ICustomerSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerSaveDto';
 import { PersonType, PersonTypeLabels } from '../../../Application/Interfaces/DataTransferObjects/Persons/PersonType';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
@@ -85,9 +86,13 @@ function createEmptyAddress(): ICustomerAddressSaveDto {
   return { id: 0, neighborhood: '', street: '', localityId: 0 };
 }
 
+const addressErrorKey = (index: number, field: keyof ICustomerAddressSaveDto) =>
+  `addresses.${index}.${field}`;
+
 export function CustomerFormScreen({ id, onGoBack }: CustomerFormScreenProps) {
   const { currentItem, isLoadingItem, isSaving, loadById, save, clearCurrentItem } = UseCustomers();
   const { listings: localities, loadAllForSelect } = UseLocalities();
+  const { errors, validate, clearError, clearErrors, bindChange } = UseFormValidation();
   const isEditing = !!id;
 
   const [name, setName] = useState('');
@@ -118,12 +123,30 @@ export function CustomerFormScreen({ id, onGoBack }: CustomerFormScreenProps) {
 
   const updateAddress = (index: number, field: keyof ICustomerAddressSaveDto, value: string | number) => {
     setAddresses(prev => prev.map((a, i) => i === index ? { ...a, [field]: value } : a));
+    clearError(addressErrorKey(index, field));
   };
 
-  const addAddress = () => setAddresses(prev => [...prev, createEmptyAddress()]);
-  const removeAddress = (index: number) => setAddresses(prev => prev.filter((_, i) => i !== index));
+  const addAddress = () => {
+    setAddresses(prev => [...prev, createEmptyAddress()]);
+    clearErrors();
+  };
+  const removeAddress = (index: number) => {
+    setAddresses(prev => prev.filter((_, i) => i !== index));
+    clearErrors();
+  };
 
   const handleSave = async () => {
+    const isValid = validate([
+      { key: 'name', isValid: !!name.trim() },
+      { key: 'document', isValid: !!document.trim() },
+      ...addresses.flatMap((address, index) => [
+        { key: addressErrorKey(index, 'street'), isValid: !!address.street.trim() },
+        { key: addressErrorKey(index, 'neighborhood'), isValid: !!address.neighborhood.trim() },
+        { key: addressErrorKey(index, 'localityId'), isValid: !!address.localityId },
+      ]),
+    ]);
+    if (!isValid) return;
+
     const dto: ICustomerSaveDto = {
       id: id ?? 0,
       name: name.trim(),
@@ -150,7 +173,7 @@ export function CustomerFormScreen({ id, onGoBack }: CustomerFormScreenProps) {
         {/* Main data */}
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Dados Gerais</Text>
-          <FormField label="Nome *" placeholder="Nome completo" value={name} onChangeText={setName} editable={!isSaving} />
+          <FormField label="Nome *" placeholder="Nome completo" value={name} onChangeText={bindChange('name', setName)} editable={!isSaving} error={errors.name} />
           <SelectField
             label="Tipo de Pessoa *"
             value={personType}
@@ -158,7 +181,7 @@ export function CustomerFormScreen({ id, onGoBack }: CustomerFormScreenProps) {
             onValueChange={setPersonType}
             disabled={isSaving}
           />
-          <FormField label="Documento *" placeholder="CPF ou CNPJ" value={document} onChangeText={setDocument} editable={!isSaving} />
+          <FormField label="Documento *" placeholder="CPF ou CNPJ" value={document} onChangeText={bindChange('document', setDocument)} editable={!isSaving} error={errors.document} />
           <FormField label="E-mail" placeholder="email@exemplo.com" value={email} onChangeText={setEmail} editable={!isSaving} keyboardType="email-address" />
           <FormField label="Inscrição Estadual" placeholder="Opcional" value={stateRegistration} onChangeText={setStateRegistration} editable={!isSaving} />
         </View>
@@ -178,10 +201,10 @@ export function CustomerFormScreen({ id, onGoBack }: CustomerFormScreenProps) {
               </View>
               <View style={styles.row}>
                 <View style={styles.flex1}>
-                  <FormField label="Rua *" placeholder="Nome da rua" value={addr.street} onChangeText={(v) => updateAddress(index, 'street', v)} editable={!isSaving} />
+                  <FormField label="Rua *" placeholder="Nome da rua" value={addr.street} onChangeText={(v) => updateAddress(index, 'street', v)} editable={!isSaving} error={errors[addressErrorKey(index, 'street')]} />
                 </View>
                 <View style={styles.flex1}>
-                  <FormField label="Bairro *" placeholder="Nome do bairro" value={addr.neighborhood} onChangeText={(v) => updateAddress(index, 'neighborhood', v)} editable={!isSaving} />
+                  <FormField label="Bairro *" placeholder="Nome do bairro" value={addr.neighborhood} onChangeText={(v) => updateAddress(index, 'neighborhood', v)} editable={!isSaving} error={errors[addressErrorKey(index, 'neighborhood')]} />
                 </View>
               </View>
               <SelectField
@@ -191,6 +214,7 @@ export function CustomerFormScreen({ id, onGoBack }: CustomerFormScreenProps) {
                 onValueChange={(v) => updateAddress(index, 'localityId', v as number)}
                 placeholder="Selecione a localidade..."
                 disabled={isSaving}
+                error={errors[addressErrorKey(index, 'localityId')]}
               />
               <View style={styles.row}>
                 <View style={styles.flex1}>
@@ -216,7 +240,6 @@ export function CustomerFormScreen({ id, onGoBack }: CustomerFormScreenProps) {
             isLoading={isSaving || isLoadingItem}
             onPress={handleSave}
             style={{ flex: 1 }}
-            disabled={!name.trim() || !document.trim()}
           />
         </View>
       </ScrollView>

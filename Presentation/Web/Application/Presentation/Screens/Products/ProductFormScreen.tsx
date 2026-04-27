@@ -5,9 +5,10 @@ import { FormField } from '../../Components/FormField';
 import { PrimaryButton } from '../../Components/PrimaryButton';
 import { SecondaryButton } from '../../Components/SecondaryButton';
 import { SelectField } from '../../Components/SelectField';
+import { UseFormValidation } from '../../../Application/Hooks/UseFormValidation';
 import { UseProducts } from '../../../Application/Hooks/UseProducts';
 import { MeasureUnit, MeasureUnitLabels } from '../../../Application/Domain/ValueObjects/Enums/Products/MeasureUnit';
-import { ProductSaveDto } from '../../../Application/Interfaces/DataTransferObjects/ProductSaveDto';
+import { IProductSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Products/IProductSaveDto';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 interface ProductFormScreenProps {
@@ -35,6 +36,7 @@ const measureUnitOptions = Object.values(MeasureUnit)
 
 export function ProductFormScreen({ id, onGoBack }: ProductFormScreenProps) {
   const { currentItem, isLoadingItem, isSaving, loadById, save, clearCurrentItem } = UseProducts();
+  const { errors, validate, bindChange } = UseFormValidation();
   const isEditing = !!id;
 
   const [description, setDescription] = useState('');
@@ -53,7 +55,12 @@ export function ProductFormScreen({ id, onGoBack }: ProductFormScreenProps) {
   }, [currentItem]);
 
   const handleSave = async () => {
-    const dto: ProductSaveDto = {
+    const isValid = validate([
+      { key: 'description', isValid: !!description.trim() },
+    ]);
+    if (!isValid) return;
+
+    const dto: IProductSaveDto = {
       id: id ?? 0,
       description: description.trim(),
       measureUnit,
@@ -77,8 +84,9 @@ export function ProductFormScreen({ id, onGoBack }: ProductFormScreenProps) {
             label="Descrição *"
             placeholder="Nome do produto"
             value={description}
-            onChangeText={setDescription}
+            onChangeText={bindChange('description', setDescription)}
             editable={!isSaving}
+            error={errors.description}
           />
           <SelectField
             label="Unidade de Medida *"
@@ -94,7 +102,6 @@ export function ProductFormScreen({ id, onGoBack }: ProductFormScreenProps) {
               isLoading={isSaving || isLoadingItem}
               onPress={handleSave}
               style={{ flex: 1 }}
-              disabled={!description.trim()}
             />
           </View>
         </View>

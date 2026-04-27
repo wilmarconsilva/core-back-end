@@ -7,7 +7,7 @@ import { UseCrud, UseCrudResult } from './UseCrud';
 
 const localityService = new LocalityService();
 
-export type UseLocalitiesResult = UseCrudResult<ILocalitySaveDto, IILocalityListing, ILocalityListingFilter> & {
+export type UseLocalitiesResult = UseCrudResult<ILocalitySaveDto, ILocalityListing, ILocalityListingFilter> & {
   loadAllForSelect: () => Promise<void>;
 };
 

@@ -7,7 +7,7 @@ import { UseAuthentication } from './Application/Hooks/UseAuthentication';
 import { colors } from './Presentation/Styles';
 
 export default function App() {
-  const { accessToken, isLoading, isInitializing, error, validationErrors, login, clearError } =
+  const { accessToken, isLoading, isInitializing, login } =
     UseAuthentication();
 
   if (isInitializing) {
@@ -33,10 +33,7 @@ export default function App() {
       <StatusBar style="dark" />
       <LoginScreen
         isLoading={isLoading}
-        error={error}
-        validationErrors={validationErrors}
         onLogin={login}
-        onClearError={clearError}
       />
       <AppToast />
     </>

@@ -9,12 +9,11 @@ import {
 import { FormField } from '../Components/FormField';
 import { PasswordField } from '../Components/PasswordField';
 import { PrimaryButton } from '../Components/PrimaryButton';
-import { ILoginScreenProps } from '../Interfaces/DataTransferObjects/ILoginScreenProps';
+import { ILoginScreenProps } from '../Interfaces/ILoginScreenProps';
 import { layoutStyles, typographyStyles } from '../Styles';
 
 export function LoginScreen({
   isLoading,
-  validationErrors,
   onLogin,
 }: ILoginScreenProps) {
   const [email, setEmail] = useState('');
@@ -45,7 +44,6 @@ export function LoginScreen({
             value={email}
             onChangeText={setEmail}
             editable={!isLoading}
-            error={validationErrors.email}
           />
 
           <PasswordField
@@ -55,7 +53,6 @@ export function LoginScreen({
             value={password}
             onChangeText={setPassword}
             editable={!isLoading}
-            error={validationErrors.password}
             onSubmitEditing={handleLogin}
           />
 

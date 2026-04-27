@@ -12,7 +12,7 @@ const _loadFromStorage = (): void => {
     if (typeof localStorage !== 'undefined') {
       const raw = localStorage.getItem(TOKEN_KEY);
       if (raw) {
-        _fullToken = JSON.parse(raw) as AccessToken;
+        _fullToken = JSON.parse(raw) as IAccessToken;
       }
     }
   } catch {

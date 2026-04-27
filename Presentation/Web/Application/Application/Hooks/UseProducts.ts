@@ -1,13 +1,13 @@
 import { useCallback, useMemo } from 'react';
 import { ProductService } from '../Services/ProductService';
-import { ProductSaveDto } from '../Interfaces/DataTransferObjects/ProductSaveDto';
-import { ProductListing } from '../Interfaces/DataTransferObjects/ProductListing';
-import { ProductListingFilter } from '../IListingFilter';
+import { IProductSaveDto } from '../Interfaces/DataTransferObjects/Products/IProductSaveDto';
+import { IProductListing } from '../Interfaces/DataTransferObjects/Products/IProductListing';
+import { IProductListingFilter } from '../Interfaces/DataTransferObjects/Products/IProductListingFilter';
 import { UseCrud, UseCrudResult } from './UseCrud';
 
 const productService = new ProductService();
 
-export type UseProductsResult = UseCrudResult<ProductSaveDto, ProductListing, ProductListingFilter> & {
+export type UseProductsResult = UseCrudResult<IProductSaveDto, IProductListing, IProductListingFilter> & {
   loadAllForSelect: () => Promise<void>;
 };
 

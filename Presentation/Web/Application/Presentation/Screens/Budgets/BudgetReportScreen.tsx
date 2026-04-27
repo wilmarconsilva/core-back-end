@@ -6,9 +6,9 @@ import { PrimaryButton } from '../../Components/PrimaryButton';
 import { BudgetReportService } from '../../../Application/Services/Budgets/BudgetReportService';
 import { TemplateService } from '../../../Application/Services/TemplateService';
 import { renderTemplate } from '../../../Application/Services/TemplateRendererService';
-import { BudgetReportFilter } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetReportFilter';
-import { BudgetReportListing } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetReportListing';
-import { BudgetReport } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetReport';
+import { IBudgetReportFilter } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetReportFilter';
+import { IBudgetReportListing } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetReportListing';
+import { IBudgetReport } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetReport';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 interface BudgetReportScreenProps {
@@ -76,12 +76,12 @@ export function BudgetReportScreen({ onGoBack }: BudgetReportScreenProps) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState<BudgetReportListing | null>(null);
+  const [data, setData] = useState<IBudgetReportListing | null>(null);
 
   const handleSearch = async () => {
     setIsLoading(true);
     try {
-      const filter: BudgetReportFilter = {
+      const filter: IBudgetReportFilter = {
         registersStart: 0,
         registersEnd: 50,
         creationDateTimeStart: startDate || undefined,
@@ -96,7 +96,7 @@ export function BudgetReportScreen({ onGoBack }: BudgetReportScreenProps) {
     }
   };
 
-  const handleGeneratePdf = async (report: BudgetReport) => {
+  const handleGeneratePdf = async (report: IBudgetReport) => {
     if (Platform.OS !== 'web') return;
     try {
       const template = await templateService.getTemplate('document');

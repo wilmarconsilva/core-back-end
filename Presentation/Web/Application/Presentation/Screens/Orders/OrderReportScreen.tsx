@@ -6,9 +6,9 @@ import { PrimaryButton } from '../../Components/PrimaryButton';
 import { OrderReportService } from '../../../Application/Services/Orders/OrderReportService';
 import { TemplateService } from '../../../Application/Services/TemplateService';
 import { renderTemplate } from '../../../Application/Services/TemplateRendererService';
-import { IOrderReportFilter } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReportFilter';
-import { IOrderReportListing } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReportListing';
-import { IOrderReport } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReport';
+import { IOrderReportFilter } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReportFilter';
+import { IOrderReportListing } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReportListing';
+import { IOrderReport } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReport';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 interface OrderReportScreenProps {

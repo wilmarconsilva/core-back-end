@@ -1,15 +1,15 @@
 import { useCallback, useMemo, useState } from 'react';
 import { BudgetService } from '../Services/Budgets/BudgetService';
-import { BudgetSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetSaveDto';
-import { BudgetListing } from '../Interfaces/DataTransferObjects/BudgetListing';
-import { BudgetListingFilter } from '../IListingFilter';
+import { IBudgetSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetSaveDto';
+import { IBudgetListing } from '../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListing';
+import { IBudgetListingFilter } from '../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListingFilter';
 import { IOrderSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderSaveDto';
 import { UseCrud, UseCrudResult } from './UseCrud';
 import Toast from 'react-native-toast-message';
 
 const budgetService = new BudgetService();
 
-export type UseBudgetsResult = UseCrudResult<BudgetSaveDto, BudgetListing, BudgetListingFilter> & {
+export type UseBudgetsResult = UseCrudResult<IBudgetSaveDto, IBudgetListing, IBudgetListingFilter> & {
   isCreatingOrder: boolean;
   createdOrder: IOrderSaveDto | null;
   createOrderByBudget: (budgetId: number) => Promise<boolean>;
@@ -26,7 +26,6 @@ export function UseBudgets(): UseBudgetsResult {
     try {
       const order = await budgetService.createOrderByBudget(budgetId);
       setCreatedOrder(order);
-      Toast.show({ type: 'success', text1: 'Pedido criado com sucesso!' });
       return true;
     } catch {
       return false;

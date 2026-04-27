@@ -7,8 +7,8 @@ import { DataGrid } from '../../Components/DataGrid';
 import { DateField } from '../../Components/DateField';
 import { FilterActionBar } from '../../Components/FilterActionBar';
 import { UseBudgets } from '../../../Application/Hooks/UseBudgets';
-import { BudgetListing } from '../../../Application/Interfaces/DataTransferObjects/BudgetListing';
-import { BudgetListingFilter } from '../IListingFilter';
+import { IBudgetListing } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListing';
+import { IBudgetListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListingFilter';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
@@ -39,9 +39,9 @@ export function BudgetsListScreen({ onGoBack, onNavigateToForm }: BudgetsListScr
   const [page, setPage] = useState(1);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [deleteTarget, setDeleteTarget] = useState<BudgetListing | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<IBudgetListing | null>(null);
 
-  const buildFilter = useCallback((p: number): BudgetListingFilter => ({
+  const buildFilter = useCallback((p: number): IBudgetListingFilter => ({
     registersStart: (p - 1) * PAGE_SIZE,
     registersEnd: p * PAGE_SIZE,
     creationDateTimeStart: startDate || undefined,
@@ -80,7 +80,7 @@ export function BudgetsListScreen({ onGoBack, onNavigateToForm }: BudgetsListScr
             </View>
           </FilterActionBar>
 
-          <DataGrid<BudgetListing>
+          <DataGrid<IBudgetListing>
             columns={[
               { key: 'id', label: 'Código', flex: 0.4 },
               { key: 'custormerName', label: 'Cliente', flex: 2 },

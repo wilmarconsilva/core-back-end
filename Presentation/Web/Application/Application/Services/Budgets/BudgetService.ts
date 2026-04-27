@@ -1,20 +1,20 @@
 import { CrudService } from '../CrudService';
 import { IBudgetService } from '../../Interfaces/Services/IBudgetService';
-import { BudgetSaveDto } from '../../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetSaveDto';
-import { BudgetListing } from '../../Interfaces/DataTransferObjects/BudgetListing';
-import { BudgetListingFilter } from '../IListingFilter';
-import { IOrderSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderSaveDto';
+import { IBudgetSaveDto } from '../../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetSaveDto';
+import { IBudgetListing } from '../../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListing';
+import { IBudgetListingFilter } from '../../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListingFilter';
+import { IOrderSaveDto } from '../../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderSaveDto';
 
 export class BudgetService
-  extends CrudService<BudgetSaveDto, BudgetListing, BudgetListingFilter>
+  extends CrudService<IBudgetSaveDto, IBudgetListing, IBudgetListingFilter>
   implements IBudgetService
 {
   constructor() {
     super('/budgets');
   }
 
-  async createOrderByBudget(id: number): Promise<OrderSaveDto> {
-    return this.request<OrderSaveDto>(`/budgets/${id}/orders`, {
+  async createOrderByBudget(id: number): Promise<IOrderSaveDto> {
+    return this.request<IOrderSaveDto>(`/budgets/${id}/orders`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
     });

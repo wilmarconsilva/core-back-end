@@ -1,6 +1,6 @@
 import { ICrudService } from './ICrudService';
-import { ProductSaveDto } from '../DataTransferObjects/ProductSaveDto';
-import { ProductListing } from '../DataTransferObjects/ProductListing';
-import { ProductListingFilter } from '../IListingFilter';
+import { IProductSaveDto } from '../DataTransferObjects/Products/IProductSaveDto';
+import { IProductListing } from '../DataTransferObjects/Products/IProductListing';
+import { IProductListingFilter } from '../DataTransferObjects/Products/IProductListingFilter';
 
-export interface IProductService extends ICrudService<ProductSaveDto, ProductListing, ProductListingFilter> {}
+export interface IProductService extends ICrudService<IProductSaveDto, IProductListing, IProductListingFilter> {}

@@ -63,7 +63,6 @@ export function UseCrud<TSaveDto, TListing, TFilter>(
       } else {
         await service.create(dto);
       }
-      Toast.show({ type: 'success', text1: 'Salvo com sucesso!' });
       return true;
     } catch {
       return false;
@@ -76,7 +75,6 @@ export function UseCrud<TSaveDto, TListing, TFilter>(
     setIsDeleting(true);
     try {
       await service.delete(id);
-      Toast.show({ type: 'success', text1: 'Excluído com sucesso!' });
       return true;
     } catch {
       return false;

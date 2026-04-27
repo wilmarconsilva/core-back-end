@@ -9,12 +9,13 @@ import { SelectField } from '../../Components/SelectField';
 import { SignatureCanvas } from '../../Components/SignatureCanvas';
 import { TextAreaField } from '../../Components/TextAreaField';
 import { UseCustomers } from '../../../Application/Hooks/UseCustomers';
+import { UseFormValidation } from '../../../Application/Hooks/UseFormValidation';
 import { UseOrders } from '../../../Application/Hooks/UseOrders';
 import { UseProducts } from '../../../Application/Hooks/UseProducts';
-import { IOrderProductSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderProductSaveDto';
-import { IOrderSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/OrderSaveDto';
+import { IOrderProductSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderProductSaveDto';
+import { IOrderSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderSaveDto';
 import { PaymentMethod, PaymentMethodLabels } from '../../../Application/Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
-import { IPaymentSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/PaymentSaveDto';
+import { IPaymentSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Payments/IPaymentSaveDto';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 interface OrderFormScreenProps {
@@ -80,6 +81,7 @@ export function OrderFormScreen({ id, onGoBack }: OrderFormScreenProps) {
   const { currentItem, isLoadingItem, isSaving, loadById, save, clearCurrentItem } = UseOrders();
   const { listings: customers, loadAll: loadCustomers } = UseCustomers();
   const { listings: products, loadAllForSelect: loadProducts } = UseProducts();
+  const { errors, validate, clearError, bindChange } = UseFormValidation();
   const isEditing = !!id;
 
   const [customerId, setCustomerId] = useState<number>(0);
@@ -143,6 +145,12 @@ export function OrderFormScreen({ id, onGoBack }: OrderFormScreenProps) {
   });
 
   const handleSave = async () => {
+    const isValid = validate([
+      { key: 'customerId', isValid: !!customerId },
+      { key: 'userId', isValid: !!userId.trim() },
+    ]);
+    if (!isValid) return;
+
     const dto: IOrderSaveDto = {
       id: id ?? 0,
       userId: parseInt(userId) || 0,
@@ -174,16 +182,18 @@ export function OrderFormScreen({ id, onGoBack }: OrderFormScreenProps) {
             label="Cliente *"
             value={customerId || undefined}
             options={customerOptions}
-            onValueChange={(v) => setCustomerId(v as number)}
+            onValueChange={(v) => { setCustomerId(v as number); clearError('customerId'); }}
             placeholder="Selecione o cliente..."
             disabled={isSaving}
+            error={errors.customerId}
           />
           <NumberField
             label="Código do Vendedor *"
             placeholder="Código do usuário"
             value={userId}
-            onChangeText={setUserId}
+            onChangeText={bindChange('userId', setUserId)}
             editable={!isSaving}
+            error={errors.userId}
           />
           <NumberField
             label="Código do Orçamento"
@@ -294,7 +304,6 @@ export function OrderFormScreen({ id, onGoBack }: OrderFormScreenProps) {
             isLoading={isSaving || isLoadingItem}
             onPress={handleSave}
             style={{ flex: 1 }}
-            disabled={!customerId || !userId.trim()}
           />
         </View>
       </ScrollView>

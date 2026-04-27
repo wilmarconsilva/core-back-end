@@ -6,8 +6,8 @@ import { DataGrid } from '../../Components/DataGrid';
 import { DateField } from '../../Components/DateField';
 import { FilterActionBar } from '../../Components/FilterActionBar';
 import { UseOrders } from '../../../Application/Hooks/UseOrders';
-import { IOrderListing } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/OrderListing';
-import { IOrderListingFilter } from '../IListingFilter';
+import { IOrderListing } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderListing';
+import { IOrderListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderListingFilter';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;

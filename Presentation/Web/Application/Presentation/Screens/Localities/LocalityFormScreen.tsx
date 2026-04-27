@@ -5,8 +5,9 @@ import { FormField } from '../../Components/FormField';
 import { NumberField } from '../../Components/NumberField';
 import { PrimaryButton } from '../../Components/PrimaryButton';
 import { SecondaryButton } from '../../Components/SecondaryButton';
+import { UseFormValidation } from '../../../Application/Hooks/UseFormValidation';
 import { UseLocalities } from '../../../Application/Hooks/UseLocalities';
-import { ILocalitySaveDto } from '../Interfaces/DataTransferObjects/Localities/ILocalitySaveDto';
+import { ILocalitySaveDto } from '../../../Application/Interfaces/DataTransferObjects/Localities/ILocalitySaveDto';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 interface LocalityFormScreenProps {
@@ -34,6 +35,7 @@ const styles = StyleSheet.create({
 
 export function LocalityFormScreen({ id, onGoBack }: LocalityFormScreenProps) {
   const { currentItem, isLoadingItem, isSaving, loadById, save, clearCurrentItem } = UseLocalities();
+  const { errors, validate, bindChange } = UseFormValidation();
   const isEditing = !!id;
 
   const [description, setDescription] = useState('');
@@ -54,6 +56,11 @@ export function LocalityFormScreen({ id, onGoBack }: LocalityFormScreenProps) {
   }, [currentItem]);
 
   const handleSave = async () => {
+    const isValid = validate([
+      { key: 'description', isValid: !!description.trim() },
+    ]);
+    if (!isValid) return;
+
     const dto: ILocalitySaveDto = {
       id: id ?? 0,
       description: description.trim(),
@@ -82,8 +89,9 @@ export function LocalityFormScreen({ id, onGoBack }: LocalityFormScreenProps) {
             label="Descrição *"
             placeholder="Nome da localidade"
             value={description}
-            onChangeText={setDescription}
+            onChangeText={bindChange('description', setDescription)}
             editable={!isSaving}
+            error={errors.description}
           />
           <NumberField
             label="Estado Código"
@@ -100,7 +108,6 @@ export function LocalityFormScreen({ id, onGoBack }: LocalityFormScreenProps) {
               isLoading={isSaving || isLoadingItem}
               onPress={handleSave}
               style={{ flex: 1 }}
-              disabled={!description.trim()}
             />
           </View>
         </View>

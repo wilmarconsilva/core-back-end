@@ -6,8 +6,8 @@ import { DataGrid } from '../../Components/DataGrid';
 import { FilterActionBar } from '../../Components/FilterActionBar';
 import { FormField } from '../../Components/FormField';
 import { UseLocalities } from '../../../Application/Hooks/UseLocalities';
-import { ILocalityListing } from '../Interfaces/DataTransferObjects/Localities/ILocalityListing';
-import { ILocalityListingFilter } from '../IListingFilter';
+import { ILocalityListing } from '../../../Application/Interfaces/DataTransferObjects/Localities/ILocalityListing';
+import { ILocalityListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Localities/ILocalityListingFilter';
 import { colors, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
