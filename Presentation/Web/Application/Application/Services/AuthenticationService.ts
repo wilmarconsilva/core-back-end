@@ -17,15 +17,16 @@ export class AuthenticationService extends APIConsumerService implements IAuthen
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(request),
-    });
+    },
+    { toastsConfiguration: { doNotShowSuccess: true } });
   }
 
   async refresh(): Promise<IAccessToken> {
-    return this.request<IAccessToken>('/authentication/refresh', { method: 'POST', credentials: 'include' });
+    return this.request<IAccessToken>('/authentication/refresh', { method: 'POST', credentials: 'include' }, { toastsConfiguration: { doNotShowSuccess: true } });
   }
 
   async revoke(): Promise<void> {
-    await this.request<void>('/authentication/revoke', { method: 'POST', credentials: 'include' });
+    await this.request<void>('/authentication/revoke', { method: 'POST', credentials: 'include' }, { toastsConfiguration: { doNotShowSuccess: true } });
   }
 
 }

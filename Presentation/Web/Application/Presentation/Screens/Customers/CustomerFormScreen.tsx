@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Breadcrumb } from '../../Components/Breadcrumb';
+import { EntitySelectField } from '../../Components/EntitySelectField';
 import { FormField } from '../../Components/FormField';
 import { PrimaryButton } from '../../Components/PrimaryButton';
 import { SecondaryButton } from '../../Components/SecondaryButton';
@@ -9,6 +10,8 @@ import { SelectField } from '../../Components/SelectField';
 import { UseCustomers } from '../../../Application/Hooks/UseCustomers';
 import { UseFormValidation } from '../../../Application/Hooks/UseFormValidation';
 import { UseLocalities } from '../../../Application/Hooks/UseLocalities';
+import { ILocalityListing } from '../../../Application/Interfaces/DataTransferObjects/Localities/ILocalityListing';
+import { ILocalityListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Localities/ILocalityListingFilter';
 import { ICustomerAddressSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerAddressSaveDto';
 import { ICustomerSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerSaveDto';
 import { PersonType, PersonTypeLabels } from '../../../Application/Interfaces/DataTransferObjects/Persons/PersonType';
@@ -18,6 +21,8 @@ interface CustomerFormScreenProps {
   id?: number;
   onGoBack: () => void;
 }
+
+const PAGE_SIZE = 50;
 
 const personTypeOptions = Object.values(PersonType)
   .filter((v) => typeof v === 'number')
@@ -41,6 +46,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     marginBottom: 16,
   },
+  filterField: { flex: 1, minWidth: 180 },
   addressCard: {
     borderWidth: 1,
     borderColor: colors.border,
@@ -91,7 +97,7 @@ const addressErrorKey = (index: number, field: keyof ICustomerAddressSaveDto) =>
 
 export function CustomerFormScreen({ id, onGoBack }: CustomerFormScreenProps) {
   const { currentItem, isLoadingItem, isSaving, loadById, save, clearCurrentItem } = UseCustomers();
-  const { listings: localities, loadAllForSelect } = UseLocalities();
+  const { listings: localities, isLoadingList: isLoadingLocalities, loadAll: loadLocalities } = UseLocalities();
   const { errors, validate, clearError, clearErrors, bindChange } = UseFormValidation();
   const isEditing = !!id;
 
@@ -102,8 +108,10 @@ export function CustomerFormScreen({ id, onGoBack }: CustomerFormScreenProps) {
   const [stateRegistration, setStateRegistration] = useState('');
   const [addresses, setAddresses] = useState<ICustomerAddressSaveDto[]>([createEmptyAddress()]);
 
+  const [filterLocalityDescription, setFilterLocalityDescription] = useState('');
+
   useEffect(() => {
-    loadAllForSelect();
+    loadLocalities({ registersStart: 0, registersEnd: PAGE_SIZE });
     if (isEditing) loadById(id);
     return () => clearCurrentItem();
   }, [id]);
@@ -118,8 +126,6 @@ export function CustomerFormScreen({ id, onGoBack }: CustomerFormScreenProps) {
       setAddresses(currentItem.addresses?.length ? currentItem.addresses : [createEmptyAddress()]);
     }
   }, [currentItem]);
-
-  const localityOptions = localities.map((l) => ({ label: l.description, value: l.id }));
 
   const updateAddress = (index: number, field: keyof ICustomerAddressSaveDto, value: string | number) => {
     setAddresses(prev => prev.map((a, i) => i === index ? { ...a, [field]: value } : a));
@@ -207,15 +213,40 @@ export function CustomerFormScreen({ id, onGoBack }: CustomerFormScreenProps) {
                   <FormField label="Bairro *" placeholder="Nome do bairro" value={addr.neighborhood} onChangeText={(v) => updateAddress(index, 'neighborhood', v)} editable={!isSaving} error={errors[addressErrorKey(index, 'neighborhood')]} />
                 </View>
               </View>
-              <SelectField
+              <EntitySelectField<ILocalityListing, ILocalityListingFilter>
                 label="Localidade *"
                 value={addr.localityId || undefined}
-                options={localityOptions}
-                onValueChange={(v) => updateAddress(index, 'localityId', v as number)}
                 placeholder="Selecione a localidade..."
                 disabled={isSaving}
                 error={errors[addressErrorKey(index, 'localityId')]}
-              />
+                listings={localities}
+                isLoading={isLoadingLocalities}
+                onLoadData={loadLocalities}
+                pageSize={PAGE_SIZE}
+                buildFilter={(page, filters) => ({
+                  registersStart: (page - 1) * PAGE_SIZE,
+                  registersEnd: page * PAGE_SIZE,
+                  description: filters.description?.trim() || undefined,
+                })}
+                columns={[
+                  { key: 'id', label: 'Código', flex: 0.4 },
+                  { key: 'description', label: 'Descrição', flex: 2 },
+                ]}
+                keyExtractor={(l) => String(l.id)}
+                labelExtractor={(l) => l.description}
+                onValueChange={(locality) => {
+                  updateAddress(index, 'localityId', locality.id);
+                }}
+              >
+                <View style={styles.filterField}>
+                  <FormField
+                    label="Descrição"
+                    placeholder="Filtrar..."
+                    value={filterLocalityDescription}
+                    onChangeText={setFilterLocalityDescription}
+                  />
+                </View>
+              </EntitySelectField>
               <View style={styles.row}>
                 <View style={styles.flex1}>
                   <FormField label="Número" placeholder="Nº" value={addr.number ?? ''} onChangeText={(v) => updateAddress(index, 'number', v)} editable={!isSaving} />

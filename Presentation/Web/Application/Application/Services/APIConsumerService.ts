@@ -1,7 +1,8 @@
 import Toast from 'react-native-toast-message';
 import { IApiError } from '../Interfaces/DataTransferObjects/Authentication/IApiError';
-import { API_BASE_URL, authorizedFetch, SessionExpiredError } from './HttpClient';
+import { API_BASE_URL, authorizedFetch, SessionExpiredError } from './HttpClientService';
 import { TokenStorageService } from './TokenStorageService';
+import { IRequestOptions } from '../Interfaces/DataTransferObjects/APIConsumer/IRequestOptions';
 
 type FetchFn = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 
@@ -12,6 +13,7 @@ export class APIConsumerService {
   protected async request<T>(
     path: string,
     requestInit: RequestInit,
+    requestOptions?: IRequestOptions
   ): Promise<T> {
     try {
       const response = await this.fetchFn(`${API_BASE_URL}${path}`, requestInit);
@@ -34,7 +36,9 @@ export class APIConsumerService {
         ? undefined as T
         : await (response.json() as Promise<T>);
 
-      Toast.show({ type: 'success', text1: 'Operação realizada com sucesso!' });
+      if (!requestOptions?.toastsConfiguration?.doNotShowSuccess) {
+        Toast.show({ type: 'success', text1: 'Operação realizada com sucesso!' });
+      }
 
       return data;
     }
@@ -56,7 +60,9 @@ export class APIConsumerService {
 
         const message = isBadRequest ? apiError.detail ?? genericErrorMessage : genericErrorMessage;
           
-        Toast.show({ type: isBadRequest ? 'info' : 'error', text1: message });
+        if (!requestOptions?.toastsConfiguration?.doNotShowError) {
+          Toast.show({ type: isBadRequest ? 'info' : 'error', text1: message });
+        }
       }
       
       throw apiError;

@@ -2,16 +2,22 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Breadcrumb } from '../../Components/Breadcrumb';
+import { EntitySelectField } from '../../Components/EntitySelectField';
 import { NumberField } from '../../Components/NumberField';
 import { PrimaryButton } from '../../Components/PrimaryButton';
 import { SecondaryButton } from '../../Components/SecondaryButton';
 import { SelectField } from '../../Components/SelectField';
 import { SignatureCanvas } from '../../Components/SignatureCanvas';
 import { TextAreaField } from '../../Components/TextAreaField';
+import { FormField } from '../../Components/FormField';
 import { UseBudgets } from '../../../Application/Hooks/UseBudgets';
 import { UseCustomers } from '../../../Application/Hooks/UseCustomers';
 import { UseFormValidation } from '../../../Application/Hooks/UseFormValidation';
 import { UseProducts } from '../../../Application/Hooks/UseProducts';
+import { ICustomerListing } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerListing';
+import { ICustomerListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerListingFilter';
+import { IProductListing } from '../../../Application/Interfaces/DataTransferObjects/Products/IProductListing';
+import { IProductListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Products/IProductListingFilter';
 import { IBudgetProductSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetProductSaveDto';
 import { IBudgetSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetSaveDto';
 import { PaymentMethod, PaymentMethodLabels } from '../../../Application/Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
@@ -22,6 +28,8 @@ interface BudgetFormScreenProps {
   id?: number;
   onGoBack: () => void;
 }
+
+const PAGE_SIZE = 50;
 
 const paymentMethodOptions = Object.values(PaymentMethod)
   .filter((v) => typeof v === 'number')
@@ -40,6 +48,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   sectionTitle: { fontSize: 16, fontWeight: '700', color: colors.textPrimary, marginBottom: 16 },
+  filterField: { flex: 1, minWidth: 180 },
   productRow: {
     flexDirection: 'row',
     gap: 8,
@@ -80,8 +89,8 @@ function createEmptyProduct(): IBudgetProductSaveDto {
 
 export function BudgetFormScreen({ id, onGoBack }: BudgetFormScreenProps) {
   const { currentItem, isLoadingItem, isSaving, loadById, save, clearCurrentItem } = UseBudgets();
-  const { listings: customers, loadAll: loadCustomers } = UseCustomers();
-  const { listings: products, loadAllForSelect: loadProducts } = UseProducts();
+  const { listings: customers, isLoadingList: isLoadingCustomers, loadAll: loadCustomers } = UseCustomers();
+  const { listings: products, isLoadingList: isLoadingProducts, loadAll: loadProducts } = UseProducts();
   const { errors, validate, clearError, bindChange } = UseFormValidation();
   const isEditing = !!id;
 
@@ -94,9 +103,12 @@ export function BudgetFormScreen({ id, onGoBack }: BudgetFormScreenProps) {
   const [installmentQty, setInstallmentQty] = useState('');
   const [productLines, setProductLines] = useState<IBudgetProductSaveDto[]>([createEmptyProduct()]);
 
+  const [filterCustomerName, setFilterCustomerName] = useState('');
+  const [filterProductDescription, setFilterProductDescription] = useState('');
+
   useEffect(() => {
-    loadCustomers({ registersStart: 0, registersEnd: 50 });
-    loadProducts();
+    loadCustomers({ registersStart: 0, registersEnd: PAGE_SIZE });
+    loadProducts({ registersStart: 0, registersEnd: PAGE_SIZE });
     if (isEditing) loadById(id);
     return () => clearCurrentItem();
   }, [id]);
@@ -113,9 +125,6 @@ export function BudgetFormScreen({ id, onGoBack }: BudgetFormScreenProps) {
       setProductLines(currentItem.products?.length ? currentItem.products : [createEmptyProduct()]);
     }
   }, [currentItem]);
-
-  const customerOptions = customers.map((c) => ({ label: `${c.name} - ${c.document}`, value: c.id }));
-  const productOptions = products.map((p) => ({ label: p.description, value: p.id }));
 
   const updateProductLine = (index: number, field: keyof IBudgetProductSaveDto, value: number) => {
     setProductLines(prev => prev.map((p, i) => {
@@ -176,15 +185,42 @@ export function BudgetFormScreen({ id, onGoBack }: BudgetFormScreenProps) {
         {/* General */}
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Dados Gerais</Text>
-          <SelectField
+          <EntitySelectField<ICustomerListing, ICustomerListingFilter>
             label="Cliente *"
             value={customerId || undefined}
-            options={customerOptions}
-            onValueChange={(v) => { setCustomerId(v as number); clearError('customerId'); }}
             placeholder="Selecione o cliente..."
-            disabled={isSaving}
             error={errors.customerId}
-          />
+            disabled={isSaving}
+            listings={customers}
+            isLoading={isLoadingCustomers}
+            onLoadData={loadCustomers}
+            pageSize={PAGE_SIZE}
+            buildFilter={(page, filters) => ({
+              registersStart: (page - 1) * PAGE_SIZE,
+              registersEnd: page * PAGE_SIZE,
+              name: filters.name?.trim() || undefined,
+            })}
+            columns={[
+              { key: 'id', label: 'Código', flex: 0.4 },
+              { key: 'name', label: 'Nome', flex: 2 },
+              { key: 'document', label: 'Documento', flex: 1.2 },
+            ]}
+            keyExtractor={(c) => String(c.id)}
+            labelExtractor={(c) => `${c.name} - ${c.document}`}
+            onValueChange={(customer) => {
+              setCustomerId(customer.id);
+              clearError('customerId');
+            }}
+          >
+            <View style={styles.filterField}>
+              <FormField
+                label="Nome"
+                placeholder="Filtrar..."
+                value={filterCustomerName}
+                onChangeText={setFilterCustomerName}
+              />
+            </View>
+          </EntitySelectField>
           <NumberField
             label="Código do Vendedor *"
             placeholder="Código do usuário"
@@ -236,14 +272,37 @@ export function BudgetFormScreen({ id, onGoBack }: BudgetFormScreenProps) {
           {productLines.map((line, index) => (
             <View key={index} style={styles.productRow}>
               <View style={styles.productField}>
-                <SelectField
+                <EntitySelectField<IProductListing, IProductListingFilter>
                   label="Produto"
                   value={line.productId || undefined}
-                  options={productOptions}
-                  onValueChange={(v) => updateProductLine(index, 'productId', v as number)}
                   placeholder="Selecione..."
                   disabled={isSaving}
-                />
+                  listings={products}
+                  isLoading={isLoadingProducts}
+                  onLoadData={loadProducts}
+                  pageSize={PAGE_SIZE}
+                  buildFilter={(page, filters) => ({
+                    registersStart: (page - 1) * PAGE_SIZE,
+                    registersEnd: page * PAGE_SIZE,
+                    description: filters.description?.trim() || undefined,
+                  })}
+                  columns={[
+                    { key: 'id', label: 'Código', flex: 0.4 },
+                    { key: 'description', label: 'Descrição', flex: 2 },
+                  ]}
+                  keyExtractor={(p) => String(p.id)}
+                  labelExtractor={(p) => p.description}
+                  onValueChange={(product) => updateProductLine(index, 'productId', product.id)}
+                >
+                  <View style={styles.filterField}>
+                    <FormField
+                      label="Descrição"
+                      placeholder="Filtrar..."
+                      value={filterProductDescription}
+                      onChangeText={setFilterProductDescription}
+                    />
+                  </View>
+                </EntitySelectField>
               </View>
               <View style={styles.productSmallField}>
                 <NumberField

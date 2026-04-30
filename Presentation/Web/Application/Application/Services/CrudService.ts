@@ -15,14 +15,15 @@ export class CrudService<TSaveDto, TListing, TFilter>
     return this.request<TListing[]>(`${this.basePath}?${params}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
-    });
+    },
+    { toastsConfiguration: { doNotShowSuccess: true } });
   }
 
   async getById(id: number): Promise<TSaveDto> {
     return this.request<TSaveDto>(`${this.basePath}/${id}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
-    });
+    }, { toastsConfiguration: { doNotShowSuccess: true } });
   }
 
   async create(dto: TSaveDto): Promise<TSaveDto> {

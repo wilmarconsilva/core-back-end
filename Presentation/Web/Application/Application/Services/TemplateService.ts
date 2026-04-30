@@ -1,5 +1,5 @@
 import { ITemplateService } from '../Interfaces/Services/ITemplateService';
-import { API_BASE_URL, authorizedFetch } from './HttpClient';
+import { API_BASE_URL, authorizedFetch } from './HttpClientService';
 
 export class TemplateService implements ITemplateService {
   async getTemplate(name: string): Promise<string> {

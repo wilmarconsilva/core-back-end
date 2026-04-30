@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AuthenticationService } from '../Services/AuthenticationService';
 import { TokenStorageService } from '../Services/TokenStorageService';
-import { registerRefreshFn } from '../Services/HttpClient';
+import { registerRefreshFn } from '../Services/HttpClientService';
 import { IAccessToken } from '../Interfaces/DataTransferObjects/Authentication/IAccessToken';
 import { ILoginRequest } from '../Interfaces/DataTransferObjects/Authentication/ILoginRequest';
 

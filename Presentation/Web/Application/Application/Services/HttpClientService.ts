@@ -1,3 +1,4 @@
+import Toast from 'react-native-toast-message';
 import { IAccessToken } from '../Interfaces/DataTransferObjects/Authentication/IAccessToken';
 import { TokenStorageService } from './TokenStorageService';
 
@@ -7,7 +8,6 @@ if (!process.env?.EXPO_PUBLIC_API_BASE_URL?.trim()) {
 
 export const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL as string;
 
-/** Thrown when a 401 triggers logout (to suppress redundant error toasts). */
 export class SessionExpiredError extends Error {
   constructor() {
     super('Session expired');
@@ -75,6 +75,7 @@ async function _handle401(retryFn: () => Promise<Response>): Promise<Response> {
     _processQueue(err);
     TokenStorageService.clearToken();
     TokenStorageService.triggerLogout();
+    Toast.show({ type: 'info', text1: 'Sua sessão expirou. Faça login novamente.' });
     throw new SessionExpiredError();
   } finally {
     _isRefreshing = false;
