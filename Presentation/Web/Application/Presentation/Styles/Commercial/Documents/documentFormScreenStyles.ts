@@ -1,0 +1,50 @@
+import { StyleSheet } from 'react-native';
+import { colors } from '../../colors';
+
+/** Estilos compartilhados entre formulários de Orçamento e Pedido (produtos, totais, ações). */
+export const documentFormScreenStyles = StyleSheet.create({
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    padding: 24,
+    marginBottom: 16,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  sectionTitle: { fontSize: 16, fontWeight: '700', color: colors.textPrimary, marginBottom: 16 },
+  productRow: {
+    flexDirection: 'row',
+    gap: 8,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 10,
+    backgroundColor: colors.surfaceAlt,
+    alignItems: 'flex-end',
+  },
+  productField: { flex: 1 },
+  productSmallField: { width: 90 },
+  totalText: { fontSize: 13, color: colors.textSecondary, marginTop: 4 },
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderWidth: 1.5,
+    borderColor: colors.primary,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+    marginTop: 4,
+  },
+  addButtonText: { color: colors.primary, fontWeight: '600', fontSize: 14 },
+  summaryRow: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 12 },
+  summaryText: { fontSize: 15, fontWeight: '700', color: colors.textPrimary },
+  actionRow: { flexDirection: 'row', gap: 12, marginTop: 8, marginBottom: 24 },
+  row: { flexDirection: 'row', gap: 12 },
+  flex1: { flex: 1 },
+});

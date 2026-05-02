@@ -5,6 +5,8 @@ import { MenuItem } from '../Components/MenuItem';
 import { ScreenTransition } from '../Components/ScreenTransition';
 import { gridStyles, layoutStyles, typographyStyles } from '../Styles';
 import { UseNavigation, Screen } from '../../Application/Hooks/UseNavigation';
+import { IHomeMenuProps } from '../Interfaces/Home/IHomeMenuProps';
+import { IHomeScreenProps } from '../Interfaces/Home/IHomeScreenProps';
 import { ReportsScreen } from './ReportsScreen';
 import { CustomersListScreen } from './Customers/CustomersListScreen';
 import { CustomerFormScreen } from './Customers/CustomerFormScreen';
@@ -19,16 +21,7 @@ import { OrderFormScreen } from './Orders/OrderFormScreen';
 import { BudgetReportScreen } from './Budgets/BudgetReportScreen';
 import { OrderReportScreen } from './Orders/OrderReportScreen';
 
-interface HomeScreenProps {
-  userName: string;
-}
-
-interface HomeMenuProps {
-  userName: string;
-  navigate: (screen: Screen) => void;
-}
-
-function HomeMenuScreen({ userName, navigate }: HomeMenuProps) {
+function HomeMenuScreen({ userName, navigate }: IHomeMenuProps) {
   return (
     <View style={layoutStyles.screenWrapper}>
       <ScrollView contentContainerStyle={layoutStyles.scrollContainer}>
@@ -52,7 +45,7 @@ function screenKey(screen: Screen): string {
   return 'id' in screen ? `${screen.name}-${screen.id ?? 'new'}` : screen.name;
 }
 
-export function HomeScreen({ userName }: HomeScreenProps) {
+export function HomeScreen({ userName }: IHomeScreenProps) {
   const { currentScreen, navigate, goBack } = UseNavigation();
 
   function renderScreen() {

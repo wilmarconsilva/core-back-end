@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Breadcrumb } from '../../Components/Breadcrumb';
 import { EntitySelectField } from '../../Components/EntitySelectField';
 import { NumberField } from '../../Components/NumberField';
@@ -22,12 +22,8 @@ import { IBudgetProductSaveDto } from '../../../Application/Interfaces/DataTrans
 import { IBudgetSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetSaveDto';
 import { PaymentMethod, PaymentMethodLabels } from '../../../Application/Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
 import { IPaymentSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Payments/IPaymentSaveDto';
-import { colors, layoutStyles, typographyStyles } from '../../Styles';
-
-interface BudgetFormScreenProps {
-  id?: number;
-  onGoBack: () => void;
-}
+import { IBudgetFormScreenProps } from '../../Interfaces/Budget/IBudgetFormScreenProps';
+import { colors, documentFormScreenStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
 
@@ -35,59 +31,11 @@ const paymentMethodOptions = Object.values(PaymentMethod)
   .filter((v) => typeof v === 'number')
   .map((v) => ({ label: PaymentMethodLabels[v as PaymentMethod], value: v as PaymentMethod }));
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 24,
-    marginBottom: 16,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: colors.textPrimary, marginBottom: 16 },
-  filterField: { flex: 1, minWidth: 180 },
-  productRow: {
-    flexDirection: 'row',
-    gap: 8,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 10,
-    backgroundColor: colors.surfaceAlt,
-    alignItems: 'flex-end',
-  },
-  productField: { flex: 1 },
-  productSmallField: { width: 90 },
-  totalText: { fontSize: 13, color: colors.textSecondary, marginTop: 4 },
-  addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderWidth: 1.5,
-    borderColor: colors.primary,
-    borderRadius: 8,
-    alignSelf: 'flex-start',
-    marginTop: 4,
-  },
-  addButtonText: { color: colors.primary, fontWeight: '600', fontSize: 14 },
-  summaryRow: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 12 },
-  summaryText: { fontSize: 15, fontWeight: '700', color: colors.textPrimary },
-  actionRow: { flexDirection: 'row', gap: 12, marginTop: 8, marginBottom: 24 },
-  row: { flexDirection: 'row', gap: 12 },
-  flex1: { flex: 1 },
-});
-
 function createEmptyProduct(): IBudgetProductSaveDto {
   return { id: 0, productId: 0, quantity: 1, valueUnit: 0, valueTotal: 0 };
 }
 
-export function BudgetFormScreen({ id, onGoBack }: BudgetFormScreenProps) {
+export function BudgetFormScreen({ id, onGoBack }: IBudgetFormScreenProps) {
   const { currentItem, isLoadingItem, isSaving, loadById, save, clearCurrentItem } = UseBudgets();
   const { listings: customers, isLoadingList: isLoadingCustomers, loadAll: loadCustomers } = UseCustomers();
   const { listings: products, isLoadingList: isLoadingProducts, loadAll: loadProducts } = UseProducts();
@@ -195,6 +143,7 @@ export function BudgetFormScreen({ id, onGoBack }: BudgetFormScreenProps) {
             isLoading={isLoadingCustomers}
             onLoadData={loadCustomers}
             pageSize={PAGE_SIZE}
+            filterValues={{ name: filterCustomerName }}
             buildFilter={(page, filters) => ({
               registersStart: (page - 1) * PAGE_SIZE,
               registersEnd: page * PAGE_SIZE,
@@ -211,16 +160,16 @@ export function BudgetFormScreen({ id, onGoBack }: BudgetFormScreenProps) {
               setCustomerId(customer.id);
               clearError('customerId');
             }}
-          >
-            <View style={styles.filterField}>
+            renderFilter={(onSubmitSearch) => (
               <FormField
                 label="Nome"
                 placeholder="Filtrar..."
                 value={filterCustomerName}
                 onChangeText={setFilterCustomerName}
+                onSubmitEditing={onSubmitSearch}
               />
-            </View>
-          </EntitySelectField>
+            )}
+          />
           <NumberField
             label="Código do Vendedor *"
             placeholder="Código do usuário"
@@ -281,6 +230,7 @@ export function BudgetFormScreen({ id, onGoBack }: BudgetFormScreenProps) {
                   isLoading={isLoadingProducts}
                   onLoadData={loadProducts}
                   pageSize={PAGE_SIZE}
+                  filterValues={{ description: filterProductDescription }}
                   buildFilter={(page, filters) => ({
                     registersStart: (page - 1) * PAGE_SIZE,
                     registersEnd: page * PAGE_SIZE,
@@ -293,16 +243,16 @@ export function BudgetFormScreen({ id, onGoBack }: BudgetFormScreenProps) {
                   keyExtractor={(p) => String(p.id)}
                   labelExtractor={(p) => p.description}
                   onValueChange={(product) => updateProductLine(index, 'productId', product.id)}
-                >
-                  <View style={styles.filterField}>
+                  renderFilter={(onSubmitSearch) => (
                     <FormField
                       label="Descrição"
                       placeholder="Filtrar..."
                       value={filterProductDescription}
                       onChangeText={setFilterProductDescription}
+                      onSubmitEditing={onSubmitSearch}
                     />
-                  </View>
-                </EntitySelectField>
+                  )}
+                />
               </View>
               <View style={styles.productSmallField}>
                 <NumberField

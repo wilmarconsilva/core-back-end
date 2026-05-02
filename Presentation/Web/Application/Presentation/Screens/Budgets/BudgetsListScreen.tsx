@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Breadcrumb } from '../../Components/Breadcrumb';
 import { ConfirmDialog } from '../../Components/ConfirmDialog';
 import { DataGrid } from '../../Components/DataGrid';
@@ -9,32 +9,12 @@ import { FilterActionBar } from '../../Components/FilterActionBar';
 import { UseBudgets } from '../../../Application/Hooks/UseBudgets';
 import { IBudgetListing } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListing';
 import { IBudgetListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListingFilter';
-import { colors, layoutStyles, typographyStyles } from '../../Styles';
+import { IBudgetsListScreenProps } from '../../Interfaces/Budget/IBudgetsListScreenProps';
+import { budgetsListScreenStyles as styles, colors, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
 
-interface BudgetsListScreenProps {
-  onGoBack: () => void;
-  onNavigateToForm: (id?: number) => void;
-}
-
-const styles = StyleSheet.create({
-  filterField: { flex: 1, minWidth: 140 },
-  sectionCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 16,
-    width: '100%',
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  currency: { fontSize: 13, color: colors.textPrimary },
-});
-
-export function BudgetsListScreen({ onGoBack, onNavigateToForm }: BudgetsListScreenProps) {
+export function BudgetsListScreen({ onGoBack, onNavigateToForm }: IBudgetsListScreenProps) {
   const { listings, isLoadingList, isDeleting, loadAll, remove, isCreatingOrder, createOrderByBudget } = UseBudgets();
   const [page, setPage] = useState(1);
   const [startDate, setStartDate] = useState('');
@@ -73,10 +53,20 @@ export function BudgetsListScreen({ onGoBack, onNavigateToForm }: BudgetsListScr
         <View style={styles.sectionCard}>
           <FilterActionBar onSearch={handleSearch} onNew={() => onNavigateToForm()}>
             <View style={styles.filterField}>
-              <DateField label="Data início" value={startDate} onChangeText={setStartDate} />
+              <DateField
+                label="Data início"
+                value={startDate}
+                onChangeText={setStartDate}
+                onSubmitEditing={handleSearch}
+              />
             </View>
             <View style={styles.filterField}>
-              <DateField label="Data fim" value={endDate} onChangeText={setEndDate} />
+              <DateField
+                label="Data fim"
+                value={endDate}
+                onChangeText={setEndDate}
+                onSubmitEditing={handleSearch}
+              />
             </View>
           </FilterActionBar>
 

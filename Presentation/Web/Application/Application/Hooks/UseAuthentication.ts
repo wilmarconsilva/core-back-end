@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AuthenticationService } from '../Services/AuthenticationService';
 import { TokenStorageService } from '../Services/TokenStorageService';
-import { registerRefreshFn } from '../Services/HttpClientService';
+import { setTokenRefreshFunction } from '../Services/HttpClientService';
 import { IAccessToken } from '../Interfaces/DataTransferObjects/Authentication/IAccessToken';
 import { ILoginRequest } from '../Interfaces/DataTransferObjects/Authentication/ILoginRequest';
 
@@ -32,7 +32,7 @@ export function UseAuthentication(): UseAuthenticationResult {
   useEffect(() => {
     // Inject the refresh function into the HTTP client to avoid a circular import
     // (AuthenticationService → APIConsumerService → HttpClient → AuthenticationService).
-    registerRefreshFn(() => authenticationService.refresh());
+    setTokenRefreshFunction(() => authenticationService.refresh());
 
     // Keep React state in sync when the HTTP interceptor silently refreshes the token.
     TokenStorageService.registerTokenRefreshedCallback(setAccessToken);

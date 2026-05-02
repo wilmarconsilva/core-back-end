@@ -1,6 +1,6 @@
 import Toast from 'react-native-toast-message';
 import { IApiError } from '../Interfaces/DataTransferObjects/Authentication/IApiError';
-import { API_BASE_URL, authorizedFetch, SessionExpiredError } from './HttpClientService';
+import { API_BASE_URL, fetchWithAuth, SessionExpiredError } from './HttpClientService';
 import { TokenStorageService } from './TokenStorageService';
 import { IRequestOptions } from '../Interfaces/DataTransferObjects/APIConsumer/IRequestOptions';
 
@@ -8,7 +8,7 @@ type FetchFn = (input: RequestInfo | URL, init?: RequestInit) => Promise<Respons
 
 export class APIConsumerService {
 
-  constructor(private readonly fetchFn: FetchFn = authorizedFetch) {}
+  constructor(private readonly fetchFn: FetchFn = fetchWithAuth) {}
 
   protected async request<T>(
     path: string,

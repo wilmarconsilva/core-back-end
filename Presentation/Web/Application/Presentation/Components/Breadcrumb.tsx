@@ -1,17 +1,11 @@
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
+import { IBreadcrumbProps } from '../Interfaces/Breadcrumb/IBreadcrumbProps';
 import { breadcrumbStyles } from '../Styles';
 
-export interface IBreadcrumbItem {
-  label: string;
-  onPress?: () => void;
-}
+export type { IBreadcrumbItem } from '../Interfaces/Breadcrumb/IBreadcrumbItem';
 
-interface BreadcrumbProps {
-  items: IBreadcrumbItem[];
-}
-
-export function Breadcrumb({ items }: BreadcrumbProps) {
+export function Breadcrumb({ items }: IBreadcrumbProps) {
   return (
     <View style={breadcrumbStyles.container}>
       {items.map((item, index) => {

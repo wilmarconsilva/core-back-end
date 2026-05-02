@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { Breadcrumb } from '../../Components/Breadcrumb';
 import { ConfirmDialog } from '../../Components/ConfirmDialog';
 import { DataGrid } from '../../Components/DataGrid';
@@ -8,31 +8,12 @@ import { FormField } from '../../Components/FormField';
 import { UseLocalities } from '../../../Application/Hooks/UseLocalities';
 import { ILocalityListing } from '../../../Application/Interfaces/DataTransferObjects/Localities/ILocalityListing';
 import { ILocalityListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Localities/ILocalityListingFilter';
-import { colors, layoutStyles, typographyStyles } from '../../Styles';
+import { ILocalitiesListScreenProps } from '../../Interfaces/Locality/ILocalitiesListScreenProps';
+import { localitiesListScreenStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
 
-interface LocalitiesListScreenProps {
-  onGoBack: () => void;
-  onNavigateToForm: (id?: number) => void;
-}
-
-const styles = StyleSheet.create({
-  filterField: { flex: 1, marginBottom: 0 },
-  sectionCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 16,
-    width: '100%',
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-});
-
-export function LocalitiesListScreen({ onGoBack, onNavigateToForm }: LocalitiesListScreenProps) {
+export function LocalitiesListScreen({ onGoBack, onNavigateToForm }: ILocalitiesListScreenProps) {
   const { listings, isLoadingList, isDeleting, loadAll, remove } = UseLocalities();
   const [page, setPage] = useState(1);
   const [description, setDescription] = useState('');

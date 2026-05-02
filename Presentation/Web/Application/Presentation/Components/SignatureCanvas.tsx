@@ -1,59 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { colors } from '../Styles';
+import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import { ISignatureCanvasProps } from '../Interfaces/SignatureCanvas/ISignatureCanvasProps';
+import { signatureCanvasStyles as styles } from '../Styles';
 
-interface SignatureCanvasProps {
-  onSignatureChange: (signatureBase64: string | null) => void;
-  width?: number;
-  height?: number;
-}
-
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.textLabel,
-    marginBottom: 6,
-  },
-  instructions: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginBottom: 8,
-  },
-  canvasWrapper: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    overflow: 'hidden',
-    backgroundColor: colors.surface,
-  },
-  clearButton: {
-    marginTop: 8,
-    alignSelf: 'flex-end',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 6,
-  },
-  clearText: {
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-  unsupported: {
-    padding: 16,
-    alignItems: 'center',
-  },
-  unsupportedText: {
-    color: colors.textSecondary,
-    fontSize: 13,
-  },
-});
-
-export function SignatureCanvas({ onSignatureChange, width = 400, height = 200 }: SignatureCanvasProps) {
+export function SignatureCanvas({ onSignatureChange, width = 400, height = 200 }: ISignatureCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const isDrawingRef = useRef(false);
   const [hasSignature, setHasSignature] = useState(false);

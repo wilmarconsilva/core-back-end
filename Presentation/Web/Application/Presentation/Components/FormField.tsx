@@ -1,14 +1,10 @@
-import React, { ReactNode } from 'react';
-import { Text, TextInput, TextInputProps, View } from 'react-native';
+import React from 'react';
+import { Text, TextInput, View } from 'react-native';
+import { IFormFieldProps } from '../Interfaces/Fields/IFormFieldProps';
 import { colors, formStyles } from '../Styles';
 
-interface FormFieldProps extends TextInputProps {
-  label: string;
-  error?: string;
-  children?: ReactNode;
-}
-
-export function FormField({ label, error, style, children, ...inputProps }: FormFieldProps) {
+export function FormField({ label, error, style, children, ...inputProps }: IFormFieldProps) {
+  const { onSubmitEditing, returnKeyType, ...restInput } = inputProps;
   return (
     <View style={formStyles.field}>
       <Text style={formStyles.label}>{label}</Text>
@@ -18,7 +14,9 @@ export function FormField({ label, error, style, children, ...inputProps }: Form
           placeholderTextColor={colors.textPlaceholder}
           autoCapitalize="none"
           autoCorrect={false}
-          {...inputProps}
+          returnKeyType={returnKeyType ?? (onSubmitEditing ? 'search' : undefined)}
+          onSubmitEditing={onSubmitEditing}
+          {...restInput}
         />
       )}
       {error ? <Text style={formStyles.fieldError}>{error}</Text> : null}

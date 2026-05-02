@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { Breadcrumb } from '../../Components/Breadcrumb';
 import { FormField } from '../../Components/FormField';
 import { PrimaryButton } from '../../Components/PrimaryButton';
@@ -9,32 +9,14 @@ import { UseFormValidation } from '../../../Application/Hooks/UseFormValidation'
 import { UseProducts } from '../../../Application/Hooks/UseProducts';
 import { MeasureUnit, MeasureUnitLabels } from '../../../Application/Domain/ValueObjects/Enums/Products/MeasureUnit';
 import { IProductSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Products/IProductSaveDto';
-import { colors, layoutStyles, typographyStyles } from '../../Styles';
-
-interface ProductFormScreenProps {
-  id?: number;
-  onGoBack: () => void;
-}
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 24,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  actionRow: { flexDirection: 'row', gap: 12, marginTop: 8 },
-});
+import { IProductFormScreenProps } from '../../Interfaces/Product/IProductFormScreenProps';
+import { productFormScreenStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
 
 const measureUnitOptions = Object.values(MeasureUnit)
   .filter((v) => typeof v === 'number')
   .map((v) => ({ label: MeasureUnitLabels[v as MeasureUnit], value: v as MeasureUnit }));
 
-export function ProductFormScreen({ id, onGoBack }: ProductFormScreenProps) {
+export function ProductFormScreen({ id, onGoBack }: IProductFormScreenProps) {
   const { currentItem, isLoadingItem, isSaving, loadById, save, clearCurrentItem } = UseProducts();
   const { errors, validate, bindChange } = UseFormValidation();
   const isEditing = !!id;

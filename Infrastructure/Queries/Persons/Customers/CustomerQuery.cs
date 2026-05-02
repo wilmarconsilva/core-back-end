@@ -23,7 +23,7 @@ namespace Infrastructure.Queries.Persons.Customers
                 query = query.Where(customer => customer.Id == filter.Id.Value);
 
             if (filter.Name != null)
-                query = query.Where(customer => customer.Name.Contains(filter.Name));
+                query = query.Where(customer => EF.Functions.ILike(customer.Name, filter.Name));
 
             return await ApplyPaging(query, filter)
                 .Select(customer => new CustomerListing

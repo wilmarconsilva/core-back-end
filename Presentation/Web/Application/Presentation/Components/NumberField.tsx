@@ -1,13 +1,8 @@
 import React from 'react';
-import { TextInputProps } from 'react-native';
 import { FormField } from './FormField';
+import { INumberFieldProps } from '../Interfaces/Fields/INumberFieldProps';
 
-interface NumberFieldProps extends Omit<TextInputProps, 'keyboardType'> {
-  label: string;
-  error?: string;
-}
-
-export function NumberField({ label, error, ...inputProps }: NumberFieldProps) {
+export function NumberField({ label, error, ...inputProps }: INumberFieldProps) {
   return (
     <FormField
       label={label}

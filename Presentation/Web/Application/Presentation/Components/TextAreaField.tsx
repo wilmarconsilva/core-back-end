@@ -1,14 +1,8 @@
 import React from 'react';
-import { TextInputProps } from 'react-native';
 import { FormField } from './FormField';
+import { ITextAreaFieldProps } from '../Interfaces/Fields/ITextAreaFieldProps';
 
-interface TextAreaFieldProps extends Omit<TextInputProps, 'multiline' | 'numberOfLines'> {
-  label: string;
-  error?: string;
-  numberOfLines?: number;
-}
-
-export function TextAreaField({ label, error, numberOfLines = 4, style, ...inputProps }: TextAreaFieldProps) {
+export function TextAreaField({ label, error, numberOfLines = 4, style, ...inputProps }: ITextAreaFieldProps) {
   return (
     <FormField
       label={label}

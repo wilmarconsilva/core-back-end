@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { Breadcrumb } from '../../Components/Breadcrumb';
 import { ConfirmDialog } from '../../Components/ConfirmDialog';
 import { DataGrid } from '../../Components/DataGrid';
@@ -8,32 +8,12 @@ import { FilterActionBar } from '../../Components/FilterActionBar';
 import { UseOrders } from '../../../Application/Hooks/UseOrders';
 import { IOrderListing } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderListing';
 import { IOrderListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderListingFilter';
-import { colors, layoutStyles, typographyStyles } from '../../Styles';
+import { IOrdersListScreenProps } from '../../Interfaces/Order/IOrdersListScreenProps';
+import { ordersListScreenStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
 
-interface OrdersListScreenProps {
-  onGoBack: () => void;
-  onNavigateToForm: (id?: number) => void;
-}
-
-const styles = StyleSheet.create({
-  filterField: { flex: 1, minWidth: 140 },
-  sectionCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 16,
-    width: '100%',
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  currency: { fontSize: 13, color: colors.textPrimary },
-});
-
-export function OrdersListScreen({ onGoBack, onNavigateToForm }: OrdersListScreenProps) {
+export function OrdersListScreen({ onGoBack, onNavigateToForm }: IOrdersListScreenProps) {
   const { listings, isLoadingList, isDeleting, loadAll, remove } = UseOrders();
   const [page, setPage] = useState(1);
   const [startDate, setStartDate] = useState('');
@@ -67,10 +47,20 @@ export function OrdersListScreen({ onGoBack, onNavigateToForm }: OrdersListScree
         <View style={styles.sectionCard}>
           <FilterActionBar onSearch={handleSearch} onNew={() => onNavigateToForm()}>
             <View style={styles.filterField}>
-              <DateField label="Data início" value={startDate} onChangeText={setStartDate} />
+              <DateField
+                label="Data início"
+                value={startDate}
+                onChangeText={setStartDate}
+                onSubmitEditing={handleSearch}
+              />
             </View>
             <View style={styles.filterField}>
-              <DateField label="Data fim" value={endDate} onChangeText={setEndDate} />
+              <DateField
+                label="Data fim"
+                value={endDate}
+                onChangeText={setEndDate}
+                onSubmitEditing={handleSearch}
+              />
             </View>
           </FilterActionBar>
 

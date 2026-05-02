@@ -1,25 +1,14 @@
 import React from 'react';
 import {
-  ActivityIndicator,
   Modal,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { IConfirmDialogProps } from '../Interfaces/ConfirmDialog/IConfirmDialogProps';
 import { modalStyles } from '../Styles';
 import { PrimaryButton } from './PrimaryButton';
 import { SecondaryButton } from './SecondaryButton';
-
-interface ConfirmDialogProps {
-  visible: boolean;
-  title: string;
-  message: string;
-  onConfirm: () => void;
-  onCancel: () => void;
-  isLoading?: boolean;
-  confirmLabel?: string;
-  cancelLabel?: string;
-}
 
 export function ConfirmDialog({
   visible,
@@ -30,7 +19,7 @@ export function ConfirmDialog({
   isLoading,
   confirmLabel = 'Confirmar',
   cancelLabel = 'Cancelar',
-}: ConfirmDialogProps) {
+}: IConfirmDialogProps) {
   return (
     <Modal
       visible={visible}

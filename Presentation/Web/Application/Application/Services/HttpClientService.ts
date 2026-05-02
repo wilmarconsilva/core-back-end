@@ -15,30 +15,25 @@ export class SessionExpiredError extends Error {
   }
 }
 
-type RefreshFn = () => Promise<IAccessToken>;
+type TokenRefreshFunction = () => Promise<IAccessToken>;
 
-type PendingEntry = {
+type PendingRequest = {
   retryFn: () => Promise<Response>;
   resolve: (value: Response) => void;
   reject: (reason: unknown) => void;
 };
 
-let _refreshFn: RefreshFn | null = null;
-let _isRefreshing = false;
-let _pendingQueue: PendingEntry[] = [];
+let tokenRefreshFn: TokenRefreshFunction | null = null;
+let isRefreshingToken = false;
+let pendingRequests: PendingRequest[] = [];
 
-/**
- * Registers the function used to refresh the access token on 401.
- * Must be called once at app startup (see UseAuthentication).
- * Injected instead of imported to avoid a circular dependency with AuthenticationService.
- */
-export function registerRefreshFn(fn: RefreshFn): void {
-  _refreshFn = fn;
+export function setTokenRefreshFunction(fn: TokenRefreshFunction): void {
+  tokenRefreshFn = fn;
 }
 
-function _processQueue(error: unknown): void {
-  const queue = _pendingQueue.splice(0);
-  queue.forEach(({ retryFn, resolve, reject }) => {
+function processPendingRequests(error: unknown): void {
+  const requests = pendingRequests.splice(0);
+  requests.forEach(({ retryFn, resolve, reject }) => {
     if (error) {
       reject(error);
     } else {
@@ -47,76 +42,75 @@ function _processQueue(error: unknown): void {
   });
 }
 
-// Arrow wrapper avoids "Illegal invocation" on Hermes — native fetch polyfills cannot be bound.
-const _nativeFetch = (input: RequestInfo | URL, init?: RequestInit) => fetch(input, init);
+const performNativeFetch = (input: RequestInfo | URL, init?: RequestInit) => fetch(input, init);
 
-async function _doRefresh(): Promise<void> {
-  if (!_refreshFn) {
-    throw new Error('No refresh function registered. Call registerRefreshFn() at startup.');
+async function refreshAccessToken(): Promise<void> {
+  if (!tokenRefreshFn) {
+    throw new Error('No token refresh function registered. Call setTokenRefreshFunction() at startup.');
   }
-  const newToken = await _refreshFn();
+
+  const newToken = await tokenRefreshFn();
   TokenStorageService.setToken(newToken);
   TokenStorageService.triggerTokenRefreshed(newToken);
 }
 
-async function _handle401(retryFn: () => Promise<Response>): Promise<Response> {
-  if (_isRefreshing) {
+async function handleUnauthorizedResponse(retryRequest: () => Promise<Response>): Promise<Response> {
+  if (isRefreshingToken) {
     return new Promise<Response>((resolve, reject) => {
-      _pendingQueue.push({ retryFn, resolve, reject });
+      pendingRequests.push({ retryFn: retryRequest, resolve, reject });
     });
   }
 
-  _isRefreshing = true;
+  isRefreshingToken = true;
   try {
-    await _doRefresh();
-    _processQueue(null);
-    return retryFn();
-  } catch (err) {
-    _processQueue(err);
+    await refreshAccessToken();
+    processPendingRequests(null);
+    return retryRequest();
+  } catch (error) {
+    processPendingRequests(error);
     TokenStorageService.clearToken();
     TokenStorageService.triggerLogout();
-    Toast.show({ type: 'info', text1: 'Sua sessão expirou. Faça login novamente.' });
+
+    Toast.show({type: 'info', text1: 'Sua sessão expirou. Por favor, faça login novamente.'});
     throw new SessionExpiredError();
   } finally {
-    _isRefreshing = false;
+    isRefreshingToken = false;
   }
 }
 
-async function _internalFetch(
-  input: RequestInfo | URL,
-  init: RequestInit | undefined,
-  isRetry: boolean,
-): Promise<Response> {
+function injectAuthorizationHeader(request: RequestInit | undefined): Record<string, string> {
   const token = TokenStorageService.getToken();
-  const initHeaders = (init?.headers as Record<string, string>) ?? {};
-  const headers: Record<string, string> = {
-    ...initHeaders,
+  const existingHeaders = (request?.headers as Record<string, string>) ?? {};
+
+  return {
+    ...existingHeaders,
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
+}
 
-  const response = await _nativeFetch(input, {
+async function performFetchWithAuth(
+  url: RequestInfo | URL,
+  options: RequestInit | undefined,
+  isRetry: boolean,
+): Promise<Response> {
+  const headers = injectAuthorizationHeader(options);
+
+  const response = await performNativeFetch(url, {
     credentials: 'include',
-    ...init,
+    ...options,
     headers,
   });
 
   if (response.status === 401 && !isRetry) {
-    return _handle401(() => _internalFetch(input, init, true));
+    return handleUnauthorizedResponse(() => performFetchWithAuth(url, options, true));
   }
 
   return response;
 }
 
-/**
- * Authorized fetch: drops in as a replacement for the native `fetch`.
- * - Automatically injects `Authorization: Bearer <token>` header.
- * - On 401, delegates to the registered refresh function, then retries the original request.
- * - Multiple concurrent 401s share a single refresh call (queue-based).
- * - If refresh fails, clears tokens and triggers logout.
- */
-export async function authorizedFetch(
-  input: RequestInfo | URL,
-  init?: RequestInit,
+export async function fetchWithAuth(
+  url: RequestInfo | URL,
+  options?: RequestInit,
 ): Promise<Response> {
-  return _internalFetch(input, init, false);
+  return performFetchWithAuth(url, options, false);
 }

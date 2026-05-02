@@ -3,16 +3,11 @@ import {
   ActivityIndicator,
   Text,
   TouchableOpacity,
-  TouchableOpacityProps,
 } from 'react-native';
+import { ISecondaryButtonProps } from '../Interfaces/Button/ISecondaryButtonProps';
 import { buttonStyles, colors } from '../Styles';
 
-interface SecondaryButtonProps extends TouchableOpacityProps {
-  title: string;
-  isLoading?: boolean;
-}
-
-export function SecondaryButton({ title, isLoading, disabled, style, ...props }: SecondaryButtonProps) {
+export function SecondaryButton({ title, isLoading, disabled, style, ...props }: ISecondaryButtonProps) {
   const isDisabled = isLoading || disabled;
   return (
     <TouchableOpacity

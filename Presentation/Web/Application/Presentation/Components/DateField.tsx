@@ -1,39 +1,27 @@
 import React from 'react';
-import { Platform, TextInput, TextInputProps } from 'react-native';
+import { Platform } from 'react-native';
+import { IDateFieldProps } from '../Interfaces/Fields/IDateFieldProps';
+import { webDateInputStyle } from '../Styles';
 import { FormField } from './FormField';
-import { colors, formStyles } from '../Styles';
 
-interface DateFieldProps extends Omit<TextInputProps, 'keyboardType'> {
-  label: string;
-  error?: string;
-}
+export function DateField({ label, error, style, ...inputProps }: IDateFieldProps) {
+  const { value, onChangeText, onSubmitEditing, editable, ...rest } = inputProps;
 
-export function DateField({ label, error, style, ...inputProps }: DateFieldProps) {
   if (Platform.OS === 'web') {
     return (
       <FormField label={label} error={error}>
-        {/* @ts-ignore */}
         <input
           type="date"
-          value={inputProps.value as string ?? ''}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => inputProps.onChangeText?.(e.target.value)}
-          style={{
-            borderWidth: 1,
-            borderColor: error ? colors.error : colors.border,
-            borderRadius: 8,
-            paddingLeft: 14,
-            paddingRight: 14,
-            paddingTop: 12,
-            paddingBottom: 12,
-            fontSize: 15,
-            color: colors.textPrimary,
-            backgroundColor: colors.surfaceAlt,
-            width: '100%',
-            boxSizing: 'border-box',
-            outline: 'none',
-            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, System',
-          } as React.CSSProperties}
-          disabled={inputProps.editable === false}
+          value={typeof value === 'string' ? value : ''}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChangeText?.(e.target.value)}
+          onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+            if (e.key !== 'Enter') return;
+            e.preventDefault();
+            (onSubmitEditing as (() => void) | undefined)?.();
+          }}
+          disabled={editable === false}
+          style={webDateInputStyle(!!error)}
+          aria-invalid={error ? true : undefined}
         />
       </FormField>
     );
@@ -45,7 +33,11 @@ export function DateField({ label, error, style, ...inputProps }: DateFieldProps
       error={error}
       placeholder="AAAA-MM-DD"
       style={style}
-      {...inputProps}
+      value={value}
+      onChangeText={onChangeText}
+      onSubmitEditing={onSubmitEditing}
+      editable={editable}
+      {...rest}
     />
   );
 }

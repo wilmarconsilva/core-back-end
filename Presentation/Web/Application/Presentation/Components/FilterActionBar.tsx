@@ -1,15 +1,8 @@
-import React, { ReactNode } from 'react';
-import { StyleSheet, View } from 'react-native';
+import React from 'react';
+import { View } from 'react-native';
+import { IFilterActionBarProps } from '../Interfaces/FilterActionBar/IFilterActionBarProps';
+import { filterActionBarStyles as styles } from '../Styles';
 import { PrimaryButton } from './PrimaryButton';
-
-interface FilterActionBarProps {
-  /** Filter fields to render on the left side */
-  children: ReactNode;
-  onSearch: () => void;
-  onNew?: () => void;
-  newLabel?: string;
-  isSearching?: boolean;
-}
 
 /**
  * Standardized filter row used on all list screens.
@@ -22,7 +15,7 @@ export function FilterActionBar({
   onNew,
   newLabel = '+ Novo',
   isSearching,
-}: FilterActionBarProps) {
+}: IFilterActionBarProps) {
   return (
     <View style={styles.container}>
       <View style={styles.filters}>{children}</View>
@@ -44,28 +37,3 @@ export function FilterActionBar({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 12,
-    alignItems: 'center',
-    flexWrap: 'wrap',
-  },
-  filters: {
-    flex: 1,
-    flexDirection: 'row',
-    gap: 8,
-    flexWrap: 'wrap',
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  btn: {
-    marginTop: 0,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-});

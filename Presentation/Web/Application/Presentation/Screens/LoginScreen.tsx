@@ -9,7 +9,7 @@ import {
 import { FormField } from '../Components/FormField';
 import { PasswordField } from '../Components/PasswordField';
 import { PrimaryButton } from '../Components/PrimaryButton';
-import { ILoginScreenProps } from '../Interfaces/ILoginScreenProps';
+import { ILoginScreenProps } from '../Interfaces/Login/ILoginScreenProps';
 import { layoutStyles, typographyStyles } from '../Styles';
 
 export function LoginScreen({

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { Breadcrumb } from '../../Components/Breadcrumb';
 import { ConfirmDialog } from '../../Components/ConfirmDialog';
 import { DataGrid } from '../../Components/DataGrid';
@@ -8,31 +8,12 @@ import { FormField } from '../../Components/FormField';
 import { UseCustomers } from '../../../Application/Hooks/UseCustomers';
 import { ICustomerListing } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerListing';
 import { ICustomerListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerListingFilter';
-import { colors, layoutStyles, typographyStyles } from '../../Styles';
+import { ICustomersListScreenProps } from '../../Interfaces/Customer/ICustomersListScreenProps';
+import { customersListScreenStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
 
-interface CustomersListScreenProps {
-  onGoBack: () => void;
-  onNavigateToForm: (id?: number) => void;
-}
-
-const styles = StyleSheet.create({
-  filterField: { flex: 1, minWidth: 180 },
-  sectionCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 16,
-    width: '100%',
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-});
-
-export function CustomersListScreen({ onGoBack, onNavigateToForm }: CustomersListScreenProps) {
+export function CustomersListScreen({ onGoBack, onNavigateToForm }: ICustomersListScreenProps) {
   const { listings, isLoadingList, isDeleting, loadAll, remove } = UseCustomers();
   const [page, setPage] = useState(1);
   const [name, setName] = useState('');

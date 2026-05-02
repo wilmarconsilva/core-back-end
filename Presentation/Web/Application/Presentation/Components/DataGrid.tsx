@@ -1,27 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { ReactNode, useState } from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator, LayoutChangeEvent, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { IDataGridProps } from '../Interfaces/DataGrid/IDataGridProps';
 import { colors, tableStyles } from '../Styles';
 
-export interface IColumn<T> {
-  key: keyof T | string;
-  label: string;
-  render?: (item: T) => ReactNode;
-  flex?: number;
-}
-
-interface DataGridProps<T> {
-  columns: IColumn<T>[];
-  data: T[];
-  isLoading: boolean;
-  page: number;
-  pageSize: number;
-  onPageChange: (page: number) => void;
-  onEdit?: (item: T) => void;
-  onDelete?: (item: T) => void;
-  keyExtractor: (item: T) => string;
-  extraActions?: (item: T) => ReactNode;
-}
+export type { IColumn } from '../Interfaces/DataGrid/IColumn';
 
 function getCellValue<T>(item: T, key: keyof T | string): string {
   const value = (item as Record<string, unknown>)[key as string];
@@ -38,9 +21,10 @@ export function DataGrid<T>({
   onPageChange,
   onEdit,
   onDelete,
+  onRowPress,
   keyExtractor,
   extraActions,
-}: DataGridProps<T>) {
+}: IDataGridProps<T>) {
   const hasActions = onEdit || onDelete || extraActions;
   const [containerWidth, setContainerWidth] = useState(0);
 
@@ -84,50 +68,65 @@ export function DataGrid<T>({
           )}
 
           {/* Rows */}
-          {!isLoading && data.map((item, rowIdx) => (
-            <View
-              key={keyExtractor(item)}
-              style={[
-                tableStyles.row,
-                rowIdx === data.length - 1 && { borderBottomWidth: 0 },
-              ]}
-            >
-              {columns.map((col, colIdx) => (
-                <View key={colIdx} style={{ flex: col.flex ?? 1, paddingRight: 8 }}>
-                  {col.render ? (
-                    col.render(item)
-                  ) : (
-                    <Text style={tableStyles.cell} numberOfLines={2}>
-                      {getCellValue(item, col.key)}
-                    </Text>
-                  )}
-                </View>
-              ))}
-              {hasActions && (
-                <View style={[tableStyles.actionsCell, { width: 100 }]}>
-                  {onEdit && (
-                    <TouchableOpacity
-                      onPress={() => onEdit(item)}
-                      activeOpacity={0.7}
-                      style={tableStyles.actionButton}
-                    >
-                      <Ionicons name="pencil-outline" size={15} color={colors.textSecondary} />
-                    </TouchableOpacity>
-                  )}
-                  {onDelete && (
-                    <TouchableOpacity
-                      onPress={() => onDelete(item)}
-                      activeOpacity={0.7}
-                      style={tableStyles.actionButton}
-                    >
-                      <Ionicons name="trash-outline" size={15} color={colors.error} />
-                    </TouchableOpacity>
-                  )}
-                  {extraActions && extraActions(item)}
-                </View>
-              )}
-            </View>
-          ))}
+          {!isLoading && data.map((item, rowIdx) => {
+            const rowStyle = [
+              tableStyles.row,
+              rowIdx === data.length - 1 && { borderBottomWidth: 0 },
+            ];
+            const rowContent = (
+              <>
+                {columns.map((col, colIdx) => (
+                  <View key={colIdx} style={{ flex: col.flex ?? 1, paddingRight: 8 }}>
+                    {col.render ? (
+                      col.render(item)
+                    ) : (
+                      <Text style={tableStyles.cell} numberOfLines={2}>
+                        {getCellValue(item, col.key)}
+                      </Text>
+                    )}
+                  </View>
+                ))}
+                {hasActions && (
+                  <View style={[tableStyles.actionsCell, { width: 100 }]}>
+                    {onEdit && (
+                      <TouchableOpacity
+                        onPress={() => onEdit(item)}
+                        activeOpacity={0.7}
+                        style={tableStyles.actionButton}
+                      >
+                        <Ionicons name="pencil-outline" size={15} color={colors.textSecondary} />
+                      </TouchableOpacity>
+                    )}
+                    {onDelete && (
+                      <TouchableOpacity
+                        onPress={() => onDelete(item)}
+                        activeOpacity={0.7}
+                        style={tableStyles.actionButton}
+                      >
+                        <Ionicons name="trash-outline" size={15} color={colors.error} />
+                      </TouchableOpacity>
+                    )}
+                    {extraActions && extraActions(item)}
+                  </View>
+                )}
+              </>
+            );
+
+            return onRowPress ? (
+              <TouchableOpacity
+                key={keyExtractor(item)}
+                style={rowStyle}
+                activeOpacity={0.6}
+                onPress={() => onRowPress(item)}
+              >
+                {rowContent}
+              </TouchableOpacity>
+            ) : (
+              <View key={keyExtractor(item)} style={rowStyle}>
+                {rowContent}
+              </View>
+            );
+          })}
         </View>
       </ScrollView>
 

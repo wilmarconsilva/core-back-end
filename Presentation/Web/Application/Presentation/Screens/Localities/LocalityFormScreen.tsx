@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { Breadcrumb } from '../../Components/Breadcrumb';
 import { FormField } from '../../Components/FormField';
 import { NumberField } from '../../Components/NumberField';
@@ -8,32 +8,10 @@ import { SecondaryButton } from '../../Components/SecondaryButton';
 import { UseFormValidation } from '../../../Application/Hooks/UseFormValidation';
 import { UseLocalities } from '../../../Application/Hooks/UseLocalities';
 import { ILocalitySaveDto } from '../../../Application/Interfaces/DataTransferObjects/Localities/ILocalitySaveDto';
-import { colors, layoutStyles, typographyStyles } from '../../Styles';
+import { ILocalityFormScreenProps } from '../../Interfaces/Locality/ILocalityFormScreenProps';
+import { localityFormScreenStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
 
-interface LocalityFormScreenProps {
-  id?: number;
-  onGoBack: () => void;
-}
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 24,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  actionRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 8,
-  },
-});
-
-export function LocalityFormScreen({ id, onGoBack }: LocalityFormScreenProps) {
+export function LocalityFormScreen({ id, onGoBack }: ILocalityFormScreenProps) {
   const { currentItem, isLoadingItem, isSaving, loadById, save, clearCurrentItem } = UseLocalities();
   const { errors, validate, bindChange } = UseFormValidation();
   const isEditing = !!id;
