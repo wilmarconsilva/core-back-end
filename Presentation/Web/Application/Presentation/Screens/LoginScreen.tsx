@@ -9,14 +9,13 @@ import {
 import { FormField } from '../Components/FormField';
 import { PasswordField } from '../Components/PasswordField';
 import { PrimaryButton } from '../Components/PrimaryButton';
-import { LoginScreenProps } from '../Interfaces/LoginScreenProps';
+import { ILoginScreenProps } from '../Interfaces/Login/ILoginScreenProps';
 import { layoutStyles, typographyStyles } from '../Styles';
 
 export function LoginScreen({
   isLoading,
-  validationErrors,
   onLogin,
-}: LoginScreenProps) {
+}: ILoginScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -30,7 +29,7 @@ export function LoginScreen({
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
-        contentContainerStyle={layoutStyles.scrollContainer}
+        contentContainerStyle={layoutStyles.loginContainer}
         keyboardShouldPersistTaps="handled"
       >
         <View style={layoutStyles.card}>
@@ -45,7 +44,6 @@ export function LoginScreen({
             value={email}
             onChangeText={setEmail}
             editable={!isLoading}
-            error={validationErrors.email}
           />
 
           <PasswordField
@@ -55,7 +53,6 @@ export function LoginScreen({
             value={password}
             onChangeText={setPassword}
             editable={!isLoading}
-            error={validationErrors.password}
             onSubmitEditing={handleLogin}
           />
 

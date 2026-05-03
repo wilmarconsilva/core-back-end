@@ -43,6 +43,7 @@ namespace REST.Controllers
                 {
                     ResponseDto response = await _authenticationService.RefreshAsync(new RefreshTokenRequestDto { RefreshToken = GetRefreshTokenFromCookie() }, cancellationToken);
                     AppendRefreshTokenCookie(response.RefreshTokenDto);
+                    throw new UnauthorizedAccessException();
                     return Ok(response.AccessTokenDto);
                 }
                 catch (UnauthorizedAccessException)

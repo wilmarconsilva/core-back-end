@@ -1,15 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Text, TouchableOpacity } from 'react-native';
+import { IMenuItemProps } from '../Interfaces/MenuItem/IMenuItemProps';
 import { colors, gridStyles } from '../Styles';
 
-interface MenuItemProps {
-  icon: keyof typeof Ionicons.glyphMap;
-  label: string;
-  onPress: () => void;
-}
-
-export function MenuItem({ icon, label, onPress }: MenuItemProps) {
+export function MenuItem({ icon, label, onPress }: IMenuItemProps) {
   return (
     <TouchableOpacity
       style={gridStyles.menuItem}
