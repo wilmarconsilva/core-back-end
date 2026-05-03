@@ -1,22 +1,16 @@
 import { StyleSheet } from 'react-native';
 import { colors } from '../../colors';
 
-/** Estilos compartilhados entre relatórios de Orçamentos e Pedidos. */
+/** Relatórios de Orçamentos e Pedidos (filtros, resumo, linhas). */
 export const documentReportScreenStyles = StyleSheet.create({
-  filterRow: { flexDirection: 'row', gap: 8, marginBottom: 12, alignItems: 'flex-end', flexWrap: 'wrap' },
-  filterField: { flex: 1, minWidth: 140 },
-  actionBtn: { marginTop: 0, paddingHorizontal: 16, paddingVertical: 12 },
-  sectionCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
+  filterRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 12,
+    alignItems: 'flex-end',
+    flexWrap: 'wrap',
   },
+  actionBtn: { marginTop: 0, paddingHorizontal: 16, paddingVertical: 12 },
   summaryBox: {
     backgroundColor: colors.primary,
     borderRadius: 12,

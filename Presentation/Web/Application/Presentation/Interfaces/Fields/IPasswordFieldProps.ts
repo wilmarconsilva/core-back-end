@@ -1,6 +1,4 @@
 import { TextInputProps } from 'react-native';
+import { ILabeledFieldBase } from './ILabeledFieldBase';
 
-export interface IPasswordFieldProps extends Omit<TextInputProps, 'secureTextEntry'> {
-  label: string;
-  error?: string;
-}
+export interface IPasswordFieldProps extends Omit<TextInputProps, 'secureTextEntry'>, ILabeledFieldBase {}

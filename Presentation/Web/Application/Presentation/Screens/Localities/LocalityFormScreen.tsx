@@ -8,10 +8,10 @@ import { SecondaryButton } from '../../Components/SecondaryButton';
 import { UseFormValidation } from '../../../Application/Hooks/UseFormValidation';
 import { UseLocalities } from '../../../Application/Hooks/UseLocalities';
 import { ILocalitySaveDto } from '../../../Application/Interfaces/DataTransferObjects/Localities/ILocalitySaveDto';
-import { ILocalityFormScreenProps } from '../../Interfaces/Locality/ILocalityFormScreenProps';
-import { localityFormScreenStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
+import { IEntityFormScreenProps } from '../../Interfaces/Screens/IEntityFormScreenProps';
+import { formScreenCommonStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
 
-export function LocalityFormScreen({ id, onGoBack }: ILocalityFormScreenProps) {
+export function LocalityFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
   const { currentItem, isLoadingItem, isSaving, loadById, save, clearCurrentItem } = UseLocalities();
   const { errors, validate, bindChange } = UseFormValidation();
   const isEditing = !!id;
@@ -62,7 +62,7 @@ export function LocalityFormScreen({ id, onGoBack }: ILocalityFormScreenProps) {
           {isEditing ? 'Editar Localidade' : 'Nova Localidade'}
         </Text>
 
-        <View style={styles.card}>
+        <View style={styles.entityCard}>
           <FormField
             label="Descrição *"
             placeholder="Nome da localidade"

@@ -22,7 +22,7 @@ import { IOrderProductSaveDto } from '../../../Application/Interfaces/DataTransf
 import { IOrderSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderSaveDto';
 import { PaymentMethod, PaymentMethodLabels } from '../../../Application/Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
 import { IPaymentSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Payments/IPaymentSaveDto';
-import { IOrderFormScreenProps } from '../../Interfaces/Order/IOrderFormScreenProps';
+import { IEntityFormScreenProps } from '../../Interfaces/Screens/IEntityFormScreenProps';
 import { colors, documentFormScreenStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
@@ -35,7 +35,7 @@ function createEmptyProduct(): IOrderProductSaveDto {
   return { id: 0, productId: 0, quantity: 1, valueUnit: 0, valueTotal: 0 };
 }
 
-export function OrderFormScreen({ id, onGoBack }: IOrderFormScreenProps) {
+export function OrderFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
   const { currentItem, isLoadingItem, isSaving, loadById, save, clearCurrentItem } = UseOrders();
   const { listings: customers, isLoadingList: isLoadingCustomers, loadAll: loadCustomers } = UseCustomers();
   const { listings: products, isLoadingList: isLoadingProducts, loadAll: loadProducts } = UseProducts();
@@ -290,7 +290,7 @@ export function OrderFormScreen({ id, onGoBack }: IOrderFormScreenProps) {
               )}
             </View>
           ))}
-          <TouchableOpacity style={styles.addButton} onPress={addProductLine} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.addDocumentProductButton} onPress={addProductLine} activeOpacity={0.7}>
             <Ionicons name="add-outline" size={16} color={colors.primary} />
             <Text style={styles.addButtonText}>Adicionar Produto</Text>
           </TouchableOpacity>
@@ -307,7 +307,7 @@ export function OrderFormScreen({ id, onGoBack }: IOrderFormScreenProps) {
           <SignatureCanvas onSignatureChange={setSignature} width={500} height={180} />
         </View>
 
-        <View style={styles.actionRow}>
+        <View style={styles.documentFooterActions}>
           <SecondaryButton title="Cancelar" onPress={onGoBack} style={{ flex: 1 }} disabled={isSaving} />
           <PrimaryButton
             title={isEditing ? 'Salvar' : 'Criar'}

@@ -9,12 +9,12 @@ import { FilterActionBar } from '../../Components/FilterActionBar';
 import { UseBudgets } from '../../../Application/Hooks/UseBudgets';
 import { IBudgetListing } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListing';
 import { IBudgetListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListingFilter';
-import { IBudgetsListScreenProps } from '../../Interfaces/Budget/IBudgetsListScreenProps';
-import { budgetsListScreenStyles as styles, colors, layoutStyles, typographyStyles } from '../../Styles';
+import { ICrudListScreenProps } from '../../Interfaces/Screens/ICrudListScreenProps';
+import { colors, layoutStyles, listScreenStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
 
-export function BudgetsListScreen({ onGoBack, onNavigateToForm }: IBudgetsListScreenProps) {
+export function BudgetsListScreen({ onGoBack, onNavigateToForm }: ICrudListScreenProps) {
   const { listings, isLoadingList, isDeleting, loadAll, remove, isCreatingOrder, createOrderByBudget } = UseBudgets();
   const [page, setPage] = useState(1);
   const [startDate, setStartDate] = useState('');
@@ -50,9 +50,9 @@ export function BudgetsListScreen({ onGoBack, onNavigateToForm }: IBudgetsListSc
         <Breadcrumb items={[{ label: 'Início', onPress: onGoBack }, { label: 'Orçamentos' }]} />
         <Text style={typographyStyles.title}>Orçamentos</Text>
 
-        <View style={styles.sectionCard}>
+        <View style={layoutStyles.sectionCard}>
           <FilterActionBar onSearch={handleSearch} onNew={() => onNavigateToForm()}>
-            <View style={styles.filterField}>
+            <View style={listScreenStyles.filterFieldCompact}>
               <DateField
                 label="Data início"
                 value={startDate}
@@ -60,7 +60,7 @@ export function BudgetsListScreen({ onGoBack, onNavigateToForm }: IBudgetsListSc
                 onSubmitEditing={handleSearch}
               />
             </View>
-            <View style={styles.filterField}>
+            <View style={listScreenStyles.filterFieldCompact}>
               <DateField
                 label="Data fim"
                 value={endDate}
@@ -80,7 +80,7 @@ export function BudgetsListScreen({ onGoBack, onNavigateToForm }: IBudgetsListSc
                 label: 'Total',
                 flex: 1,
                 render: (item) => (
-                  <Text style={styles.currency}>
+                  <Text style={listScreenStyles.currency}>
                     {item.valueTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                   </Text>
                 ),

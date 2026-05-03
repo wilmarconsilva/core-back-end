@@ -9,13 +9,19 @@ import { renderTemplate } from '../../../Application/Services/TemplateRendererSe
 import { IOrderReportFilter } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReportFilter';
 import { IOrderReportListing } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReportListing';
 import { IOrderReport } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReport';
-import { IOrderReportScreenProps } from '../../Interfaces/Order/IOrderReportScreenProps';
-import { colors, documentReportScreenStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
+import { IBackOnlyScreenProps } from '../../Interfaces/Screens/IBackOnlyScreenProps';
+import {
+  colors,
+  documentReportScreenStyles as styles,
+  layoutStyles,
+  listScreenStyles,
+  typographyStyles,
+} from '../../Styles';
 
 const orderReportService = new OrderReportService();
 const templateService = new TemplateService();
 
-export function OrderReportScreen({ onGoBack }: IOrderReportScreenProps) {
+export function OrderReportScreen({ onGoBack }: IBackOnlyScreenProps) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -78,12 +84,12 @@ export function OrderReportScreen({ onGoBack }: IOrderReportScreenProps) {
         ]} />
         <Text style={typographyStyles.title}>Relatório de Pedidos</Text>
 
-        <View style={styles.sectionCard}>
+        <View style={layoutStyles.sectionCardSpaced}>
           <View style={styles.filterRow}>
-            <View style={styles.filterField}>
+            <View style={listScreenStyles.filterFieldCompact}>
               <DateField label="Data início" value={startDate} onChangeText={setStartDate} />
             </View>
-            <View style={styles.filterField}>
+            <View style={listScreenStyles.filterFieldCompact}>
               <DateField label="Data fim" value={endDate} onChangeText={setEndDate} />
             </View>
             <PrimaryButton title="Gerar" isLoading={isLoading} onPress={handleSearch} style={styles.actionBtn} />
@@ -104,7 +110,7 @@ export function OrderReportScreen({ onGoBack }: IOrderReportScreenProps) {
         )}
 
         {!isLoading && data && (
-          <View style={styles.sectionCard}>
+          <View style={layoutStyles.sectionCardSpaced}>
             {data.registers.length === 0 ? (
               <Text style={styles.emptyText}>Nenhum registro encontrado.</Text>
             ) : (

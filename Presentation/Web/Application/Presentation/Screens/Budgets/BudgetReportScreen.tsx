@@ -9,13 +9,19 @@ import { renderTemplate } from '../../../Application/Services/TemplateRendererSe
 import { IBudgetReportFilter } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetReportFilter';
 import { IBudgetReportListing } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetReportListing';
 import { IBudgetReport } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetReport';
-import { IBudgetReportScreenProps } from '../../Interfaces/Budget/IBudgetReportScreenProps';
-import { colors, documentReportScreenStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
+import { IBackOnlyScreenProps } from '../../Interfaces/Screens/IBackOnlyScreenProps';
+import {
+  colors,
+  documentReportScreenStyles as styles,
+  layoutStyles,
+  listScreenStyles,
+  typographyStyles,
+} from '../../Styles';
 
 const budgetReportService = new BudgetReportService();
 const templateService = new TemplateService();
 
-export function BudgetReportScreen({ onGoBack }: IBudgetReportScreenProps) {
+export function BudgetReportScreen({ onGoBack }: IBackOnlyScreenProps) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -78,12 +84,12 @@ export function BudgetReportScreen({ onGoBack }: IBudgetReportScreenProps) {
         ]} />
         <Text style={typographyStyles.title}>Relatório de Orçamentos</Text>
 
-        <View style={styles.sectionCard}>
+        <View style={layoutStyles.sectionCardSpaced}>
           <View style={styles.filterRow}>
-            <View style={styles.filterField}>
+            <View style={listScreenStyles.filterFieldCompact}>
               <DateField label="Data início" value={startDate} onChangeText={setStartDate} />
             </View>
-            <View style={styles.filterField}>
+            <View style={listScreenStyles.filterFieldCompact}>
               <DateField label="Data fim" value={endDate} onChangeText={setEndDate} />
             </View>
             <PrimaryButton title="Gerar" isLoading={isLoading} onPress={handleSearch} style={styles.actionBtn} />
@@ -104,7 +110,7 @@ export function BudgetReportScreen({ onGoBack }: IBudgetReportScreenProps) {
         )}
 
         {!isLoading && data && (
-          <View style={styles.sectionCard}>
+          <View style={layoutStyles.sectionCardSpaced}>
             {data.registers.length === 0 ? (
               <Text style={styles.emptyText}>Nenhum registro encontrado.</Text>
             ) : (

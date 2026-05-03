@@ -8,12 +8,12 @@ import { FormField } from '../../Components/FormField';
 import { UseCustomers } from '../../../Application/Hooks/UseCustomers';
 import { ICustomerListing } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerListing';
 import { ICustomerListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerListingFilter';
-import { ICustomersListScreenProps } from '../../Interfaces/Customer/ICustomersListScreenProps';
-import { customersListScreenStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
+import { ICrudListScreenProps } from '../../Interfaces/Screens/ICrudListScreenProps';
+import { layoutStyles, listScreenStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
 
-export function CustomersListScreen({ onGoBack, onNavigateToForm }: ICustomersListScreenProps) {
+export function CustomersListScreen({ onGoBack, onNavigateToForm }: ICrudListScreenProps) {
   const { listings, isLoadingList, isDeleting, loadAll, remove } = UseCustomers();
   const [page, setPage] = useState(1);
   const [name, setName] = useState('');
@@ -42,9 +42,9 @@ export function CustomersListScreen({ onGoBack, onNavigateToForm }: ICustomersLi
         <Breadcrumb items={[{ label: 'Início', onPress: onGoBack }, { label: 'Clientes' }]} />
         <Text style={typographyStyles.title}>Clientes</Text>
 
-        <View style={styles.sectionCard}>
+        <View style={layoutStyles.sectionCard}>
           <FilterActionBar onSearch={handleSearch} onNew={() => onNavigateToForm()}>
-            <View style={styles.filterField}>
+            <View style={listScreenStyles.filterFieldWide}>
               <FormField
                 label="Nome"
                 placeholder="Filtrar por nome..."

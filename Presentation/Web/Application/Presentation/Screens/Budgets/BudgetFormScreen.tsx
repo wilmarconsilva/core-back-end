@@ -22,7 +22,7 @@ import { IBudgetProductSaveDto } from '../../../Application/Interfaces/DataTrans
 import { IBudgetSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetSaveDto';
 import { PaymentMethod, PaymentMethodLabels } from '../../../Application/Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
 import { IPaymentSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Payments/IPaymentSaveDto';
-import { IBudgetFormScreenProps } from '../../Interfaces/Budget/IBudgetFormScreenProps';
+import { IEntityFormScreenProps } from '../../Interfaces/Screens/IEntityFormScreenProps';
 import { colors, documentFormScreenStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
@@ -35,7 +35,7 @@ function createEmptyProduct(): IBudgetProductSaveDto {
   return { id: 0, productId: 0, quantity: 1, valueUnit: 0, valueTotal: 0 };
 }
 
-export function BudgetFormScreen({ id, onGoBack }: IBudgetFormScreenProps) {
+export function BudgetFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
   const { currentItem, isLoadingItem, isSaving, loadById, save, clearCurrentItem } = UseBudgets();
   const { listings: customers, isLoadingList: isLoadingCustomers, loadAll: loadCustomers } = UseCustomers();
   const { listings: products, isLoadingList: isLoadingProducts, loadAll: loadProducts } = UseProducts();
@@ -280,7 +280,7 @@ export function BudgetFormScreen({ id, onGoBack }: IBudgetFormScreenProps) {
               )}
             </View>
           ))}
-          <TouchableOpacity style={styles.addButton} onPress={addProductLine} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.addDocumentProductButton} onPress={addProductLine} activeOpacity={0.7}>
             <Ionicons name="add-outline" size={16} color={colors.primary} />
             <Text style={styles.addButtonText}>Adicionar Produto</Text>
           </TouchableOpacity>
@@ -297,7 +297,7 @@ export function BudgetFormScreen({ id, onGoBack }: IBudgetFormScreenProps) {
           <SignatureCanvas onSignatureChange={setSignature} width={500} height={180} />
         </View>
 
-        <View style={styles.actionRow}>
+        <View style={styles.documentFooterActions}>
           <SecondaryButton title="Cancelar" onPress={onGoBack} style={{ flex: 1 }} disabled={isSaving} />
           <PrimaryButton
             title={isEditing ? 'Salvar' : 'Criar'}

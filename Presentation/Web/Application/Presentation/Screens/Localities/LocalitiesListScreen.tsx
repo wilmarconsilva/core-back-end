@@ -8,12 +8,12 @@ import { FormField } from '../../Components/FormField';
 import { UseLocalities } from '../../../Application/Hooks/UseLocalities';
 import { ILocalityListing } from '../../../Application/Interfaces/DataTransferObjects/Localities/ILocalityListing';
 import { ILocalityListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Localities/ILocalityListingFilter';
-import { ILocalitiesListScreenProps } from '../../Interfaces/Locality/ILocalitiesListScreenProps';
-import { localitiesListScreenStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
+import { ICrudListScreenProps } from '../../Interfaces/Screens/ICrudListScreenProps';
+import { layoutStyles, listScreenStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
 
-export function LocalitiesListScreen({ onGoBack, onNavigateToForm }: ILocalitiesListScreenProps) {
+export function LocalitiesListScreen({ onGoBack, onNavigateToForm }: ICrudListScreenProps) {
   const { listings, isLoadingList, isDeleting, loadAll, remove } = UseLocalities();
   const [page, setPage] = useState(1);
   const [description, setDescription] = useState('');
@@ -56,9 +56,9 @@ export function LocalitiesListScreen({ onGoBack, onNavigateToForm }: ILocalities
         />
         <Text style={typographyStyles.title}>Localidades</Text>
 
-        <View style={styles.sectionCard}>
+        <View style={layoutStyles.sectionCard}>
           <FilterActionBar onSearch={handleSearch} onNew={() => onNavigateToForm()} newLabel="+ Nova">
-            <View style={styles.filterField}>
+            <View style={listScreenStyles.filterFieldFlush}>
               <FormField
                 label="Descrição"
                 placeholder="Filtrar por descrição..."

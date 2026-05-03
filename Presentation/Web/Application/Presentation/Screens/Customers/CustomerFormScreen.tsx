@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
+import { formatWithMask, Masks } from 'react-native-mask-input';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Breadcrumb } from '../../Components/Breadcrumb';
 import { EntitySelectField } from '../../Components/EntitySelectField';
@@ -15,9 +16,8 @@ import { ILocalityListingFilter } from '../../../Application/Interfaces/DataTran
 import { ICustomerAddressSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerAddressSaveDto';
 import { ICustomerSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerSaveDto';
 import { PersonType, PersonTypeLabels } from '../../../Application/Interfaces/DataTransferObjects/Persons/PersonType';
-import { ICustomerFormScreenProps } from '../../Interfaces/Customer/ICustomerFormScreenProps';
+import { IEntityFormScreenProps } from '../../Interfaces/Screens/IEntityFormScreenProps';
 import { colors, customerFormScreenStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
-
 const PAGE_SIZE = 50;
 
 const personTypeOptions = Object.values(PersonType)
@@ -31,7 +31,7 @@ function createEmptyAddress(): ICustomerAddressSaveDto {
 const addressErrorKey = (index: number, field: keyof ICustomerAddressSaveDto) =>
   `addresses.${index}.${field}`;
 
-export function CustomerFormScreen({ id, onGoBack }: ICustomerFormScreenProps) {
+export function CustomerFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
   const { currentItem, isLoadingItem, isSaving, loadById, save, clearCurrentItem } = UseCustomers();
   const { listings: localities, isLoadingList: isLoadingLocalities, loadAll: loadLocalities } = UseLocalities();
   const { errors, validate, clearError, clearErrors, bindChange } = UseFormValidation();
@@ -46,6 +46,10 @@ export function CustomerFormScreen({ id, onGoBack }: ICustomerFormScreenProps) {
 
   const [filterLocalityDescription, setFilterLocalityDescription] = useState('');
 
+  const documentFieldLabel = personType === PersonType.Natural ? 'CPF *' : 'CNPJ *';
+  const documentFieldPlaceholder = personType === PersonType.Natural ? '000.000.000-00' : 'CNPJ Alfanumérico';
+  const documentMask = personType === PersonType.Natural ? Masks.BRL_CPF : null;
+
   useEffect(() => {
     loadLocalities({ registersStart: 0, registersEnd: PAGE_SIZE });
     if (isEditing) loadById(id);
@@ -56,12 +60,27 @@ export function CustomerFormScreen({ id, onGoBack }: ICustomerFormScreenProps) {
     if (currentItem) {
       setName(currentItem.name ?? '');
       setPersonType(currentItem.personType);
-      setDocument(currentItem.document ?? '');
+      const docMask = currentItem.personType === PersonType.Natural ? Masks.BRL_CPF : null;
+      if (docMask) {
+        setDocument(formatWithMask({ text: currentItem.document ?? '', mask: docMask }).masked);
+      } else {
+        setDocument(currentItem.document ?? '');
+      }
       setEmail(currentItem.email ?? '');
       setStateRegistration(currentItem.stateRegistration ?? '');
       setAddresses(currentItem.addresses?.length ? currentItem.addresses : [createEmptyAddress()]);
     }
   }, [currentItem]);
+
+  useEffect(() => {
+    const mask = personType === PersonType.Natural ? Masks.BRL_CPF : null;
+
+    if (mask) {
+      setDocument((prev) =>
+        formatWithMask({ text: prev.replace(/\D/g, ''), mask }).masked,
+      );
+    }
+  }, [personType]);
 
   const updateAddress = (index: number, field: keyof ICustomerAddressSaveDto, value: string | number) => {
     setAddresses(prev => prev.map((a, i) => i === index ? { ...a, [field]: value } : a));
@@ -123,9 +142,22 @@ export function CustomerFormScreen({ id, onGoBack }: ICustomerFormScreenProps) {
             onValueChange={setPersonType}
             disabled={isSaving}
           />
-          <FormField label="Documento *" placeholder="CPF ou CNPJ" value={document} onChangeText={bindChange('document', setDocument)} editable={!isSaving} error={errors.document} />
+          <FormField
+            label={documentFieldLabel}
+            placeholder={documentFieldPlaceholder}
+            mask={documentMask ?? undefined}
+            value={document}
+            onChangeText={bindChange('document', setDocument)}
+            editable={!isSaving}
+            error={errors.document}
+          />
           <FormField label="E-mail" placeholder="email@exemplo.com" value={email} onChangeText={setEmail} editable={!isSaving} keyboardType="email-address" />
-          <FormField label="Inscrição Estadual" placeholder="Opcional" value={stateRegistration} onChangeText={setStateRegistration} editable={!isSaving} />
+          <FormField
+            label="Inscrição Estadual"
+            value={stateRegistration}
+            onChangeText={setStateRegistration}
+            editable={!isSaving}
+          />
         </View>
 
         {/* Addresses */}
@@ -189,13 +221,19 @@ export function CustomerFormScreen({ id, onGoBack }: ICustomerFormScreenProps) {
                   <FormField label="Número" placeholder="Nº" value={addr.number ?? ''} onChangeText={(v) => updateAddress(index, 'number', v)} editable={!isSaving} />
                 </View>
                 <View style={styles.flex1}>
-                  <FormField label="CEP" placeholder="00000-000" value={addr.postalCode ?? ''} onChangeText={(v) => updateAddress(index, 'postalCode', v)} editable={!isSaving} />
+                  <FormField 
+                  label="CEP"
+                  placeholder="00000-000" 
+                  value={addr.postalCode ?? ''} 
+                  onChangeText={(v) => updateAddress(index, 'postalCode', v)} 
+                  editable={!isSaving}
+                  mask={Masks.ZIP_CODE} />
                 </View>
               </View>
               <FormField label="Complemento" placeholder="Apt, bloco, etc." value={addr.complement ?? ''} onChangeText={(v) => updateAddress(index, 'complement', v)} editable={!isSaving} />
             </View>
           ))}
-          <TouchableOpacity style={styles.addButton} onPress={addAddress} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.addCustomerAddressButton} onPress={addAddress} activeOpacity={0.7}>
             <Ionicons name="add-outline" size={16} color={colors.primary} />
             <Text style={styles.addButtonText}>Adicionar Endereço</Text>
           </TouchableOpacity>

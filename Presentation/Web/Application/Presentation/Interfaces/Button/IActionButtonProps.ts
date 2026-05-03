@@ -1,6 +1,6 @@
 import { TouchableOpacityProps } from 'react-native';
 
-export interface IPrimaryButtonProps extends TouchableOpacityProps {
+export interface IActionButtonProps extends TouchableOpacityProps {
   title: string;
   isLoading?: boolean;
 }

@@ -9,14 +9,14 @@ import { UseFormValidation } from '../../../Application/Hooks/UseFormValidation'
 import { UseProducts } from '../../../Application/Hooks/UseProducts';
 import { MeasureUnit, MeasureUnitLabels } from '../../../Application/Domain/ValueObjects/Enums/Products/MeasureUnit';
 import { IProductSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Products/IProductSaveDto';
-import { IProductFormScreenProps } from '../../Interfaces/Product/IProductFormScreenProps';
-import { productFormScreenStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
+import { IEntityFormScreenProps } from '../../Interfaces/Screens/IEntityFormScreenProps';
+import { formScreenCommonStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
 
 const measureUnitOptions = Object.values(MeasureUnit)
   .filter((v) => typeof v === 'number')
   .map((v) => ({ label: MeasureUnitLabels[v as MeasureUnit], value: v as MeasureUnit }));
 
-export function ProductFormScreen({ id, onGoBack }: IProductFormScreenProps) {
+export function ProductFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
   const { currentItem, isLoadingItem, isSaving, loadById, save, clearCurrentItem } = UseProducts();
   const { errors, validate, bindChange } = UseFormValidation();
   const isEditing = !!id;
@@ -61,7 +61,7 @@ export function ProductFormScreen({ id, onGoBack }: IProductFormScreenProps) {
         ]} />
         <Text style={typographyStyles.title}>{isEditing ? 'Editar Produto' : 'Novo Produto'}</Text>
 
-        <View style={styles.card}>
+        <View style={styles.entityCard}>
           <FormField
             label="Descrição *"
             placeholder="Nome do produto"

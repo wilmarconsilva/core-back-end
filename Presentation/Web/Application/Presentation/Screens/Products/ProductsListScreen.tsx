@@ -8,12 +8,12 @@ import { FormField } from '../../Components/FormField';
 import { UseProducts } from '../../../Application/Hooks/UseProducts';
 import { IProductListing } from '../../../Application/Interfaces/DataTransferObjects/Products/IProductListing';
 import { IProductListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Products/IProductListingFilter';
-import { IProductsListScreenProps } from '../../Interfaces/Product/IProductsListScreenProps';
-import { productsListScreenStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
+import { ICrudListScreenProps } from '../../Interfaces/Screens/ICrudListScreenProps';
+import { layoutStyles, listScreenStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
 
-export function ProductsListScreen({ onGoBack, onNavigateToForm }: IProductsListScreenProps) {
+export function ProductsListScreen({ onGoBack, onNavigateToForm }: ICrudListScreenProps) {
   const { listings, isLoadingList, isDeleting, loadAll, remove } = UseProducts();
   const [page, setPage] = useState(1);
   const [description, setDescription] = useState('');
@@ -42,9 +42,9 @@ export function ProductsListScreen({ onGoBack, onNavigateToForm }: IProductsList
         <Breadcrumb items={[{ label: 'Início', onPress: onGoBack }, { label: 'Produtos' }]} />
         <Text style={typographyStyles.title}>Produtos</Text>
 
-        <View style={styles.sectionCard}>
+        <View style={layoutStyles.sectionCard}>
           <FilterActionBar onSearch={handleSearch} onNew={() => onNavigateToForm()}>
-            <View style={styles.filterField}>
+            <View style={listScreenStyles.filterFieldWide}>
               <FormField
                 label="Descrição"
                 placeholder="Filtrar..."

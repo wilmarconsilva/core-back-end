@@ -8,12 +8,12 @@ import { FilterActionBar } from '../../Components/FilterActionBar';
 import { UseOrders } from '../../../Application/Hooks/UseOrders';
 import { IOrderListing } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderListing';
 import { IOrderListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderListingFilter';
-import { IOrdersListScreenProps } from '../../Interfaces/Order/IOrdersListScreenProps';
-import { ordersListScreenStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
+import { ICrudListScreenProps } from '../../Interfaces/Screens/ICrudListScreenProps';
+import { layoutStyles, listScreenStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
 
-export function OrdersListScreen({ onGoBack, onNavigateToForm }: IOrdersListScreenProps) {
+export function OrdersListScreen({ onGoBack, onNavigateToForm }: ICrudListScreenProps) {
   const { listings, isLoadingList, isDeleting, loadAll, remove } = UseOrders();
   const [page, setPage] = useState(1);
   const [startDate, setStartDate] = useState('');
@@ -44,9 +44,9 @@ export function OrdersListScreen({ onGoBack, onNavigateToForm }: IOrdersListScre
         <Breadcrumb items={[{ label: 'Início', onPress: onGoBack }, { label: 'Pedidos' }]} />
         <Text style={typographyStyles.title}>Pedidos</Text>
 
-        <View style={styles.sectionCard}>
+        <View style={layoutStyles.sectionCard}>
           <FilterActionBar onSearch={handleSearch} onNew={() => onNavigateToForm()}>
-            <View style={styles.filterField}>
+            <View style={listScreenStyles.filterFieldCompact}>
               <DateField
                 label="Data início"
                 value={startDate}
@@ -54,7 +54,7 @@ export function OrdersListScreen({ onGoBack, onNavigateToForm }: IOrdersListScre
                 onSubmitEditing={handleSearch}
               />
             </View>
-            <View style={styles.filterField}>
+            <View style={listScreenStyles.filterFieldCompact}>
               <DateField
                 label="Data fim"
                 value={endDate}
@@ -74,7 +74,7 @@ export function OrdersListScreen({ onGoBack, onNavigateToForm }: IOrdersListScre
                 label: 'Total',
                 flex: 1,
                 render: (item) => (
-                  <Text style={styles.currency}>
+                  <Text style={listScreenStyles.currency}>
                     {item.valueTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                   </Text>
                 ),

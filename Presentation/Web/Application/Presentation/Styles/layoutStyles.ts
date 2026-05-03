@@ -10,6 +10,18 @@ const container: ViewStyle = {
     alignSelf: 'center',
 };
 
+const elevatedSectionCard: ViewStyle = {
+  backgroundColor: colors.surface,
+  borderRadius: 12,
+  padding: 16,
+  width: '100%',
+  shadowColor: colors.shadow,
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.06,
+  shadowRadius: 4,
+  elevation: 2,
+};
+
 export const layoutStyles = StyleSheet.create({
   screenWrapper: {
     flex: 1,
@@ -33,15 +45,10 @@ export const layoutStyles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 4,
   },
-  sectionCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 16,
-    width: '100%',
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
+  sectionCard: elevatedSectionCard,
+  /** Como sectionCard, com espaçamento inferior (relatórios, cartões empilhados). */
+  sectionCardSpaced: {
+    ...elevatedSectionCard,
+    marginBottom: 16,
   },
 });

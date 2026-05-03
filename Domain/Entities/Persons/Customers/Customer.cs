@@ -69,17 +69,18 @@ namespace Domain.Entities.Persons.Customers
         public void Fill(string name, PersonType personType, string document, string? email, string? stateRegistration, IReadOnlyCollection<CustomerAddress> addresses)
         {
             Name = name;
-            Document = document;
             Email = email;
             StateRegistration = stateRegistration;
 
             SetPersonType(personType);
+            Document = document;
+
             SetAddresses(addresses);
         }
 
         private void SetDocument(string document)
         {
-            Validator.ValidateValue(document, nameof(Document));
+            Validator.ValidateCpfCnpj(document, DocumentType.ToString(), this.PersonType);
 
             _document = document;
         }
@@ -89,7 +90,7 @@ namespace Domain.Entities.Persons.Customers
             if (email is null)
                 return;
 
-            Validator.ValidateEmail(email, nameof(Email));
+            Validator.ValidateEmail(email, "E-mail");
 
             _email = email;
         }
