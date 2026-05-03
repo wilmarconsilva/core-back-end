@@ -1,8 +1,8 @@
-import { AccessToken } from '../DataTransferObjects/AccessToken';
-import { LoginRequest } from '../DataTransferObjects/LoginRequest';
+import { IAccessToken } from '../DataTransferObjects/Authentication/IAccessToken';
+import { ILoginRequest } from '../DataTransferObjects/Authentication/ILoginRequest';
 
 export interface IAuthenticationService {
-  login(request: LoginRequest): Promise<AccessToken>;
-  refresh(): Promise<AccessToken>;
+  login(request: ILoginRequest): Promise<IAccessToken>;
+  refresh(): Promise<IAccessToken>;
   revoke(): Promise<void>;
 }

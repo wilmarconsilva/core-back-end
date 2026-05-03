@@ -28,12 +28,12 @@ namespace Domain.Entities.Commercial.Documents
         /// </summary>
         protected DocumentProduct() { }
 
-        public DocumentProduct(long productId, decimal quantity, decimal valueUnit, decimal valueTotal)
+        protected DocumentProduct(long productId, decimal quantity, decimal valueUnit, decimal valueTotal)
         {
             Fill(productId, quantity, valueUnit, valueTotal);
         }
 
-        public DocumentProduct(long documentId, long productId, decimal quantity, decimal valueUnit, decimal valueTotal)
+        protected DocumentProduct(long documentId, long productId, decimal quantity, decimal valueUnit, decimal valueTotal)
         {
             SetDocumentId(documentId);
 

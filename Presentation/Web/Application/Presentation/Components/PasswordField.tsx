@@ -2,19 +2,14 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
   TextInput,
-  TextInputProps,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { IPasswordFieldProps } from '../Interfaces/Fields/IPasswordFieldProps';
 import { colors, formStyles } from '../Styles';
 import { FormField } from './FormField';
 
-interface PasswordFieldProps extends Omit<TextInputProps, 'secureTextEntry'> {
-  label: string;
-  error?: string;
-}
-
-export function PasswordField({ label, error, ...inputProps }: PasswordFieldProps) {
+export function PasswordField({ label, error, ...inputProps }: IPasswordFieldProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   return (

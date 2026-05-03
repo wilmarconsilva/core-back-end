@@ -1,4 +1,3 @@
-using Application.DataTransferObjects.Persons.Customers.Validators;
 using Application.Interfaces.Queries;
 using Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
@@ -42,7 +41,6 @@ public static class ApplicationServiceExtensions
     {
         ArgumentNullException.ThrowIfNull(services);
 
-        AddValidation(services);
         AddAutoMapper(services);
         AddCustomerServices(services);
         AddProductServices(services);
@@ -52,63 +50,6 @@ public static class ApplicationServiceExtensions
         AddSecurityServices(services);
 
         return services;
-    }
-
-    private static void AddValidation(IServiceCollection services)
-    {
-        services.AddScoped<FluentValidationAction>();
-        services.Configure<MvcOptions>(options => options.Filters.AddService<FluentValidationAction>());
-        AddValidatorsFromAssemblyContaining<CustomerSaveDtoValidator>(services);
-        services.Configure<ApiBehaviorOptions>(options =>
-        {
-            options.InvalidModelStateResponseFactory = context =>
-            {
-                var errors = context.ModelState
-                    .Where(kvp => kvp.Value?.Errors.Count > 0)
-                    .ToDictionary(
-                        kvp => kvp.Key,
-                        kvp => kvp.Value!.Errors.Select(GetErrorMessage).ToArray()
-                    );
-
-                return new BadRequestObjectResult(new ValidationProblemDetails(errors)
-                {
-                    Status = StatusCodes.Status400BadRequest
-                });
-            };
-        });
-    }
-
-    private static void AddValidatorsFromAssemblyContaining<TValidator>(IServiceCollection services)
-    {
-        Type validatorInterface = typeof(IValidator<>);
-
-        IEnumerable<Type> validatorTypes = typeof(TValidator).Assembly
-            .GetTypes()
-            .Where(type => type is { IsAbstract: false, IsInterface: false })
-            .Where(type => type.GetInterfaces().Any(@interface => @interface.IsGenericType && @interface.GetGenericTypeDefinition() == validatorInterface));
-
-        foreach (Type validatorType in validatorTypes)
-        {
-            services.TryAddScoped(validatorType, validatorType);
-
-            foreach (Type serviceType in validatorType.GetInterfaces()
-                         .Where(@interface => @interface.IsGenericType && @interface.GetGenericTypeDefinition() == validatorInterface))
-            {
-                services.TryAddScoped(serviceType, validatorType);
-            }
-        }
-    }
-
-    private static string GetErrorMessage(ModelError error)
-    {
-        Exception? exception = error.Exception;
-        while (exception != null)
-        {
-            if (exception is BusinessRuleException bre)
-                return bre.Message;
-            exception = exception.InnerException;
-        }
-        return string.IsNullOrEmpty(error.ErrorMessage) ? "The input was not valid." : error.ErrorMessage;
     }
 
     private static void AddAutoMapper(IServiceCollection services)

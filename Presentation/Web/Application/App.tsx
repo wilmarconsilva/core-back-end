@@ -4,15 +4,16 @@ import { LoginScreen } from './Presentation/Screens/LoginScreen';
 import { HomeScreen } from './Presentation/Screens/HomeScreen';
 import { AppToast } from './Presentation/Components/AppToast';
 import { UseAuthentication } from './Application/Hooks/UseAuthentication';
+import { colors } from './Presentation/Styles';
 
 export default function App() {
-  const { accessToken, isLoading, isInitializing, error, validationErrors, login, clearError } =
+  const { accessToken, isLoading, isInitializing, login } =
     UseAuthentication();
 
   if (isInitializing) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -32,10 +33,7 @@ export default function App() {
       <StatusBar style="dark" />
       <LoginScreen
         isLoading={isLoading}
-        error={error}
-        validationErrors={validationErrors}
         onLogin={login}
-        onClearError={clearError}
       />
       <AppToast />
     </>

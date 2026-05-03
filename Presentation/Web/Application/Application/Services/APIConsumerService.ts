@@ -1,53 +1,70 @@
 import Toast from 'react-native-toast-message';
-import { ApiError } from '../Interfaces/DataTransferObjects/ApiError';
+import { IApiError } from '../Interfaces/DataTransferObjects/Authentication/IApiError';
+import { API_BASE_URL, fetchWithAuth, SessionExpiredError } from './HttpClientService';
+import { TokenStorageService } from './TokenStorageService';
+import { IRequestOptions } from '../Interfaces/DataTransferObjects/APIConsumer/IRequestOptions';
 
-if (!process.env?.EXPO_PUBLIC_API_BASE_URL?.trim()) {
-  throw new Error('EXPO_PUBLIC_API_BASE_URL is not defined in the .env file.');
-}
-
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL as string;
-
-export interface RequestOptions<T> {
-  onSuccess?: (data: T) => void;
-  onError?: (error: ApiError) => void;
-  ignoreErrors?: boolean;
-}
+type FetchFn = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 
 export class APIConsumerService {
+
+  constructor(private readonly fetchFn: FetchFn = fetchWithAuth) {}
 
   protected async request<T>(
     path: string,
     requestInit: RequestInit,
-    options?: RequestOptions<T>,
+    requestOptions?: IRequestOptions
   ): Promise<T> {
     try {
-      const response = await fetch(`${API_BASE_URL}${path}`, requestInit);
+      const response = await this.fetchFn(`${API_BASE_URL}${path}`, requestInit);
 
-      if (!response.ok) {
-        const error: ApiError = await response.json().finally(() => ({ status: response.status }));
-        throw error;
+      if (!response.ok) 
+      {
+        let error: IApiError = {};
+
+        const text = await response.text();
+        try {
+          error = JSON.parse(text);
+        } catch {
+          error = { detail: text };
+        }
+
+        throw { ...error, status: response.status };
       }
 
       const data: T = response.status === 204
         ? undefined as T
         : await (response.json() as Promise<T>);
 
-      options?.onSuccess?.(data);
-
-      return data;
-    } 
-    catch (err: unknown) {
-      const apiError = err as ApiError;
-      if (!options?.ignoreErrors) {
-        const message = apiError.detail
-          ?? apiError.title
-          ?? 'Ocorreu um erro inesperado.';
-
-        Toast.show({ type: 'error', text1: message });
+      if (!requestOptions?.toastsConfiguration?.doNotShowSuccess) {
+        Toast.show({ type: 'success', text1: 'Operação realizada com sucesso!' });
       }
 
-      options?.onError?.(apiError);
+      return data;
+    }
+    catch (err: any) {
+      if (err instanceof SessionExpiredError) {
+        throw err;
+      }
 
+      const apiError = err as IApiError;
+
+      if (!TokenStorageService.isLoggingOut()) 
+      {        
+        const isBadRequest: boolean = apiError.status !== undefined &&
+          apiError.status !== null &&
+          apiError.status >= 400 &&
+          apiError.status < 500;
+
+        const genericErrorMessage = `Status: ${apiError.status ?? "não definido."} - ${new Date().toLocaleString('pt-BR')} - Ocorreu um erro inesperado. Por favor, contate o suporte.`;
+
+        const message = isBadRequest ? apiError.detail ?? genericErrorMessage : genericErrorMessage;
+          
+        if (!requestOptions?.toastsConfiguration?.doNotShowError) {
+          Toast.show({ type: isBadRequest ? 'info' : 'error', text1: message });
+        }
+      }
+      
       throw apiError;
     }
   }
