@@ -1,17 +1,16 @@
+﻿using Application.DataTransferObjects.Commercial.Documents.DocumentsProducts;
 using Application.DataTransferObjects.Commercial.Documents.Payments;
 using Application.DataTransferObjects.Entities;
-using Application.DataTransferObjects.Persons.Customers;
 
-namespace Application.DataTransferObjects.Commercial.Documents.Budgets
+namespace Application.DataTransferObjects.Commercial.Documents
 {
-    public class BudgetDetailDto : EntitySaveDto
+    public class DocumentDetailDto : EntitySaveDto
     {
-        [System.Text.Json.Serialization.JsonIgnore]
         public override long Id { get; set; }
 
         public required long UserId { get; set; }
 
-        public required CustomerReferenceDto Customer { get; set; }
+        public required EntityReferenceDto Customer { get; set; }
 
         public required PaymentSaveDto Payment { get; set; }
 
@@ -19,6 +18,6 @@ namespace Application.DataTransferObjects.Commercial.Documents.Budgets
 
         public byte[]? CustomerSignatureImage { get; set; }
 
-        public required List<BudgetProductDetailDto> Products { get; set; }
+        public required List<DocumentProductDetailDto> Products { get; set; }
     }
 }

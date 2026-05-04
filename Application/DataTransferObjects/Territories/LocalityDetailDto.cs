@@ -9,6 +9,6 @@ namespace Application.DataTransferObjects.Territories
 
         public required string Description { get; set; }
 
-        public StateReferenceDto? State { get; set; }
+        public EntityReferenceDto? State { get; set; }
     }
 }

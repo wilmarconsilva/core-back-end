@@ -1,14 +1,10 @@
-using Application.DataTransferObjects.Commercial.Documents.Budgets;
-using AutoMapper;
+using Application.DataTransferObjects.Commercial.Documents.DocumentsProducts;
 using Domain.Entities.Commercial.Documents.Budgets;
 
 namespace Application.Mappings.Commercial.Documents.Budgets
 {
-    public class BudgetProductProfile : Profile
+    public class BudgetProductProfile : DocumentProductDetailProfile<BudgetProduct, DocumentProductDetailDto>
     {
-        public BudgetProductProfile()
-        {
-            CreateMap<BudgetProductSaveDto, BudgetProduct>();
-        }
+
     }
 }

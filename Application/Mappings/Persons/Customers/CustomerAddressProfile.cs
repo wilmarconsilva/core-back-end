@@ -1,4 +1,4 @@
-using Application.DataTransferObjects.Persons.Customers;
+using Application.DataTransferObjects.Persons.Customers.CustomerAddresses;
 using AutoMapper;
 using Domain.Entities.Persons.Customers;
 

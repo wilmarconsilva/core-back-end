@@ -1,7 +1,6 @@
 using Application.DataTransferObjects.Entities;
-using Application.DataTransferObjects.Localities;
 
-namespace Application.DataTransferObjects.Persons.Customers
+namespace Application.DataTransferObjects.Persons.Customers.CustomerAddresses
 {
     public class CustomerAddressDetailDto : EntitySaveDto
     {
@@ -9,7 +8,7 @@ namespace Application.DataTransferObjects.Persons.Customers
 
         public required string Street { get; set; }
 
-        public required LocalityReferenceDto Locality { get; set; }
+        public required EntityReferenceDto Locality { get; set; }
 
         public string? Complement { get; set; }
 

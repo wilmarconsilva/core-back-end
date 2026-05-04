@@ -1,3 +1,4 @@
+using Application.DataTransferObjects.Commercial.Documents;
 using Application.DataTransferObjects.Commercial.Documents.Budgets;
 using Application.DataTransferObjects.Commercial.Documents.Budgets.Listings;
 using Application.DataTransferObjects.Commercial.Documents.Orders;
@@ -15,7 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.Services.Commercial.Documents.Budgets
 {
-    public class BudgetService : DocumentService<Budget, BudgetSaveDto, BudgetDetailDto, BudgetProductSaveDto, BudgetListing, BudgetListingFilter>, IBudgetService
+    public class BudgetService : DocumentService<Budget, BudgetSaveDto, DocumentDetailDto, BudgetProductSaveDto, BudgetListing, BudgetListingFilter>, IBudgetService
     {
         private readonly IMapper _mapper;
         private readonly IOrderService _orderService;

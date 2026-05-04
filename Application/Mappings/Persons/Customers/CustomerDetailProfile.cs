@@ -1,5 +1,6 @@
-using Application.DataTransferObjects.Localities;
+using Application.DataTransferObjects.Entities;
 using Application.DataTransferObjects.Persons.Customers;
+using Application.DataTransferObjects.Persons.Customers.CustomerAddresses;
 using AutoMapper;
 using Domain.Entities.Persons.Customers;
 
@@ -13,10 +14,10 @@ namespace Application.Mappings.Persons.Customers
 
             CreateMap<CustomerAddress, CustomerAddressDetailDto>()
                 .ForMember(d => d.Locality, opt => opt.MapFrom(s =>
-                    new LocalityReferenceDto
+                    new EntityReferenceDto
                     {
-                        Id = s.Locality != null ? s.Locality.Id : s.LocalityId,
-                        Description = s.Locality != null ? s.Locality.Description : null,
+                        Id = s.LocalityId,
+                        Description = s.Locality!.Description,
                     }));
         }
     }

@@ -1,6 +1,6 @@
 using Application.DataTransferObjects.Entities;
 
-namespace Application.DataTransferObjects.Persons.Customers
+namespace Application.DataTransferObjects.Persons.Customers.CustomerAddresses
 {
     public class CustomerAddressSaveDto : EntitySaveDto
     {

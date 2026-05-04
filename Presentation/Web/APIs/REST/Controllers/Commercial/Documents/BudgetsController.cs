@@ -1,3 +1,4 @@
+using Application.DataTransferObjects.Commercial.Documents;
 using Application.DataTransferObjects.Commercial.Documents.Budgets;
 using Application.DataTransferObjects.Commercial.Documents.Budgets.Listings;
 using Application.DataTransferObjects.Commercial.Documents.Orders;
@@ -10,7 +11,7 @@ namespace REST.Controllers.Commercial.Documents
 {
     [ApiController]
     [Route("[controller]")]
-    public class BudgetsController : CrudController<BudgetSaveDto, BudgetDetailDto, BudgetListing, BudgetListingFilter>
+    public class BudgetsController : CrudController<BudgetSaveDto, DocumentDetailDto, BudgetListing, BudgetListingFilter>
     {
         private readonly IBudgetService _service;
 

@@ -1,4 +1,5 @@
 using Application.DataTransferObjects.Commercial.Documents;
+using Application.DataTransferObjects.Commercial.Documents.DocumentsProducts;
 using Application.DataTransferObjects.Email;
 using Application.DataTransferObjects.Entities;
 using Application.DataTransferObjects.Listings;

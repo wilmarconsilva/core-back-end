@@ -1,14 +1,10 @@
-using Application.DataTransferObjects.Commercial.Documents.Orders;
-using AutoMapper;
+using Application.DataTransferObjects.Commercial.Documents.DocumentsProducts;
 using Domain.Entities.Commercial.Documents.Orders;
 
 namespace Application.Mappings.Commercial.Documents.Orders
 {
-    public class OrderProductProfile : Profile
+    public class OrderProductProfile : DocumentProductDetailProfile<OrderProduct, DocumentProductDetailDto>
     {
-        public OrderProductProfile()
-        {
-            CreateMap<OrderProductSaveDto, OrderProduct>();
-        }
+
     }
 }
