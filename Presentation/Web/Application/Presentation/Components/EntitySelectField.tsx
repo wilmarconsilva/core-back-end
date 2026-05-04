@@ -15,6 +15,7 @@ import { FilterActionBar } from './FilterActionBar';
 export function EntitySelectField<TListing, TFilter>({
   label,
   value,
+  selectedDisplayLabel,
   placeholder = 'Selecione...',
   error,
   disabled,
@@ -41,6 +42,13 @@ export function EntitySelectField<TListing, TFilter>({
   }, [isOpen]);
 
   const selectedItem = listings.find(item => keyExtractor(item) === String(value));
+
+  const displayLabel =
+    selectedItem != null
+      ? labelExtractor(selectedItem)
+      : value !== undefined && value !== null && String(value) !== '' && selectedDisplayLabel
+        ? selectedDisplayLabel
+        : null;
 
   const handleSearch = async () => {
     setPage(1);
@@ -69,10 +77,10 @@ export function EntitySelectField<TListing, TFilter>({
         disabled={disabled}
       >
         <Text
-          style={[styles.triggerText, !selectedItem ? styles.placeholder : null]}
+          style={[styles.triggerText, displayLabel == null ? styles.placeholder : null]}
           numberOfLines={1}
         >
-          {selectedItem ? labelExtractor(selectedItem) : placeholder}
+          {displayLabel ?? placeholder}
         </Text>
         <Text style={styles.arrow}>🔍︎</Text>
       </TouchableOpacity>

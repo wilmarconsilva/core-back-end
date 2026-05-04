@@ -4,11 +4,12 @@ using Application.Interfaces.Queries.Commercial.Documents.Budgets;
 using AutoMapper;
 using Domain.Entities.Commercial.Documents.Budgets;
 using Infrastructure.Persistece;
+using Infrastructure.Queries.Commercial.Documents;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Queries.Commercial.Documents.Budgets
 {
-    public class BudgetQuery : DocumentQuery<Budget, BudgetSaveDto, BudgetProduct, BudgetListing, BudgetListingFilter>, IBudgetQuery
+    public class BudgetQuery : DocumentQuery<Budget, BudgetDetailDto, BudgetProduct, BudgetListing, BudgetListingFilter>, IBudgetQuery
     {
         public BudgetQuery(AppDbContext context, IMapper mapper) : base(context, mapper)
         {
@@ -17,7 +18,9 @@ namespace Infrastructure.Queries.Commercial.Documents.Budgets
         protected override IQueryable<Budget> ApplyIncludes(IQueryable<Budget> query)
         {
             return query
-                .Include(b => b.Products);
+                .Include(b => b.Customer)
+                .Include(b => b.Products)
+                    .ThenInclude(p => p.Product);
         }
     }
 }

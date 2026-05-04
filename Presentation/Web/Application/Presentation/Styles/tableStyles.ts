@@ -22,7 +22,6 @@ export const tableStyles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 11,
     letterSpacing: 0.8,
-    textTransform: 'uppercase',
   },
   row: {
     flexDirection: 'row',

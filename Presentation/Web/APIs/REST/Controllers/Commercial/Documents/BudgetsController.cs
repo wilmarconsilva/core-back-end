@@ -10,7 +10,7 @@ namespace REST.Controllers.Commercial.Documents
 {
     [ApiController]
     [Route("[controller]")]
-    public class BudgetsController : CrudController<BudgetSaveDto, BudgetListing, BudgetListingFilter>
+    public class BudgetsController : CrudController<BudgetSaveDto, BudgetDetailDto, BudgetListing, BudgetListingFilter>
     {
         private readonly IBudgetService _service;
 
@@ -30,12 +30,12 @@ namespace REST.Controllers.Commercial.Documents
         }
 
         [HttpPost("{id}/orders")]
-        public async Task<ActionResult<OrderSaveDto>> CreateOrderByBudget([FromRoute] long id, CancellationToken cancellationToken)
+        public async Task<ActionResult<OrderDetailDto>> CreateOrderByBudget([FromRoute] long id, CancellationToken cancellationToken)
         {
-            return await ProcessRequestAsync<OrderSaveDto>(async () =>
+            return await ProcessRequestAsync<OrderDetailDto>(async () =>
             {
-                OrderSaveDto orderSaveDto = await _service.CreateOrderByBudget(id, cancellationToken);
-                return CreatedAtAction(nameof(OrdersController.GetById), nameof(OrdersController).Replace("Controller", string.Empty), new { id = orderSaveDto.Id }, orderSaveDto);
+                OrderDetailDto orderDetail = await _service.CreateOrderByBudget(id, cancellationToken);
+                return CreatedAtAction(nameof(OrdersController.GetById), nameof(OrdersController).Replace("Controller", string.Empty), new { id = orderDetail.Id }, orderDetail);
             }, cancellationToken);
         }
     }

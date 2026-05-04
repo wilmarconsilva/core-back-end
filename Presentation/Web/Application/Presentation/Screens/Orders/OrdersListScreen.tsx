@@ -68,7 +68,7 @@ export function OrdersListScreen({ onGoBack, onNavigateToForm }: ICrudListScreen
             columns={[
               { key: 'id', label: 'Código', flex: 0.4 },
               { key: 'custormerName', label: 'Cliente', flex: 2 },
-              { key: 'customerCityState', label: 'Cidade/Estado', flex: 1.5 },
+              { key: 'customerLocalityState', label: 'Localidade/Estado', flex: 1.5 },
               {
                 key: 'valueTotal',
                 label: 'Total',

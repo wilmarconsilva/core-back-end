@@ -8,7 +8,7 @@ using Domain.Interfaces.Repositories;
 
 namespace Application.Services.Territories
 {
-    public class LocalityService : CrudService<Locality, LocalitySaveDto, LocalityListing, LocalityListingFilter>, ILocalityService
+    public class LocalityService : CrudService<Locality, LocalitySaveDto, LocalityDetailDto, LocalityListing, LocalityListingFilter>, ILocalityService
     {
         public LocalityService(ILocalityRepository repository, ILocalityQuery query, IUnitOfWork unitOfWork) : base(repository, query, unitOfWork)
         {

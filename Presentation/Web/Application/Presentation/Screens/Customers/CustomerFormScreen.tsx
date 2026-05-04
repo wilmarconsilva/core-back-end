@@ -14,6 +14,7 @@ import { UseLocalities } from '../../../Application/Hooks/UseLocalities';
 import { ILocalityListing } from '../../../Application/Interfaces/DataTransferObjects/Localities/ILocalityListing';
 import { ILocalityListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Localities/ILocalityListingFilter';
 import { ICustomerAddressSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerAddressSaveDto';
+import { ICustomerDetailDto } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerDetailDto';
 import { ICustomerSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerSaveDto';
 import { PersonType, PersonTypeLabels } from '../../../Application/Interfaces/DataTransferObjects/Persons/PersonType';
 import { IEntityFormScreenProps } from '../../Interfaces/Screens/IEntityFormScreenProps';
@@ -26,6 +27,19 @@ const personTypeOptions = Object.values(PersonType)
 
 function createEmptyAddress(): ICustomerAddressSaveDto {
   return { id: 0, neighborhood: '', street: '', localityId: 0 };
+}
+
+function mapDetailAddressesToForm(detail: ICustomerDetailDto): ICustomerAddressSaveDto[] {
+  return detail.addresses.map((a) => ({
+    id: a.id,
+    neighborhood: a.neighborhood,
+    street: a.street,
+    localityId: a.locality.id,
+    localityDescription: a.locality.description,
+    complement: a.complement,
+    postalCode: a.postalCode,
+    number: a.number,
+  }));
 }
 
 const addressErrorKey = (index: number, field: keyof ICustomerAddressSaveDto) =>
@@ -68,7 +82,11 @@ export function CustomerFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
       }
       setEmail(currentItem.email ?? '');
       setStateRegistration(currentItem.stateRegistration ?? '');
-      setAddresses(currentItem.addresses?.length ? currentItem.addresses : [createEmptyAddress()]);
+      setAddresses(
+        currentItem.addresses?.length
+          ? mapDetailAddressesToForm(currentItem as ICustomerDetailDto)
+          : [createEmptyAddress()],
+      );
     }
   }, [currentItem]);
 
@@ -162,11 +180,11 @@ export function CustomerFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
 
         {/* Addresses */}
         <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Endereços</Text>
+          <Text style={styles.sectionTitle}>Endereço{/* Descomentar quando adaptar orçamentos e pedidos para mais de um endereço: s */}</Text>
           {addresses.map((addr, index) => (
             <View key={index} style={styles.addressCard}>
               <View style={styles.addressHeader}>
-                <Text style={styles.addressTitle}>Endereço {index + 1}</Text>
+                {/* Descomentar quando adaptar orçamentos e pedidos para mais de um endereço: <Text style={styles.addressTitle}>Endereço {index + 1}</Text> */}
                 {addresses.length > 1 && (
                   <TouchableOpacity onPress={() => removeAddress(index)} activeOpacity={0.7}>
                     <Ionicons name="trash-outline" size={18} color={colors.error} />
@@ -184,6 +202,7 @@ export function CustomerFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
               <EntitySelectField<ILocalityListing, ILocalityListingFilter>
                 label="Localidade *"
                 value={addr.localityId || undefined}
+                selectedDisplayLabel={addr.localityDescription}
                 placeholder="Selecione a localidade..."
                 disabled={isSaving}
                 error={errors[addressErrorKey(index, 'localityId')]}
@@ -204,7 +223,14 @@ export function CustomerFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
                 keyExtractor={(l) => String(l.id)}
                 labelExtractor={(l) => l.description}
                 onValueChange={(locality) => {
-                  updateAddress(index, 'localityId', locality.id);
+                  setAddresses(prev =>
+                    prev.map((a, i) =>
+                      i === index
+                        ? { ...a, localityId: locality.id, localityDescription: locality.description }
+                        : a,
+                    ),
+                  );
+                  clearError(addressErrorKey(index, 'localityId'));
                 }}
                 renderFilter={(onSubmitSearch) => (
                   <FormField
@@ -233,10 +259,10 @@ export function CustomerFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
               <FormField label="Complemento" placeholder="Apt, bloco, etc." value={addr.complement ?? ''} onChangeText={(v) => updateAddress(index, 'complement', v)} editable={!isSaving} />
             </View>
           ))}
-          <TouchableOpacity style={styles.addCustomerAddressButton} onPress={addAddress} activeOpacity={0.7}>
+{/*Descomentar quando adaptar orçamentos e pedidos para mais de um endereço: <TouchableOpacity style={styles.addCustomerAddressButton} onPress={addAddress} activeOpacity={0.7}>
             <Ionicons name="add-outline" size={16} color={colors.primary} />
-            <Text style={styles.addButtonText}>Adicionar Endereço</Text>
-          </TouchableOpacity>
+            <Text style={styles.addButtonText}>Adicionar endereço</Text>
+          </TouchableOpacity> */}
         </View>
 
         <View style={styles.actionRow}>

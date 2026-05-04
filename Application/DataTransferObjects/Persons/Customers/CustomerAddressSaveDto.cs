@@ -13,7 +13,7 @@ namespace Application.DataTransferObjects.Persons.Customers
         public string? Complement { get; set; }
 
         public string? PostalCode { get; set; }
-        
+
         public string? Number { get; set; }
     }
 }

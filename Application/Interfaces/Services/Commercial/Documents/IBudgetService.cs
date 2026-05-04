@@ -4,8 +4,8 @@ using Application.DataTransferObjects.Commercial.Documents.Orders;
 
 namespace Application.Interfaces.Services.Commercial.Documents
 {
-    public interface IBudgetService : ICrudService<BudgetSaveDto, BudgetListing, BudgetListingFilter>
+    public interface IBudgetService : ICrudService<BudgetSaveDto, BudgetDetailDto, BudgetListing, BudgetListingFilter>
     {
-        Task<OrderSaveDto> CreateOrderByBudget(long id, CancellationToken cancellationToken);
+        Task<OrderDetailDto> CreateOrderByBudget(long id, CancellationToken cancellationToken);
     }
 }

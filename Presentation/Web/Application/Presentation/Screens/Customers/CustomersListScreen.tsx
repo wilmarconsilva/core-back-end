@@ -59,7 +59,7 @@ export function CustomersListScreen({ onGoBack, onNavigateToForm }: ICrudListScr
             columns={[
               { key: 'id', label: 'Código', flex: 0.4 },
               { key: 'name', label: 'Nome', flex: 2 },
-              { key: 'document', label: 'Documento', flex: 1.2 },
+              { key: 'localityState', label: 'Localidade/Estado', flex: 1.2 },
             ]}
             data={listings}
             isLoading={isLoadingList}

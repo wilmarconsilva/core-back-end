@@ -16,9 +16,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.Services.Commercial.Documents
 {
-    public abstract class DocumentService<TEntity, TDocumentSaveDto, TDocumentProductSaveDto, TListing, TFilter> : CrudService<TEntity, TDocumentSaveDto, TListing, TFilter>
+    public abstract class DocumentService<TEntity, TDocumentSaveDto, TDocumentDetailDto, TDocumentProductSaveDto, TListing, TFilter> : CrudService<TEntity, TDocumentSaveDto, TDocumentDetailDto, TListing, TFilter>
         where TEntity : Entity, IDocument
         where TDocumentSaveDto : DocumentSaveDto<TDocumentProductSaveDto>
+        where TDocumentDetailDto : class
         where TDocumentProductSaveDto : DocumentProductSaveDto
         where TListing : EntityListing
         where TFilter : ListingFilter
@@ -29,7 +30,7 @@ namespace Application.Services.Commercial.Documents
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
         protected DocumentService(IRepositoryCrud<TEntity> repository,
-            IEntitySaveDtoQuery<TDocumentSaveDto> query,
+            IEntityCrudQuery<TDocumentDetailDto, TListing, TFilter> query,
             IUnitOfWork unitOfWork,
             ICustomerRepository customerRepository,
             IProductRepository productRepository,

@@ -9,63 +9,50 @@ using Domain.Interfaces.Repositories;
 
 namespace Application.Services
 {
-    public abstract class CrudService<TEntity, TEntitySaveDto, TListing, TFilter> : ICrudService<TEntitySaveDto, TListing, TFilter>
+    public abstract class CrudService<TEntity, TSaveDto, TDetailDto, TListing, TFilter> : ICrudService<TSaveDto, TDetailDto, TListing, TFilter>
         where TEntity : Entity
-        where TEntitySaveDto : EntitySaveDto
+        where TSaveDto : EntitySaveDto
+        where TDetailDto : class
         where TListing : EntityListing
         where TFilter : ListingFilter
     {
-        #region Attributes
-
         protected readonly IRepositoryCrud<TEntity> _repositoryCrud;
-        protected readonly IEntitySaveDtoQuery<TEntitySaveDto> _query;
-        protected readonly IEntityListingQuery<TListing, TFilter> _listingQuery;
+        protected readonly IEntityCrudQuery<TDetailDto, TListing, TFilter> _query;
 
         private readonly IUnitOfWork _unitOfWork;
 
-        #endregion Attributes
-
-        #region Constructors
-
-        protected CrudService(IRepositoryCrud<TEntity> repository, IEntitySaveDtoQuery<TEntitySaveDto> query, IUnitOfWork unitOfWork)
+        protected CrudService(IRepositoryCrud<TEntity> repository, IEntityCrudQuery<TDetailDto, TListing, TFilter> query, IUnitOfWork unitOfWork)
         {
-            this._repositoryCrud = repository;
-            this._query = query;
-            this._listingQuery = (IEntityListingQuery<TListing, TFilter>)query;
-            this._unitOfWork = unitOfWork;
+            _repositoryCrud = repository;
+            _query = query;
+            _unitOfWork = unitOfWork;
         }
 
-        #endregion Constructors
-
-        #region Public methods
-
-        public Task<IEnumerable<Entity>> CreateAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
+        public Task<IEnumerable<Entity>> CreateAsync(IEnumerable<TSaveDto> dtos, CancellationToken cancellationToken)
         {
             ValidateDtos(dtos);
 
             return SaveAsync(dtos, cancellationToken);
         }
 
-        public async Task<TEntitySaveDto> GetByIdAsync(long id, CancellationToken cancellationToken)
+        public async Task<TDetailDto> GetByIdAsync(long id, CancellationToken cancellationToken)
         {
-            TEntitySaveDto? entitySaveDto = await _query.GetSaveDto(id, cancellationToken);
+            TDetailDto? detail = await _query.GetDetailAsync(id, cancellationToken);
 
-            if (entitySaveDto == null)
+            if (detail == null)
                 ThrowNotFoundException(id);
 
-            return entitySaveDto!;
+            return detail!;
         }
 
-        public async Task UpdateAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
+        public async Task UpdateAsync(IEnumerable<TSaveDto> dtos, CancellationToken cancellationToken)
         {
             ValidateDtos(dtos);
-
-            IEnumerable<long> dtosIds = dtos.Select(d => d.Id);
 
             await SaveAsync(dtos, cancellationToken);
         }
 
-        public Task UpdateAsync(long id, TEntitySaveDto dto, CancellationToken cancellationToken)
+        public Task UpdateAsync(long id, TSaveDto dto, CancellationToken cancellationToken)
         {
             dto.Id = id;
             return UpdateAsync([dto], cancellationToken);
@@ -91,16 +78,12 @@ namespace Application.Services
 
         public Task<List<TListing>> GetAllAsync(TFilter filter, CancellationToken cancellationToken)
         {
-            return _listingQuery.GetAll(filter, cancellationToken);
+            return _query.GetAll(filter, cancellationToken);
         }
 
-        #endregion Public methods
+        protected abstract TEntity CreateEntity(TSaveDto dto);
 
-        #region Protected methods
-
-        protected abstract TEntity CreateEntity(TEntitySaveDto dto);
-
-        protected abstract void UpdateEntity(TEntitySaveDto dto, TEntity entity);
+        protected abstract void UpdateEntity(TSaveDto dto, TEntity entity);
 
         protected abstract Task<bool> EntitiesCanBeDeleted(IEnumerable<long> ids);
 
@@ -114,11 +97,11 @@ namespace Application.Services
             return $"Nenhum registro encontrado para o(s) código(s): {string.Join(",", ids)}.";
         }
 
-        protected async Task<IEnumerable<Entity>> SaveAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
+        protected async Task<IEnumerable<Entity>> SaveAsync(IEnumerable<TSaveDto> dtos, CancellationToken cancellationToken)
         {
             List<TEntity> entities = await TransformToEntity(dtos, cancellationToken);
 
-            await this.SaveAsync(entities, cancellationToken);
+            await SaveAsync(entities, cancellationToken);
 
             return entities;
         }
@@ -131,10 +114,6 @@ namespace Application.Services
 
             await _unitOfWork.CommitAsync(cancellationToken);
         }
-
-        #endregion Protected methods
-
-        #region Private methods
 
         private async Task<IEnumerable<long>> GetNotExistingIds(IEnumerable<long> dtosIds, CancellationToken cancellationToken)
         {
@@ -151,7 +130,7 @@ namespace Application.Services
                 ThrowNotFoundException(notExistingIds);
         }
 
-        private async Task<List<TEntity>> TransformToEntity(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken)
+        private async Task<List<TEntity>> TransformToEntity(IEnumerable<TSaveDto> dtos, CancellationToken cancellationToken)
         {
             IEnumerable<long> existingIds = dtos.Where(dto => dto.Id > 0).Select(dto => dto.Id);
 
@@ -161,7 +140,7 @@ namespace Application.Services
             else
                 entities = new List<TEntity>(dtos.Count());
 
-            foreach (TEntitySaveDto dto in dtos)
+            foreach (TSaveDto dto in dtos)
             {
                 TEntity? entity;
 
@@ -186,21 +165,15 @@ namespace Application.Services
             return entities;
         }
 
-        #region Private static methods
-
         private static void ThrowNotFoundException(long id)
         {
             ThrowNotFoundException([id]);
         }
 
-        private static void ValidateDtos(IEnumerable<TEntitySaveDto> dtos)
+        private static void ValidateDtos(IEnumerable<TSaveDto> dtos)
         {
             if (dtos == null || !dtos.Any())
                 throw new BusinessRuleException("Nenhuma informação foi fornecida para executar a operação.");
         }
-
-        #endregion Private static methods
-
-        #endregion Private methods
     }
 }

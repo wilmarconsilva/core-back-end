@@ -4,13 +4,14 @@ using Application.Interfaces.Queries;
 using AutoMapper;
 using Domain.Entities.Commercial.Documents;
 using Infrastructure.Persistece;
+using Infrastructure.Queries;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Queries.Commercial.Documents
 {
-    public abstract class DocumentQuery<TEntity, TEntitySaveDto, TDocumentProduct, TListing, TFilter> : SaveDtoQuery<TEntity, TEntitySaveDto>, IEntityListingQuery<TListing, TFilter>
+    public abstract class DocumentQuery<TEntity, TEntityDetailDto, TDocumentProduct, TListing, TFilter> : DetailDtoQuery<TEntity, TEntityDetailDto>, IEntityCrudQuery<TEntityDetailDto, TListing, TFilter>
         where TEntity : Document<TDocumentProduct>
-        where TEntitySaveDto : EntitySaveDto
+        where TEntityDetailDto : class
         where TDocumentProduct : DocumentProduct
         where TListing : DocumentListing, new()
         where TFilter : DocumentListingFilter
@@ -40,7 +41,7 @@ namespace Infrastructure.Queries.Commercial.Documents
                 {
                     Id = document.Id,
                     CustormerName = document.Customer!.Name,
-                    CustomerCityState = document.Customer!.Addresses
+                    CustomerLocalityState = document.Customer!.Addresses
                             .OrderBy(address => address.Id)
                             .Select(address => address.Locality!.Description + (address.Locality.State == null ? string.Empty : $" - {address.Locality.State.Acronym}"))
                             .FirstOrDefault() ?? string.Empty,

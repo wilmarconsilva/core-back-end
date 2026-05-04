@@ -8,32 +8,33 @@ using Microsoft.AspNetCore.Mvc;
 namespace REST.Controllers
 {
     [ApiController]
-    public abstract class CrudController<TEntitySaveDto, TListing, TFilter> : Controller
-        where TEntitySaveDto : EntitySaveDto
+    public abstract class CrudController<TSaveDto, TDetailDto, TListing, TFilter> : Controller
+        where TSaveDto : EntitySaveDto
+        where TDetailDto : class
         where TListing : EntityListing
         where TFilter : ListingFilter
     {
-        private readonly ICrudService<TEntitySaveDto, TListing, TFilter> _service;
+        private readonly ICrudService<TSaveDto, TDetailDto, TListing, TFilter> _service;
 
-        protected CrudController(ICrudService<TEntitySaveDto, TListing, TFilter> service, ILogger logger, IUnitOfWork unitOfWork) : base(logger, unitOfWork)
+        protected CrudController(ICrudService<TSaveDto, TDetailDto, TListing, TFilter> service, ILogger logger, IUnitOfWork unitOfWork) : base(logger, unitOfWork)
         {
             _service = service;
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<TEntitySaveDto>> GetById(long id, CancellationToken cancellationToken)
+        public async Task<ActionResult<TDetailDto>> GetById(long id, CancellationToken cancellationToken)
         {
-            return await ProcessRequestAsync<TEntitySaveDto>(async () =>
+            return await ProcessRequestAsync<TDetailDto>(async () =>
             {
-                TEntitySaveDto dto = await _service.GetByIdAsync(id, cancellationToken);
+                TDetailDto dto = await _service.GetByIdAsync(id, cancellationToken);
                 return Ok(dto);
             }, cancellationToken);
         }
 
         [HttpPost]
-        public async Task<ActionResult<TEntitySaveDto>> Create([FromBody] TEntitySaveDto dto, CancellationToken cancellationToken)
+        public async Task<ActionResult<TSaveDto>> Create([FromBody] TSaveDto dto, CancellationToken cancellationToken)
         {
-            return await ProcessRequestAsync<TEntitySaveDto>(async () =>
+            return await ProcessRequestAsync<TSaveDto>(async () =>
             {
                 Entity entity = (await _service.CreateAsync([dto], cancellationToken)).First();
                 return CreatedAtAction(nameof(GetById), new { id = entity.Id }, dto);
@@ -41,9 +42,9 @@ namespace REST.Controllers
         }
 
         [HttpPut("{id}")]
-        public virtual async Task<ActionResult<TEntitySaveDto>> Update(long id, [FromBody] TEntitySaveDto dto, CancellationToken cancellationToken)
+        public virtual async Task<ActionResult<TSaveDto>> Update(long id, [FromBody] TSaveDto dto, CancellationToken cancellationToken)
         {
-            return await ProcessRequestAsync<TEntitySaveDto>(async () =>
+            return await ProcessRequestAsync<TSaveDto>(async () =>
             {
                 await _service.UpdateAsync(id, dto, cancellationToken);
                 return Ok(dto);

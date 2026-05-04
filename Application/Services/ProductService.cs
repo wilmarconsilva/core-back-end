@@ -8,7 +8,7 @@ using Domain.Interfaces.Repositories;
 
 namespace Application.Services.Persons.Customers
 {
-    public class ProductService : CrudService<Product, ProductSaveDto, ProductListing, ProductListingFilter>, IProductService
+    public class ProductService : CrudService<Product, ProductSaveDto, ProductDetailDto, ProductListing, ProductListingFilter>, IProductService
     {
         public ProductService(IProductRepository repository, IProductQuery query, IUnitOfWork unitOfWork) : base(repository, query, unitOfWork)
         {
