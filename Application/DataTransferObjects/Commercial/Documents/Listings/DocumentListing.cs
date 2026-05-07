@@ -6,7 +6,7 @@ namespace Application.DataTransferObjects.Commercial.Documents.Listings
     {
         public string CustormerName { get; init; } = null!;
 
-        public string CustomerCityState { get; init; } = null!;
+        public string CustomerLocalityState { get; init; } = null!;
 
         public decimal ValueTotal { get; init; }
     }

@@ -2,6 +2,7 @@ using Domain.Exceptions;
 using Domain.Interfaces.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Npgsql;
 
 namespace REST.Controllers
 {
@@ -37,6 +38,10 @@ namespace REST.Controllers
             {
                 return ProcessException(ex, cancellationToken);
             }
+            catch (PostgresException ex)
+            {
+                return ProcessException(ex, cancellationToken);
+            }
             catch (Exception ex)
             {
                 if (ex.InnerException is BusinessRuleException businessRuleException)
@@ -64,6 +69,10 @@ namespace REST.Controllers
                 return ProcessException(ex, cancellationToken);
             }
             catch (UnauthorizedAccessException ex)
+            {
+                return ProcessException(ex, cancellationToken);
+            }
+            catch (PostgresException ex)
             {
                 return ProcessException(ex, cancellationToken);
             }
@@ -102,6 +111,19 @@ namespace REST.Controllers
             _unitOfWork.RollbackAsync(cancellationToken);
             _logger.LogInformation(ex, "Unauthorized request");
             return Unauthorized(ex.Message);
+        }
+
+        private ObjectResult ProcessException(PostgresException ex, CancellationToken cancellationToken)
+        {
+            _unitOfWork.RollbackAsync(cancellationToken);
+
+            if (ex.SqlState == "23001")
+            {
+                _logger.LogWarning(ex, "Foreign key constraint violation");
+                return Conflict(new { detail = "Não é possível deletar este registro porque existem dados relacionados a ele. Sugerimos inativar o registro para evitar inconsistências nas informações." });
+            }
+
+            return ProcessException((Exception)ex, cancellationToken);
         }
 
         private ObjectResult ProcessException(Exception ex, CancellationToken cancellationToken)

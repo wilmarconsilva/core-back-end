@@ -3,8 +3,7 @@ using Application.DataTransferObjects.Territories.Listings;
 
 namespace Application.Interfaces.Services.Territories
 {
-    public interface ILocalityService : ICrudService<LocalitySaveDto, LocalityListing, LocalityListingFilter>
+    public interface ILocalityService : ICrudService<LocalitySaveDto, LocalityDetailDto, LocalityListing, LocalityListingFilter>
     {
-
     }
 }

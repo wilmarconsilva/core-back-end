@@ -121,7 +121,7 @@ export function OrderReportScreen({ onGoBack }: IBackOnlyScreenProps) {
                     <Text style={styles.reportTotal}>{formatCurrency(report.valueTotal)}</Text>
                   </View>
                   <Text style={styles.reportCustomer}>{report.customerName}</Text>
-                  <Text style={styles.reportCity}>{report.customerCityState}</Text>
+                  <Text style={styles.reportCity}>{report.customerLocalityState}</Text>
                   <Text style={styles.reportDate}>{formatDate(report.creationDateTime)}</Text>
                   <Text style={styles.reportPayment}>{report.paymentMethodDescription}</Text>
                   {Platform.OS === 'web' && (

@@ -8,7 +8,7 @@ namespace REST.Controllers.Territories
 {
     [ApiController]
     [Route("[controller]")]
-    public class LocalitiesController : CrudController<LocalitySaveDto, LocalityListing, LocalityListingFilter>
+    public class LocalitiesController : CrudController<LocalitySaveDto, LocalityDetailDto, LocalityListing, LocalityListingFilter>
     {
         private readonly ILocalityService _service;
 

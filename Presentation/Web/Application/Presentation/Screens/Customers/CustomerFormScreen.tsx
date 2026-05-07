@@ -14,11 +14,24 @@ import { UseLocalities } from '../../../Application/Hooks/UseLocalities';
 import { ILocalityListing } from '../../../Application/Interfaces/DataTransferObjects/Localities/ILocalityListing';
 import { ILocalityListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Localities/ILocalityListingFilter';
 import { ICustomerAddressSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerAddressSaveDto';
+import { ICustomerDetailDto } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerDetailDto';
 import { ICustomerSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerSaveDto';
 import { PersonType, PersonTypeLabels } from '../../../Application/Interfaces/DataTransferObjects/Persons/PersonType';
 import { IEntityFormScreenProps } from '../../Interfaces/Screens/IEntityFormScreenProps';
 import { colors, customerFormScreenStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
 const PAGE_SIZE = 50;
+
+/** Formato aceito: local@domínio.tld (sem espaços; um único @). */
+const EMAIL_MASK_REGEX = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+function sanitizeEmailInput(raw: string): string {
+  const noSpaces = raw.replace(/\s/g, '');
+  const at = noSpaces.indexOf('@');
+  if (at === -1) return noSpaces;
+  const local = noSpaces.slice(0, at).replace(/@/g, '');
+  const domain = noSpaces.slice(at + 1).replace(/@/g, '');
+  return `${local}@${domain}`;
+}
 
 const personTypeOptions = Object.values(PersonType)
   .filter((v) => typeof v === 'number')
@@ -26,6 +39,30 @@ const personTypeOptions = Object.values(PersonType)
 
 function createEmptyAddress(): ICustomerAddressSaveDto {
   return { id: 0, neighborhood: '', street: '', localityId: 0 };
+}
+
+function mapDetailAddressesToForm(detail: ICustomerDetailDto): ICustomerAddressSaveDto[] {
+  return detail.addresses.map((a) => ({
+    id: a.id,
+    neighborhood: a.neighborhood,
+    street: a.street,
+    localityId: a.locality.id,
+    localityDescription: a.locality.description,
+    complement: a.complement,
+    postalCode: a.postalCode,
+    number: a.number,
+  }));
+}
+
+function validateDocument(personType: PersonType, document: string): boolean {
+  if (personType === PersonType.Natural) {
+    return document.length === 14;
+  }
+  else if(personType === PersonType.Legal) {
+    return document.length === 18;
+  }
+
+  return false;
 }
 
 const addressErrorKey = (index: number, field: keyof ICustomerAddressSaveDto) =>
@@ -46,7 +83,7 @@ export function CustomerFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
 
   const [filterLocalityDescription, setFilterLocalityDescription] = useState('');
 
-  const documentFieldLabel = personType === PersonType.Natural ? 'CPF *' : 'CNPJ *';
+  const documentFieldLabel = personType === PersonType.Natural ? 'CPF' : 'CNPJ';
   const documentFieldPlaceholder = personType === PersonType.Natural ? '000.000.000-00' : 'CNPJ Alfanumérico';
   const documentMask = personType === PersonType.Natural ? Masks.BRL_CPF : null;
 
@@ -60,24 +97,25 @@ export function CustomerFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
     if (currentItem) {
       setName(currentItem.name ?? '');
       setPersonType(currentItem.personType);
-      const docMask = currentItem.personType === PersonType.Natural ? Masks.BRL_CPF : null;
-      if (docMask) {
-        setDocument(formatWithMask({ text: currentItem.document ?? '', mask: docMask }).masked);
+      if (currentItem.personType === PersonType.Natural) {
+        setDocument(formatWithMask({ text: currentItem.document ?? '', mask: Masks.BRL_CPF }).masked);
       } else {
         setDocument(currentItem.document ?? '');
       }
-      setEmail(currentItem.email ?? '');
+      setEmail(sanitizeEmailInput(currentItem.email ?? ''));
       setStateRegistration(currentItem.stateRegistration ?? '');
-      setAddresses(currentItem.addresses?.length ? currentItem.addresses : [createEmptyAddress()]);
+      setAddresses(
+        currentItem.addresses?.length
+          ? mapDetailAddressesToForm(currentItem as ICustomerDetailDto)
+          : [createEmptyAddress()],
+      );
     }
   }, [currentItem]);
 
   useEffect(() => {
-    const mask = personType === PersonType.Natural ? Masks.BRL_CPF : null;
-
-    if (mask) {
+    if (personType === PersonType.Natural) {
       setDocument((prev) =>
-        formatWithMask({ text: prev.replace(/\D/g, ''), mask }).masked,
+        formatWithMask({ text: prev.replace(/\D/g, ''), mask: Masks.BRL_CPF }).masked,
       );
     }
   }, [personType]);
@@ -97,9 +135,16 @@ export function CustomerFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
   };
 
   const handleSave = async () => {
+    const emailTrimmed = email.trim();
     const isValid = validate([
       { key: 'name', isValid: !!name.trim() },
       { key: 'document', isValid: !!document.trim() },
+      {
+        key: 'email',
+        isValid: !emailTrimmed || EMAIL_MASK_REGEX.test(emailTrimmed),
+        message: 'Informe um e-mail válido.',
+      },
+      { key: 'document', isValid: validateDocument(personType, document), message: `Informe um ${documentFieldLabel} válido.` },
       ...addresses.flatMap((address, index) => [
         { key: addressErrorKey(index, 'street'), isValid: !!address.street.trim() },
         { key: addressErrorKey(index, 'neighborhood'), isValid: !!address.neighborhood.trim() },
@@ -143,7 +188,7 @@ export function CustomerFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
             disabled={isSaving}
           />
           <FormField
-            label={documentFieldLabel}
+            label={`${documentFieldLabel} *`}
             placeholder={documentFieldPlaceholder}
             mask={documentMask ?? undefined}
             value={document}
@@ -151,7 +196,15 @@ export function CustomerFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
             editable={!isSaving}
             error={errors.document}
           />
-          <FormField label="E-mail" placeholder="email@exemplo.com" value={email} onChangeText={setEmail} editable={!isSaving} keyboardType="email-address" />
+          <FormField
+            label="E-mail"
+            placeholder="email@exemplo.com"
+            value={email}
+            onChangeText={(text) => bindChange('email', setEmail)(sanitizeEmailInput(text))}
+            editable={!isSaving}
+            keyboardType="email-address"
+            error={errors.email}
+          />
           <FormField
             label="Inscrição Estadual"
             value={stateRegistration}
@@ -162,11 +215,11 @@ export function CustomerFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
 
         {/* Addresses */}
         <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Endereços</Text>
+          <Text style={styles.sectionTitle}>Endereço{/* Descomentar quando adaptar orçamentos e pedidos para mais de um endereço: s */}</Text>
           {addresses.map((addr, index) => (
             <View key={index} style={styles.addressCard}>
               <View style={styles.addressHeader}>
-                <Text style={styles.addressTitle}>Endereço {index + 1}</Text>
+                {/* Descomentar quando adaptar orçamentos e pedidos para mais de um endereço: <Text style={styles.addressTitle}>Endereço {index + 1}</Text> */}
                 {addresses.length > 1 && (
                   <TouchableOpacity onPress={() => removeAddress(index)} activeOpacity={0.7}>
                     <Ionicons name="trash-outline" size={18} color={colors.error} />
@@ -184,6 +237,7 @@ export function CustomerFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
               <EntitySelectField<ILocalityListing, ILocalityListingFilter>
                 label="Localidade *"
                 value={addr.localityId || undefined}
+                selectedDisplayLabel={addr.localityDescription}
                 placeholder="Selecione a localidade..."
                 disabled={isSaving}
                 error={errors[addressErrorKey(index, 'localityId')]}
@@ -204,7 +258,14 @@ export function CustomerFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
                 keyExtractor={(l) => String(l.id)}
                 labelExtractor={(l) => l.description}
                 onValueChange={(locality) => {
-                  updateAddress(index, 'localityId', locality.id);
+                  setAddresses(prev =>
+                    prev.map((a, i) =>
+                      i === index
+                        ? { ...a, localityId: locality.id, localityDescription: locality.description }
+                        : a,
+                    ),
+                  );
+                  clearError(addressErrorKey(index, 'localityId'));
                 }}
                 renderFilter={(onSubmitSearch) => (
                   <FormField
@@ -233,10 +294,10 @@ export function CustomerFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
               <FormField label="Complemento" placeholder="Apt, bloco, etc." value={addr.complement ?? ''} onChangeText={(v) => updateAddress(index, 'complement', v)} editable={!isSaving} />
             </View>
           ))}
-          <TouchableOpacity style={styles.addCustomerAddressButton} onPress={addAddress} activeOpacity={0.7}>
+{/*Descomentar quando adaptar orçamentos e pedidos para mais de um endereço: <TouchableOpacity style={styles.addCustomerAddressButton} onPress={addAddress} activeOpacity={0.7}>
             <Ionicons name="add-outline" size={16} color={colors.primary} />
-            <Text style={styles.addButtonText}>Adicionar Endereço</Text>
-          </TouchableOpacity>
+            <Text style={styles.addButtonText}>Adicionar endereço</Text>
+          </TouchableOpacity> */}
         </View>
 
         <View style={styles.actionRow}>

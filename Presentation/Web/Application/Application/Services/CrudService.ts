@@ -2,9 +2,9 @@ import { APIConsumerService } from './APIConsumerService';
 import { ICrudService } from '../Interfaces/Services/ICrudService';
 import { buildQueryParams } from './Utilities/QueryUtilities';
 
-export class CrudService<TSaveDto, TListing, TFilter>
+export class CrudService<TSaveDto, TDetailDto, TListing, TFilter>
   extends APIConsumerService
-  implements ICrudService<TSaveDto, TListing, TFilter>
+  implements ICrudService<TSaveDto, TDetailDto, TListing, TFilter>
 {
   constructor(protected readonly basePath: string) {
     super();
@@ -19,8 +19,8 @@ export class CrudService<TSaveDto, TListing, TFilter>
     { toastsConfiguration: { doNotShowSuccess: true } });
   }
 
-  async getById(id: number): Promise<TSaveDto> {
-    return this.request<TSaveDto>(`${this.basePath}/${id}`, {
+  async getById(id: number): Promise<TDetailDto> {
+    return this.request<TDetailDto>(`${this.basePath}/${id}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     }, { toastsConfiguration: { doNotShowSuccess: true } });

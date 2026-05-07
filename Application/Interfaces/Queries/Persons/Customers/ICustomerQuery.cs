@@ -3,8 +3,7 @@ using Application.DataTransferObjects.Persons.Customers.Listings;
 
 namespace Application.Interfaces.Queries.Persons.Customers
 {
-    public interface ICustomerQuery : IEntitySaveDtoQuery<CustomerSaveDto>, IEntityListingQuery<CustomerListing, CustomerListingFilter>
+    public interface ICustomerQuery : IEntityCrudQuery<CustomerDetailDto, CustomerListing, CustomerListingFilter>
     {
-
     }
 }

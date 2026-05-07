@@ -4,16 +4,19 @@ using Domain.Entities;
 
 namespace Application.Interfaces.Services
 {
-    public interface ICrudService<TEntitySaveDto, TListing, TFilter>
-        where TEntitySaveDto : EntitySaveDto
+    public interface ICrudService<TSaveDto, TDetailDto, TListing, TFilter>
+        where TSaveDto : EntitySaveDto
+        where TDetailDto : class
         where TListing : EntityListing
         where TFilter : ListingFilter
     {
-        Task<IEnumerable<Entity>> CreateAsync(IEnumerable<TEntitySaveDto> dtos, CancellationToken cancellationToken);
+        Task<IEnumerable<Entity>> CreateAsync(IEnumerable<TSaveDto> dtos, CancellationToken cancellationToken);
 
-        Task<TEntitySaveDto> GetByIdAsync(long id, CancellationToken cancellationToken);
+        Task<TDetailDto> GetByIdAsync(long id, CancellationToken cancellationToken);
 
-        Task UpdateAsync(long id, TEntitySaveDto dto, CancellationToken cancellationToken);
+        Task UpdateAsync(long id, TSaveDto dto, CancellationToken cancellationToken);
+
+        Task UpdateAsync(IEnumerable<TSaveDto> dtos, CancellationToken cancellationToken);
 
         Task DeleteAsync(IEnumerable<long> ids, CancellationToken cancellationToken);
 

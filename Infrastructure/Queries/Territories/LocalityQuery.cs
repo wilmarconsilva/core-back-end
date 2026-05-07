@@ -8,10 +8,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Queries.Territories
 {
-    public class LocalityQuery : SaveDtoQuery<Locality, LocalitySaveDto>, ILocalityQuery
+    public class LocalityQuery : DetailDtoQuery<Locality, LocalityDetailDto>, ILocalityQuery
     {
         public LocalityQuery(AppDbContext context, IMapper mapper) : base(context, mapper)
         {
+        }
+
+        protected override IQueryable<Locality> ApplyIncludes(IQueryable<Locality> query)
+        {
+            return query.Include(l => l.State);
         }
 
         public Task<List<LocalityListing>> GetAll(LocalityListingFilter filter, CancellationToken cancellationToken)

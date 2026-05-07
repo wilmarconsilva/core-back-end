@@ -1,6 +1,7 @@
 using Application.DataTransferObjects.Commercial.Documents.Orders;
 using Application.DataTransferObjects.Commercial.Documents.Orders.Listings;
 using Application.Interfaces.Queries.Commercial.Documents.Orders;
+using System;
 using Application.Interfaces.Services.Commercial.Documents.Orders;
 using AutoMapper;
 using Domain.Entities.Commercial.Documents;
@@ -13,7 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.Services.Commercial.Documents.Orders
 {
-    public class OrderService : DocumentService<Order, OrderSaveDto, OrderProductSaveDto, OrderListing, OrderListingFilter>, IOrderService
+    public class OrderService : DocumentService<Order, OrderSaveDto, OrderDetailDto, OrderProductSaveDto, OrderListing, OrderListingFilter>, IOrderService
     {
         private readonly IMapper _mapper;
 
@@ -31,13 +32,17 @@ namespace Application.Services.Commercial.Documents.Orders
                 model["BudgetId"] = entity.BudgetId.Value;
         }
 
-        public async Task<OrderSaveDto> CreateByBudgetAsync(Budget budget, CancellationToken cancellationToken)
+        public async Task<OrderDetailDto> CreateByBudgetAsync(Budget budget, CancellationToken cancellationToken)
         {
             Order order = new Order(budget);
 
             await SaveAsync([order], cancellationToken);
 
-            return _mapper.Map<Order, OrderSaveDto>(order);
+            OrderDetailDto? detail = await _query.GetDetailAsync(order.Id, cancellationToken);
+            if (detail == null)
+                throw new InvalidOperationException($"Pedido {order.Id} não encontrado após criação.");
+
+            return detail;
         }
 
         protected override Order CreateEntity(OrderSaveDto dto)

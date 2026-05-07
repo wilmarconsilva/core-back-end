@@ -18,6 +18,8 @@ import { ICustomerListing } from '../../../Application/Interfaces/DataTransferOb
 import { ICustomerListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerListingFilter';
 import { IProductListing } from '../../../Application/Interfaces/DataTransferObjects/Products/IProductListing';
 import { IProductListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Products/IProductListingFilter';
+import { ICustomerReferenceDto } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerReferenceDto';
+import { IBudgetDetailDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetDetailDto';
 import { IBudgetProductSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetProductSaveDto';
 import { IBudgetSaveDto } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetSaveDto';
 import { PaymentMethod, PaymentMethodLabels } from '../../../Application/Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
@@ -26,6 +28,13 @@ import { IEntityFormScreenProps } from '../../Interfaces/Screens/IEntityFormScre
 import { colors, documentFormScreenStyles as styles, layoutStyles, typographyStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
+
+function customerSelectLabel(c: ICustomerReferenceDto): string | undefined {
+  if (c.name != null && c.document != null && `${c.name}${c.document}`.length > 0) {
+    return `${c.name} - ${c.document}`;
+  }
+  return undefined;
+}
 
 const paymentMethodOptions = Object.values(PaymentMethod)
   .filter((v) => typeof v === 'number')
@@ -42,7 +51,8 @@ export function BudgetFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
   const { errors, validate, clearError, bindChange } = UseFormValidation();
   const isEditing = !!id;
 
-  const [customerId, setCustomerId] = useState<number>(0);
+  const [customerId, setCustomerId] = useState(0);
+  const [customerDisplayLabel, setCustomerDisplayLabel] = useState('');
   const [userId, setUserId] = useState('');
   const [observations, setObservations] = useState('');
   const [signature, setSignature] = useState<string | null>(null);
@@ -63,14 +73,27 @@ export function BudgetFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
 
   useEffect(() => {
     if (currentItem) {
-      setCustomerId(currentItem.customerId);
-      setUserId(String(currentItem.userId));
-      setObservations(currentItem.observations ?? '');
-      setSignature(currentItem.customerSignatureImage ?? null);
-      setPaymentMethod(currentItem.payment?.method ?? PaymentMethod.Money);
-      setDiscountValue(String(currentItem.payment?.discountValue ?? 0));
-      setInstallmentQty(String(currentItem.payment?.installment?.quantity ?? ''));
-      setProductLines(currentItem.products?.length ? currentItem.products : [createEmptyProduct()]);
+      const d = currentItem as IBudgetDetailDto;
+      setCustomerId(d.customer.id);
+      setCustomerDisplayLabel(customerSelectLabel(d.customer) ?? '');
+      setUserId(String(d.userId));
+      setObservations(d.observations ?? '');
+      setSignature(d.customerSignatureImage ?? null);
+      setPaymentMethod(d.payment?.method ?? PaymentMethod.Money);
+      setDiscountValue(String(d.payment?.discountValue ?? 0));
+      setInstallmentQty(String(d.payment?.installment?.quantity ?? ''));
+      setProductLines(
+        d.products?.length
+          ? d.products.map((p) => ({
+            id: p.id,
+            productId: p.product.id,
+            productDescription: p.product.description,
+            quantity: p.quantity,
+            valueUnit: p.valueUnit,
+            valueTotal: p.valueTotal,
+          }))
+          : [createEmptyProduct()],
+      );
     }
   }, [currentItem]);
 
@@ -83,6 +106,12 @@ export function BudgetFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
       }
       return updated;
     }));
+  };
+
+  const selectProductLine = (index: number, product: { id: number; description: string }) => {
+    setProductLines(prev => prev.map((p, i) =>
+      i === index ? { ...p, productId: product.id, productDescription: product.description } : p,
+    ));
   };
 
   const addProductLine = () => setProductLines(prev => [...prev, createEmptyProduct()]);
@@ -114,7 +143,9 @@ export function BudgetFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
       payment: buildPayment(),
       observations: observations.trim() || undefined,
       customerSignatureImage: signature ?? undefined,
-      products: productLines.filter(p => p.productId > 0),
+      products: productLines
+        .filter(p => p.productId > 0)
+        .map(({ productDescription: _pd, ...line }) => line),
     };
     const success = await save(id ?? null, dto);
     if (success) onGoBack();
@@ -136,6 +167,7 @@ export function BudgetFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
           <EntitySelectField<ICustomerListing, ICustomerListingFilter>
             label="Cliente *"
             value={customerId || undefined}
+            selectedDisplayLabel={customerDisplayLabel}
             placeholder="Selecione o cliente..."
             error={errors.customerId}
             disabled={isSaving}
@@ -156,8 +188,9 @@ export function BudgetFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
             ]}
             keyExtractor={(c) => String(c.id)}
             labelExtractor={(c) => `${c.name} - ${c.document}`}
-            onValueChange={(customer) => {
-              setCustomerId(customer.id);
+            onValueChange={(c) => {
+              setCustomerId(c.id);
+              setCustomerDisplayLabel(`${c.name} - ${c.document}`);
               clearError('customerId');
             }}
             renderFilter={(onSubmitSearch) => (
@@ -224,6 +257,7 @@ export function BudgetFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
                 <EntitySelectField<IProductListing, IProductListingFilter>
                   label="Produto"
                   value={line.productId || undefined}
+                  selectedDisplayLabel={line.productDescription}
                   placeholder="Selecione..."
                   disabled={isSaving}
                   listings={products}
@@ -242,7 +276,7 @@ export function BudgetFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
                   ]}
                   keyExtractor={(p) => String(p.id)}
                   labelExtractor={(p) => p.description}
-                  onValueChange={(product) => updateProductLine(index, 'productId', product.id)}
+                  onValueChange={(product) => selectProductLine(index, product)}
                   renderFilter={(onSubmitSearch) => (
                     <FormField
                       label="Descrição"

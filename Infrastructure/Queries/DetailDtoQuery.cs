@@ -1,6 +1,4 @@
-﻿using Application.DataTransferObjects.Entities;
 using Application.DataTransferObjects.Listings;
-using Application.Interfaces.Queries;
 using AutoMapper;
 using Domain.Entities;
 using Infrastructure.Persistece;
@@ -9,26 +7,24 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Queries
 {
-    public abstract class SaveDtoQuery<TEntity, TEntitySaveDto> : AppDbContextAcessor, IEntitySaveDtoQuery<TEntitySaveDto> where TEntity : Entity where TEntitySaveDto : EntitySaveDto
+    public abstract class DetailDtoQuery<TEntity, TDetailDto> : AppDbContextAcessor
+        where TEntity : Entity
+        where TDetailDto : class
     {
         protected readonly IQueryable<TEntity> _query;
         protected readonly IMapper _mapper;
 
-        protected SaveDtoQuery(AppDbContext context, IMapper mapper) : base(context)
+        protected DetailDtoQuery(AppDbContext context, IMapper mapper) : base(context)
         {
             _mapper = mapper;
             _query = _context.Set<TEntity>().AsNoTracking();
         }
 
-        public async Task<TEntitySaveDto?> GetSaveDto(long id, CancellationToken cancellationToken)
+        public async Task<TDetailDto?> GetDetailAsync(long id, CancellationToken cancellationToken)
         {
-            IQueryable<TEntity> query = _query.Where(c => c.Id == id);
-
-            query = ApplyIncludes(query);
-
+            IQueryable<TEntity> query = ApplyIncludes(_query.Where(e => e.Id == id));
             TEntity? entity = await query.FirstOrDefaultAsync(cancellationToken);
-
-            return entity == null ? null : _mapper.Map<TEntitySaveDto>(entity);
+            return entity == null ? null : _mapper.Map<TDetailDto>(entity);
         }
 
         protected virtual IQueryable<TEntity> ApplyIncludes(IQueryable<TEntity> query)
