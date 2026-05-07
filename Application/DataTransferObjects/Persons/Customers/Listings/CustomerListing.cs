@@ -6,6 +6,6 @@ namespace Application.DataTransferObjects.Persons.Customers.Listings
     {
         public required string Name { get; init; }
 
-        public required string Document { get; init; }
+        public required string LocalityState { get; init; }
     }
 }

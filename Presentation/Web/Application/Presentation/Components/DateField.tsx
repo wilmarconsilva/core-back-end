@@ -31,7 +31,7 @@ export function DateField({ label, error, style, ...inputProps }: IDateFieldProp
     <FormField
       label={label}
       error={error}
-      placeholder="AAAA-MM-DD"
+      placeholder="dd/mm/aaaa"
       style={style}
       value={value}
       onChangeText={onChangeText}

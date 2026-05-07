@@ -9,7 +9,7 @@ using Domain.Interfaces.Repositories;
 
 namespace Application.Services.Persons.Customers
 {
-    public class CustomerService : CrudService<Customer, CustomerSaveDto, CustomerListing, CustomerListingFilter>, ICustomerService
+    public class CustomerService : CrudService<Customer, CustomerSaveDto, CustomerDetailDto, CustomerListing, CustomerListingFilter>, ICustomerService
     {
         private readonly IMapper _mapper;
 

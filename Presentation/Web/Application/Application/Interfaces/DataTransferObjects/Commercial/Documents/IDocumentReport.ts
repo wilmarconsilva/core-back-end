@@ -18,5 +18,5 @@ export interface IDocumentReport {
   observations?: string;
   userName: string;
   customerName: string;
-  customerCityState: string;
+  customerLocalityState: string;
 }

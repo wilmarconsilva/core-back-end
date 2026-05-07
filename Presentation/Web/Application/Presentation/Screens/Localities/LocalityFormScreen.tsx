@@ -29,7 +29,8 @@ export function LocalityFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
   useEffect(() => {
     if (currentItem) {
       setDescription(currentItem.description ?? '');
-      setStateId(currentItem.stateId !== undefined ? String(currentItem.stateId) : '');
+      const sid = currentItem.state?.id;
+      setStateId(sid !== undefined && sid !== null ? String(sid) : '');
     }
   }, [currentItem]);
 
@@ -42,7 +43,7 @@ export function LocalityFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
     const dto: ILocalitySaveDto = {
       id: id ?? 0,
       description: description.trim(),
-      stateId: stateId ? Number(stateId) : undefined,
+      stateId: stateId.trim() ? parseInt(stateId, 10) : undefined,
     };
     const success = await save(id ?? null, dto);
     if (success) onGoBack();
@@ -72,12 +73,18 @@ export function LocalityFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
             error={errors.description}
           />
           <NumberField
-            label="Estado Código"
-            placeholder="Código do estado (opcional)"
+            label="Estado (código)"
+            placeholder="ID do estado (opcional)"
             value={stateId}
             onChangeText={setStateId}
             editable={!isSaving}
           />
+          {isEditing && currentItem?.state?.acronym ? (
+            <Text style={{ marginBottom: 8, opacity: 0.75 }}>
+              Estado selecionado: {currentItem.state.acronym}
+              {currentItem.state.description ? ` — ${currentItem.state.description}` : ''}
+            </Text>
+          ) : null}
 
           <View style={styles.actionRow}>
             <SecondaryButton title="Cancelar" onPress={onGoBack} style={{ flex: 1 }} disabled={isSaving} />

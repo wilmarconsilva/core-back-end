@@ -8,7 +8,7 @@ namespace REST.Controllers.Persons
 {
     [ApiController]
     [Route("[controller]")]
-    public class CustomersController : CrudController<CustomerSaveDto, CustomerListing, CustomerListingFilter>
+    public class CustomersController : CrudController<CustomerSaveDto, CustomerDetailDto, CustomerListing, CustomerListingFilter>
     {
         private readonly ICustomerService _service;
 

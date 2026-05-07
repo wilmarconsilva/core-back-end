@@ -1,3 +1,4 @@
+using Application.DataTransferObjects.Commercial.Documents;
 using Application.DataTransferObjects.Commercial.Documents.Budgets;
 using Application.DataTransferObjects.Commercial.Documents.Budgets.Listings;
 using Application.DataTransferObjects.Commercial.Documents.Orders;
@@ -15,7 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.Services.Commercial.Documents.Budgets
 {
-    public class BudgetService : DocumentService<Budget, BudgetSaveDto, BudgetProductSaveDto, BudgetListing, BudgetListingFilter>, IBudgetService
+    public class BudgetService : DocumentService<Budget, BudgetSaveDto, DocumentDetailDto, BudgetProductSaveDto, BudgetListing, BudgetListingFilter>, IBudgetService
     {
         private readonly IMapper _mapper;
         private readonly IOrderService _orderService;
@@ -46,16 +47,14 @@ namespace Application.Services.Commercial.Documents.Budgets
             entity.Fill(dto.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products);
         }
 
-        public async Task<OrderSaveDto> CreateOrderByBudget(long id, CancellationToken cancellationToken)
+        public async Task<OrderDetailDto> CreateOrderByBudget(long id, CancellationToken cancellationToken)
         {
             Budget? budget = (await _repositoryCrud.GetByIdsAsync([id], cancellationToken)).FirstOrDefault();
 
             if (budget == null)
                 throw new BusinessRuleException(GetNotFoundMessage([id]));
 
-            OrderSaveDto orderSaveDto = await _orderService.CreateByBudgetAsync(budget, cancellationToken);
-
-            return orderSaveDto;
+            return await _orderService.CreateByBudgetAsync(budget, cancellationToken);
         }
 
         protected override Task<bool> EntitiesCanBeDeleted(IEnumerable<long> ids)

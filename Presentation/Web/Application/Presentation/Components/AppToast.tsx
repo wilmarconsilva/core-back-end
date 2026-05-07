@@ -42,6 +42,7 @@ export function AppToast() {
       position="bottom"
       bottomOffset={40}
       config={toastConfig}
+      visibilityTime={10000}
     />
   );
 }

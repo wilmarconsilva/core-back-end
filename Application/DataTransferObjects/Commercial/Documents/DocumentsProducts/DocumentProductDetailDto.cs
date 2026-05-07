@@ -1,10 +1,10 @@
 using Application.DataTransferObjects.Entities;
 
-namespace Application.DataTransferObjects.Commercial.Documents
+namespace Application.DataTransferObjects.Commercial.Documents.DocumentsProducts
 {
-    public abstract class DocumentProductSaveDto : EntitySaveDto
+    public class DocumentProductDetailDto : EntitySaveDto
     {
-        public required long ProductId { get; set; }
+        public required EntityReferenceDto Product { get; set; }
 
         public required decimal Quantity { get; set; }
 

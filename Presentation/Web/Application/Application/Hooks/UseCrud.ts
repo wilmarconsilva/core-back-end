@@ -1,11 +1,10 @@
 import { useCallback, useState } from 'react';
-import Toast from 'react-native-toast-message';
 import { ICrudService } from '../Interfaces/Services/ICrudService';
 
-interface CrudState<TSaveDto, TListing> {
+interface CrudState<TDetailDto, TListing> {
   listings: TListing[];
   isLoadingList: boolean;
-  currentItem: TSaveDto | null;
+  currentItem: TDetailDto | null;
   isLoadingItem: boolean;
   isSaving: boolean;
   isDeleting: boolean;
@@ -19,14 +18,14 @@ interface CrudActions<TSaveDto, TFilter> {
   clearCurrentItem: () => void;
 }
 
-export type UseCrudResult<TSaveDto, TListing, TFilter> = CrudState<TSaveDto, TListing> & CrudActions<TSaveDto, TFilter>;
+export type UseCrudResult<TSaveDto, TDetailDto, TListing, TFilter> = CrudState<TDetailDto, TListing> & CrudActions<TSaveDto, TFilter>;
 
-export function UseCrud<TSaveDto, TListing, TFilter>(
-  service: ICrudService<TSaveDto, TListing, TFilter>,
-): UseCrudResult<TSaveDto, TListing, TFilter> {
+export function UseCrud<TSaveDto, TDetailDto, TListing, TFilter>(
+  service: ICrudService<TSaveDto, TDetailDto, TListing, TFilter>,
+): UseCrudResult<TSaveDto, TDetailDto, TListing, TFilter> {
   const [listings, setListings] = useState<TListing[]>([]);
   const [isLoadingList, setIsLoadingList] = useState(false);
-  const [currentItem, setCurrentItem] = useState<TSaveDto | null>(null);
+  const [currentItem, setCurrentItem] = useState<TDetailDto | null>(null);
   const [isLoadingItem, setIsLoadingItem] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -37,7 +36,6 @@ export function UseCrud<TSaveDto, TListing, TFilter>(
       const data = await service.getAll(filter);
       setListings(data);
     } catch {
-      // Error already shown by APIConsumerService
     } finally {
       setIsLoadingList(false);
     }
@@ -49,7 +47,6 @@ export function UseCrud<TSaveDto, TListing, TFilter>(
       const data = await service.getById(id);
       setCurrentItem(data);
     } catch {
-      // Error already shown by APIConsumerService
     } finally {
       setIsLoadingItem(false);
     }

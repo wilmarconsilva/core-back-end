@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Modal,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { IConfirmDialogProps } from '../Interfaces/ConfirmDialog/IConfirmDialogProps';
@@ -25,20 +24,15 @@ export function ConfirmDialog({
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={onCancel}
     >
-      <TouchableOpacity
-        style={modalStyles.overlay}
-        activeOpacity={1}
-        onPress={!isLoading ? onCancel : undefined}
-      >
-        <TouchableOpacity activeOpacity={1} style={modalStyles.dialog}>
+      <View style={modalStyles.overlay}>
+        <View style={modalStyles.dialog}>
           <Text style={modalStyles.title}>{title}</Text>
           <Text style={modalStyles.message}>{message}</Text>
           <View style={modalStyles.actions}>
             <SecondaryButton
               title={cancelLabel}
-              onPress={onCancel}
+              onPress={!isLoading ? onCancel : undefined}
               disabled={isLoading}
               style={{ flex: 1, marginTop: 0 }}
             />
@@ -49,8 +43,8 @@ export function ConfirmDialog({
               style={{ flex: 1, marginTop: 0 }}
             />
           </View>
-        </TouchableOpacity>
-      </TouchableOpacity>
+        </View>
+      </View>
     </Modal>
   );
 }

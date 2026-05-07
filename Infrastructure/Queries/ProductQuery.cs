@@ -4,15 +4,15 @@ using Application.Interfaces.Queries;
 using AutoMapper;
 using Domain.Entities;
 using Infrastructure.Persistece;
+using Infrastructure.Queries;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Queries
 {
-    public class ProductQuery : SaveDtoQuery<Product, ProductSaveDto>, IProductQuery
+    public class ProductQuery : DetailDtoQuery<Product, ProductDetailDto>, IProductQuery
     {
         public ProductQuery(AppDbContext context, IMapper mapper) : base(context, mapper)
         {
-
         }
 
         public async Task<List<ProductListing>> GetAll(ProductListingFilter filter, CancellationToken cancellationToken)

@@ -3,8 +3,7 @@ using Application.DataTransferObjects.Products.Listings;
 
 namespace Application.Interfaces.Queries
 {
-    public interface IProductQuery : IEntitySaveDtoQuery<ProductSaveDto>, IEntityListingQuery<ProductListing, ProductListingFilter>
+    public interface IProductQuery : IEntityCrudQuery<ProductDetailDto, ProductListing, ProductListingFilter>
     {
-
     }
 }

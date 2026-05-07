@@ -8,7 +8,7 @@ namespace REST.Controllers.Commercial.Documents.Orders
 {
     [ApiController]
     [Route("[controller]")]
-    public class OrdersController : CrudController<OrderSaveDto, OrderListing, OrderListingFilter>
+    public class OrdersController : CrudController<OrderSaveDto, OrderDetailDto, OrderListing, OrderListingFilter>
     {
         private readonly IOrderService _service;
 

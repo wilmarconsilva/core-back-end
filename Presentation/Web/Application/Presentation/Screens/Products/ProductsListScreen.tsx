@@ -5,6 +5,7 @@ import { ConfirmDialog } from '../../Components/ConfirmDialog';
 import { DataGrid } from '../../Components/DataGrid';
 import { FilterActionBar } from '../../Components/FilterActionBar';
 import { FormField } from '../../Components/FormField';
+import { UseDeleteConfirmDialog } from '../../../Application/Hooks/UseDeleteConfirmDialog';
 import { UseProducts } from '../../../Application/Hooks/UseProducts';
 import { IProductListing } from '../../../Application/Interfaces/DataTransferObjects/Products/IProductListing';
 import { IProductListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Products/IProductListingFilter';
@@ -17,8 +18,6 @@ export function ProductsListScreen({ onGoBack, onNavigateToForm }: ICrudListScre
   const { listings, isLoadingList, isDeleting, loadAll, remove } = UseProducts();
   const [page, setPage] = useState(1);
   const [description, setDescription] = useState('');
-  const [deleteTarget, setDeleteTarget] = useState<IProductListing | null>(null);
-
   const buildFilter = useCallback((p: number): IProductListingFilter => ({
     registersStart: (p - 1) * PAGE_SIZE,
     registersEnd: p * PAGE_SIZE,
@@ -30,11 +29,17 @@ export function ProductsListScreen({ onGoBack, onNavigateToForm }: ICrudListScre
   const handleSearch = () => { setPage(1); loadAll(buildFilter(1)); };
   const handlePageChange = (p: number) => { setPage(p); loadAll(buildFilter(p)); };
 
-  const handleDelete = async () => {
-    if (!deleteTarget) return;
-    const success = await remove(deleteTarget.id);
-    if (success) { setDeleteTarget(null); loadAll(buildFilter(page)); }
-  };
+  const reloadCurrentPage = useCallback(() => {
+    loadAll(buildFilter(page));
+  }, [loadAll, buildFilter, page]);
+
+  const {
+    deleteTarget,
+    deleteDialogVisible,
+    openDeleteConfirm,
+    closeDeleteConfirm,
+    confirmDelete,
+  } = UseDeleteConfirmDialog<IProductListing>({ remove, reloadAfterDelete: reloadCurrentPage });
 
   return (
     <View style={layoutStyles.screenWrapper}>
@@ -66,18 +71,18 @@ export function ProductsListScreen({ onGoBack, onNavigateToForm }: ICrudListScre
             pageSize={PAGE_SIZE}
             onPageChange={handlePageChange}
             onEdit={(item) => onNavigateToForm(item.id)}
-            onDelete={(item) => setDeleteTarget(item)}
+            onDelete={openDeleteConfirm}
             keyExtractor={(item) => String(item.id)}
           />
         </View>
       </ScrollView>
 
       <ConfirmDialog
-        visible={!!deleteTarget}
+        visible={deleteDialogVisible}
         title="Excluir Produto"
         message={`Deseja excluir o produto "${deleteTarget?.description}"?`}
-        onConfirm={handleDelete}
-        onCancel={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+        onCancel={closeDeleteConfirm}
         isLoading={isDeleting}
         confirmLabel="Excluir"
       />

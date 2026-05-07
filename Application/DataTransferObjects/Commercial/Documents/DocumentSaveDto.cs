@@ -1,3 +1,4 @@
+using Application.DataTransferObjects.Commercial.Documents.DocumentsProducts;
 using Application.DataTransferObjects.Commercial.Documents.Payments;
 using Application.DataTransferObjects.Entities;
 
