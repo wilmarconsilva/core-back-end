@@ -1,6 +1,6 @@
 using Domain.Entities.Commercial.Documents.Orders;
 
-namespace Infrastructure.Persistence.Mappings.Territories.Commercial.Documents.Orders
+namespace Infrastructure.Persistence.Mappings.Commercial.Documents.Orders
 {
     public class OrderProductMapping : DocumentProductMapping<OrderProduct>
     {

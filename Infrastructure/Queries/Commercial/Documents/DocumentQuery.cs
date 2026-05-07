@@ -44,6 +44,7 @@ namespace Infrastructure.Queries.Commercial.Documents
                             .Select(address => address.Locality!.Description + (address.Locality.State == null ? string.Empty : $" - {address.Locality.State.Acronym}"))
                             .FirstOrDefault() ?? string.Empty,
                     ValueTotal = document.ValueTotal,
+                    CreationDateTime = document.CreationDateTime
                 })
                 .ToListAsync(cancellationToken);
         }

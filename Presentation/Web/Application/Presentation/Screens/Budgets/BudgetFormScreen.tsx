@@ -48,12 +48,11 @@ export function BudgetFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
   const { currentItem, isLoadingItem, isSaving, loadById, save, clearCurrentItem } = UseBudgets();
   const { listings: customers, isLoadingList: isLoadingCustomers, loadAll: loadCustomers } = UseCustomers();
   const { listings: products, isLoadingList: isLoadingProducts, loadAll: loadProducts } = UseProducts();
-  const { errors, validate, clearError, bindChange } = UseFormValidation();
+  const { errors, validate, clearError } = UseFormValidation();
   const isEditing = !!id;
 
   const [customerId, setCustomerId] = useState(0);
   const [customerDisplayLabel, setCustomerDisplayLabel] = useState('');
-  const [userId, setUserId] = useState('');
   const [observations, setObservations] = useState('');
   const [signature, setSignature] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.Money);
@@ -76,7 +75,6 @@ export function BudgetFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
       const d = currentItem as IBudgetDetailDto;
       setCustomerId(d.customer.id);
       setCustomerDisplayLabel(customerSelectLabel(d.customer) ?? '');
-      setUserId(String(d.userId));
       setObservations(d.observations ?? '');
       setSignature(d.customerSignatureImage ?? null);
       setPaymentMethod(d.payment?.method ?? PaymentMethod.Money);
@@ -132,13 +130,11 @@ export function BudgetFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
   const handleSave = async () => {
     const isValid = validate([
       { key: 'customerId', isValid: !!customerId },
-      { key: 'userId', isValid: !!userId.trim() },
     ]);
     if (!isValid) return;
 
     const dto: IBudgetSaveDto = {
       id: id ?? 0,
-      userId: parseInt(userId) || 0,
       customerId,
       payment: buildPayment(),
       observations: observations.trim() || undefined,
@@ -202,14 +198,6 @@ export function BudgetFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
                 onSubmitEditing={onSubmitSearch}
               />
             )}
-          />
-          <NumberField
-            label="Código do Vendedor *"
-            placeholder="Código do usuário"
-            value={userId}
-            onChangeText={bindChange('userId', setUserId)}
-            editable={!isSaving}
-            error={errors.userId}
           />
           <TextAreaField
             label="Observações"

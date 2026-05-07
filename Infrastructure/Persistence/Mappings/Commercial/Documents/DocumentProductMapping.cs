@@ -2,7 +2,7 @@ using Domain.Entities.Commercial.Documents;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Persistence.Mappings.Territories.Commercial.Documents
+namespace Infrastructure.Persistence.Mappings.Commercial.Documents
 {
     /// <summary>
     /// Mapeamento abstrato para DocumentProduct com suporte a relacionamentos com Document e Product.

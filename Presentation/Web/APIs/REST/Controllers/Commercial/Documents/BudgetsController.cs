@@ -31,11 +31,11 @@ namespace REST.Controllers.Commercial.Documents
         }
 
         [HttpPost("{id}/orders")]
-        public async Task<ActionResult<OrderDetailDto>> CreateOrderByBudget([FromRoute] long id, CancellationToken cancellationToken)
+        public async Task<ActionResult<OrderDetailDto>> CreateOrderByBudget([FromRoute] long id, [FromBody] OrderByBudgetDto orderByBudgetDto, CancellationToken cancellationToken)
         {
             return await ProcessRequestAsync<OrderDetailDto>(async () =>
             {
-                OrderDetailDto orderDetail = await _service.CreateOrderByBudget(id, cancellationToken);
+                OrderDetailDto orderDetail = await _service.CreateOrderByBudget(id, orderByBudgetDto, cancellationToken);
                 return CreatedAtAction(nameof(OrdersController.GetById), nameof(OrdersController).Replace("Controller", string.Empty), new { id = orderDetail.Id }, orderDetail);
             }, cancellationToken);
         }

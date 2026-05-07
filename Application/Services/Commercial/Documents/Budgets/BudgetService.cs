@@ -36,7 +36,7 @@ namespace Application.Services.Commercial.Documents.Budgets
 
             Payment payment = CreatePayment(dto);
 
-            return new Budget(dto.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products);
+            return new Budget(dto.UserId, dto.CreationDateTime, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products);
         }
 
         protected override void UpdateEntity(BudgetSaveDto dto, Budget entity)
@@ -47,14 +47,14 @@ namespace Application.Services.Commercial.Documents.Budgets
             entity.Fill(dto.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products);
         }
 
-        public async Task<OrderDetailDto> CreateOrderByBudget(long id, CancellationToken cancellationToken)
+        public async Task<OrderDetailDto> CreateOrderByBudget(long id, OrderByBudgetDto orderByBudgetDto, CancellationToken cancellationToken)
         {
             Budget? budget = (await _repositoryCrud.GetByIdsAsync([id], cancellationToken)).FirstOrDefault();
 
             if (budget == null)
                 throw new BusinessRuleException(GetNotFoundMessage([id]));
 
-            return await _orderService.CreateByBudgetAsync(budget, cancellationToken);
+            return await _orderService.CreateByBudgetAsync(budget, orderByBudgetDto, cancellationToken);
         }
 
         protected override Task<bool> EntitiesCanBeDeleted(IEnumerable<long> ids)

@@ -1,9 +1,8 @@
 using Domain.Entities.Commercial.Documents;
-using Domain.Entities.Persons.Customers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Persistence.Mappings.Territories.Commercial.Documents
+namespace Infrastructure.Persistence.Mappings.Commercial.Documents
 {
     /// <summary>
     /// Mapeamento para CommercialDocument com suporte a Value Objects aninhados em múltiplos níveis.

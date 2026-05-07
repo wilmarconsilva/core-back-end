@@ -3,7 +3,6 @@ import { IDocumentProductSaveDto } from './IDocumentProductSaveDto';
 
 export interface IDocumentSaveDto<TProduct extends IDocumentProductSaveDto> {
   id: number;
-  userId: number;
   customerId: number;
   budgetId?: number;
   payment: IPaymentSaveDto;

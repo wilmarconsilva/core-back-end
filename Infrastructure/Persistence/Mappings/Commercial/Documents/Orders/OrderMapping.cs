@@ -2,7 +2,7 @@ using Domain.Entities.Commercial.Documents.Orders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Persistence.Mappings.Territories.Commercial.Documents.Orders
+namespace Infrastructure.Persistence.Mappings.Commercial.Documents.Orders
 {
     public class OrderMapping : DocumentMapping<Order, OrderProduct>
     {

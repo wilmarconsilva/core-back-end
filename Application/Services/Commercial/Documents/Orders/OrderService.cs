@@ -32,9 +32,9 @@ namespace Application.Services.Commercial.Documents.Orders
                 model["BudgetId"] = entity.BudgetId.Value;
         }
 
-        public async Task<OrderDetailDto> CreateByBudgetAsync(Budget budget, CancellationToken cancellationToken)
+        public async Task<OrderDetailDto> CreateByBudgetAsync(Budget budget, OrderByBudgetDto orderByBudgetDto, CancellationToken cancellationToken)
         {
-            Order order = new Order(budget);
+            Order order = new Order(budget, orderByBudgetDto.CreationDateTime);
 
             await SaveAsync([order], cancellationToken);
 
@@ -51,7 +51,7 @@ namespace Application.Services.Commercial.Documents.Orders
 
             Payment payment = CreatePayment(dto);
 
-            return new Order(dto.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products, dto.BudgetId);
+            return new Order(dto.UserId, dto.CreationDateTime, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products, dto.BudgetId);
         }
 
         protected override void UpdateEntity(OrderSaveDto dto, Order entity)

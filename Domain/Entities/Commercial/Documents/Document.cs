@@ -41,9 +41,9 @@ namespace Domain.Entities.Commercial.Documents
         /// </summary>
         protected Document() { }
 
-        protected Document(long userId, long customerId, Payment payment, string? observations, byte[]? customerSignatureImage, IReadOnlyCollection<TProduct> products)
+        protected Document(long userId, DateTime creationDateTime, long customerId, Payment payment, string? observations, byte[]? customerSignatureImage, IReadOnlyCollection<TProduct> products)
         {
-            CreationDateTime = DateTime.UtcNow;
+            CreationDateTime = creationDateTime;
             Fill(userId, customerId, payment, observations, customerSignatureImage, products);
         }
 

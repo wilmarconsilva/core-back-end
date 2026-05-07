@@ -8,6 +8,8 @@ namespace Application.DataTransferObjects.Commercial.Documents.Listings
 
         public string CustomerLocalityState { get; init; } = null!;
 
+        public DateTime CreationDateTime { get; init; }
+
         public decimal ValueTotal { get; init; }
     }
 }

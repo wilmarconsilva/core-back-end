@@ -11,7 +11,7 @@ import { UseDeleteConfirmDialog } from '../../../Application/Hooks/UseDeleteConf
 import { IBudgetListing } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListing';
 import { IBudgetListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListingFilter';
 import { ICrudListScreenProps } from '../../Interfaces/Screens/ICrudListScreenProps';
-import { colors, layoutStyles, listScreenStyles, typographyStyles } from '../../Styles';
+import { colors, layoutStyles, listScreenStyles, typographyStyles, tableStyles } from '../../Styles';
 
 const PAGE_SIZE = 50;
 
@@ -80,6 +80,16 @@ export function BudgetsListScreen({ onGoBack, onNavigateToForm }: ICrudListScree
               { key: 'id', label: 'Código', flex: 0.4 },
               { key: 'custormerName', label: 'Cliente', flex: 2 },
               { key: 'customerLocalityState', label: 'Localidade/Estado', flex: 1.5 },
+              {
+                key: 'creationDateTime',
+                label: 'Data de criação',
+                flex: 1.5,
+                render: (item) => (
+                  <Text style={tableStyles.cell}>
+                    {new Date(item.creationDateTime).toLocaleString('pt-BR')}
+                  </Text>
+                ),
+              },
               {
                 key: 'valueTotal',
                 label: 'Total',
