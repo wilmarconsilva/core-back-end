@@ -5,6 +5,7 @@ import { ConfirmDialog } from '../../Components/ConfirmDialog';
 import { DataGrid } from '../../Components/DataGrid';
 import { DateField } from '../../Components/DateField';
 import { FilterActionBar } from '../../Components/FilterActionBar';
+import { UseDeleteConfirmDialog } from '../../../Application/Hooks/UseDeleteConfirmDialog';
 import { UseOrders } from '../../../Application/Hooks/UseOrders';
 import { IOrderListing } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderListing';
 import { IOrderListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderListingFilter';
@@ -18,8 +19,6 @@ export function OrdersListScreen({ onGoBack, onNavigateToForm }: ICrudListScreen
   const [page, setPage] = useState(1);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [deleteTarget, setDeleteTarget] = useState<IOrderListing | null>(null);
-
   const buildFilter = useCallback((p: number): IOrderListingFilter => ({
     registersStart: (p - 1) * PAGE_SIZE,
     registersEnd: p * PAGE_SIZE,
@@ -32,11 +31,17 @@ export function OrdersListScreen({ onGoBack, onNavigateToForm }: ICrudListScreen
   const handleSearch = () => { setPage(1); loadAll(buildFilter(1)); };
   const handlePageChange = (p: number) => { setPage(p); loadAll(buildFilter(p)); };
 
-  const handleDelete = async () => {
-    if (!deleteTarget) return;
-    const success = await remove(deleteTarget.id);
-    if (success) { setDeleteTarget(null); loadAll(buildFilter(page)); }
-  };
+  const reloadCurrentPage = useCallback(() => {
+    loadAll(buildFilter(page));
+  }, [loadAll, buildFilter, page]);
+
+  const {
+    deleteTarget,
+    deleteDialogVisible,
+    openDeleteConfirm,
+    closeDeleteConfirm,
+    confirmDelete,
+  } = UseDeleteConfirmDialog<IOrderListing>({ remove, reloadAfterDelete: reloadCurrentPage });
 
   return (
     <View style={layoutStyles.screenWrapper}>
@@ -86,18 +91,18 @@ export function OrdersListScreen({ onGoBack, onNavigateToForm }: ICrudListScreen
             pageSize={PAGE_SIZE}
             onPageChange={handlePageChange}
             onEdit={(item) => onNavigateToForm(item.id)}
-            onDelete={(item) => setDeleteTarget(item)}
+            onDelete={openDeleteConfirm}
             keyExtractor={(item) => String(item.id)}
           />
         </View>
       </ScrollView>
 
       <ConfirmDialog
-        visible={!!deleteTarget}
+        visible={deleteDialogVisible}
         title="Excluir Pedido"
         message={`Deseja excluir o pedido ${deleteTarget?.id}?`}
-        onConfirm={handleDelete}
-        onCancel={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+        onCancel={closeDeleteConfirm}
         isLoading={isDeleting}
         confirmLabel="Excluir"
       />

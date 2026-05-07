@@ -71,6 +71,9 @@ namespace Domain.Utilities.Entities
 
         private static bool IsValidCpf(string cpf)
         {
+            if (cpf.Length != 11)
+                return false;
+
             if (cpf.Distinct().Count() == 1)
                 return false;
 

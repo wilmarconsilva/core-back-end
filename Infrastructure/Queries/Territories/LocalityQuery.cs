@@ -4,7 +4,6 @@ using Application.Interfaces.Queries.Territories;
 using AutoMapper;
 using Domain.Entities.Territories;
 using Infrastructure.Persistece;
-using Infrastructure.Queries;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Queries.Territories

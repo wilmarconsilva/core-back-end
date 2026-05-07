@@ -1,10 +1,8 @@
 using Application.DataTransferObjects.Commercial.Documents.Listings;
-using Application.DataTransferObjects.Entities;
 using Application.Interfaces.Queries;
 using AutoMapper;
 using Domain.Entities.Commercial.Documents;
 using Infrastructure.Persistece;
-using Infrastructure.Queries;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Queries.Commercial.Documents

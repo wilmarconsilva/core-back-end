@@ -7,6 +7,7 @@ import { DataGrid } from '../../Components/DataGrid';
 import { DateField } from '../../Components/DateField';
 import { FilterActionBar } from '../../Components/FilterActionBar';
 import { UseBudgets } from '../../../Application/Hooks/UseBudgets';
+import { UseDeleteConfirmDialog } from '../../../Application/Hooks/UseDeleteConfirmDialog';
 import { IBudgetListing } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListing';
 import { IBudgetListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListingFilter';
 import { ICrudListScreenProps } from '../../Interfaces/Screens/ICrudListScreenProps';
@@ -19,8 +20,6 @@ export function BudgetsListScreen({ onGoBack, onNavigateToForm }: ICrudListScree
   const [page, setPage] = useState(1);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [deleteTarget, setDeleteTarget] = useState<IBudgetListing | null>(null);
-
   const buildFilter = useCallback((p: number): IBudgetListingFilter => ({
     registersStart: (p - 1) * PAGE_SIZE,
     registersEnd: p * PAGE_SIZE,
@@ -33,11 +32,17 @@ export function BudgetsListScreen({ onGoBack, onNavigateToForm }: ICrudListScree
   const handleSearch = () => { setPage(1); loadAll(buildFilter(1)); };
   const handlePageChange = (p: number) => { setPage(p); loadAll(buildFilter(p)); };
 
-  const handleDelete = async () => {
-    if (!deleteTarget) return;
-    const success = await remove(deleteTarget.id);
-    if (success) { setDeleteTarget(null); loadAll(buildFilter(page)); }
-  };
+  const reloadCurrentPage = useCallback(() => {
+    loadAll(buildFilter(page));
+  }, [loadAll, buildFilter, page]);
+
+  const {
+    deleteTarget,
+    deleteDialogVisible,
+    openDeleteConfirm,
+    closeDeleteConfirm,
+    confirmDelete,
+  } = UseDeleteConfirmDialog<IBudgetListing>({ remove, reloadAfterDelete: reloadCurrentPage });
 
   const handleCreateOrder = async (budgetId: number) => {
     await createOrderByBudget(budgetId);
@@ -92,7 +97,7 @@ export function BudgetsListScreen({ onGoBack, onNavigateToForm }: ICrudListScree
             pageSize={PAGE_SIZE}
             onPageChange={handlePageChange}
             onEdit={(item) => onNavigateToForm(item.id)}
-            onDelete={(item) => setDeleteTarget(item)}
+            onDelete={openDeleteConfirm}
             keyExtractor={(item) => String(item.id)}
             extraActions={(item) => (
               <TouchableOpacity
@@ -108,11 +113,11 @@ export function BudgetsListScreen({ onGoBack, onNavigateToForm }: ICrudListScree
       </ScrollView>
 
       <ConfirmDialog
-        visible={!!deleteTarget}
+        visible={deleteDialogVisible}
         title="Excluir Orçamento"
         message={`Deseja excluir o orçamento ${deleteTarget?.id}?`}
-        onConfirm={handleDelete}
-        onCancel={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+        onCancel={closeDeleteConfirm}
         isLoading={isDeleting}
         confirmLabel="Excluir"
       />

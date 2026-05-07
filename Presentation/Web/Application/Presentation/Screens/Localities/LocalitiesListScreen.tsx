@@ -5,6 +5,7 @@ import { ConfirmDialog } from '../../Components/ConfirmDialog';
 import { DataGrid } from '../../Components/DataGrid';
 import { FilterActionBar } from '../../Components/FilterActionBar';
 import { FormField } from '../../Components/FormField';
+import { UseDeleteConfirmDialog } from '../../../Application/Hooks/UseDeleteConfirmDialog';
 import { UseLocalities } from '../../../Application/Hooks/UseLocalities';
 import { ILocalityListing } from '../../../Application/Interfaces/DataTransferObjects/Localities/ILocalityListing';
 import { ILocalityListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Localities/ILocalityListingFilter';
@@ -17,8 +18,6 @@ export function LocalitiesListScreen({ onGoBack, onNavigateToForm }: ICrudListSc
   const { listings, isLoadingList, isDeleting, loadAll, remove } = UseLocalities();
   const [page, setPage] = useState(1);
   const [description, setDescription] = useState('');
-  const [deleteTarget, setDeleteTarget] = useState<ILocalityListing | null>(null);
-
   const buildFilter = useCallback((p: number): ILocalityListingFilter => ({
     registersStart: (p - 1) * PAGE_SIZE,
     registersEnd: p * PAGE_SIZE,
@@ -39,14 +38,17 @@ export function LocalitiesListScreen({ onGoBack, onNavigateToForm }: ICrudListSc
     loadAll(buildFilter(newPage));
   };
 
-  const handleDelete = async () => {
-    if (!deleteTarget) return;
-    const success = await remove(deleteTarget.id);
-    if (success) {
-      setDeleteTarget(null);
-      loadAll(buildFilter(page));
-    }
-  };
+  const reloadCurrentPage = useCallback(() => {
+    loadAll(buildFilter(page));
+  }, [loadAll, buildFilter, page]);
+
+  const {
+    deleteTarget,
+    deleteDialogVisible,
+    openDeleteConfirm,
+    closeDeleteConfirm,
+    confirmDelete,
+  } = UseDeleteConfirmDialog<ILocalityListing>({ remove, reloadAfterDelete: reloadCurrentPage });
 
   return (
     <View style={layoutStyles.screenWrapper}>
@@ -81,18 +83,18 @@ export function LocalitiesListScreen({ onGoBack, onNavigateToForm }: ICrudListSc
             pageSize={PAGE_SIZE}
             onPageChange={handlePageChange}
             onEdit={(item) => onNavigateToForm(item.id)}
-            onDelete={(item) => setDeleteTarget(item)}
+            onDelete={openDeleteConfirm}
             keyExtractor={(item) => String(item.id)}
           />
         </View>
       </ScrollView>
 
       <ConfirmDialog
-        visible={!!deleteTarget}
+        visible={deleteDialogVisible}
         title="Excluir Localidade"
         message={`Deseja realmente excluir a localidade "${deleteTarget?.description}"?`}
-        onConfirm={handleDelete}
-        onCancel={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+        onCancel={closeDeleteConfirm}
         isLoading={isDeleting}
         confirmLabel="Excluir"
       />
