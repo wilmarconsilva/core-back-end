@@ -1,4 +1,5 @@
 using Application.Interfaces.Security;
+using Infrastructure.Security;
 using Application.Interfaces.Services;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
@@ -11,7 +12,6 @@ using Infrastructure.Repositories.Commercial.Documents.Orders;
 using Infrastructure.Repositories.Persons;
 using Infrastructure.Repositories.Persons.Customers;
 using Infrastructure.Repositories.Security;
-using Infrastructure.Security;
 using Infrastructure.Security.JsonWebTokens;
 using Microsoft.EntityFrameworkCore;
 
@@ -45,9 +45,11 @@ public static class InfrastructureServiceExtensions
 
     private static void AddSecurity(IServiceCollection services, IConfiguration configuration)
     {
+        services.AddHttpContextAccessor();
         services.Configure<Options>(configuration.GetSection(Options.SectionName));
         services.AddScoped<IJwtTokenGenerator, TokenGenerator>();
         services.AddScoped<IPasswordHasherService, PasswordHasherService>();
+        services.AddScoped<IHttpContextCurrentUser, HttpContextCurrentUser>();
     }
 
     private static void AddEmail(IServiceCollection services, IConfiguration configuration)

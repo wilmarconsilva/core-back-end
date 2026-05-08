@@ -6,6 +6,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="18.4.0" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.4.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.5" />

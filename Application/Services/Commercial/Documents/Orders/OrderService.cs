@@ -2,6 +2,7 @@ using Application.DataTransferObjects.Commercial.Documents.Orders;
 using Application.DataTransferObjects.Commercial.Documents.Orders.Listings;
 using Application.Interfaces.Queries.Commercial.Documents.Orders;
 using System;
+using Application.Interfaces.Security;
 using Application.Interfaces.Services.Commercial.Documents.Orders;
 using AutoMapper;
 using Domain.Entities.Commercial.Documents;
@@ -17,11 +18,13 @@ namespace Application.Services.Commercial.Documents.Orders
     public class OrderService : DocumentService<Order, OrderSaveDto, OrderDetailDto, OrderProductSaveDto, OrderListing, OrderListingFilter>, IOrderService
     {
         private readonly IMapper _mapper;
+        private readonly IHttpContextCurrentUser _currentUser;
 
-        public OrderService(IOrderRepository repository, IOrderQuery query, IUnitOfWork unitOfWork, IMapper mapper, ICustomerRepository customerRepository, IProductRepository productRepository, IServiceScopeFactory serviceScopeFactory)
+        public OrderService(IOrderRepository repository, IOrderQuery query, IUnitOfWork unitOfWork, IMapper mapper, ICustomerRepository customerRepository, IProductRepository productRepository, IServiceScopeFactory serviceScopeFactory, IHttpContextCurrentUser currentUser)
             : base(repository, query, unitOfWork, customerRepository, productRepository, serviceScopeFactory, new("Pedido", "pedido"))
         {
             _mapper = mapper;
+            _currentUser = currentUser;
         }
 
         protected override IEnumerable<DocumentProduct> GetProducts(Order entity) => entity.Products;
@@ -51,7 +54,7 @@ namespace Application.Services.Commercial.Documents.Orders
 
             Payment payment = CreatePayment(dto);
 
-            return new Order(dto.UserId, dto.CreationDateTime, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products, dto.BudgetId);
+            return new Order(_currentUser.UserId, dto.CreationDateTime, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products, dto.BudgetId);
         }
 
         protected override void UpdateEntity(OrderSaveDto dto, Order entity)
@@ -59,7 +62,7 @@ namespace Application.Services.Commercial.Documents.Orders
             List<OrderProduct> products = _mapper.Map<List<OrderProduct>>(dto.Products);
             Payment payment = CreatePayment(dto);
 
-            entity.Fill(dto.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products);
+            entity.Fill(_currentUser.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products);
         }
 
         protected override Task<bool> EntitiesCanBeDeleted(IEnumerable<long> ids)

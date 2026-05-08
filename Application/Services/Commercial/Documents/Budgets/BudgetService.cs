@@ -3,6 +3,7 @@ using Application.DataTransferObjects.Commercial.Documents.Budgets;
 using Application.DataTransferObjects.Commercial.Documents.Budgets.Listings;
 using Application.DataTransferObjects.Commercial.Documents.Orders;
 using Application.Interfaces.Queries.Commercial.Documents.Budgets;
+using Application.Interfaces.Security;
 using Application.Interfaces.Services.Commercial.Documents;
 using Application.Interfaces.Services.Commercial.Documents.Orders;
 using AutoMapper;
@@ -20,12 +21,14 @@ namespace Application.Services.Commercial.Documents.Budgets
     {
         private readonly IMapper _mapper;
         private readonly IOrderService _orderService;
+        private readonly IHttpContextCurrentUser _currentUser;
 
-        public BudgetService(IBudgetRepository repository, IBudgetQuery query, IUnitOfWork unitOfWork, IMapper mapper, IOrderService orderService, ICustomerRepository customerRepository, IProductRepository productRepository, IServiceScopeFactory serviceScopeFactory)
+        public BudgetService(IBudgetRepository repository, IBudgetQuery query, IUnitOfWork unitOfWork, IMapper mapper, IOrderService orderService, ICustomerRepository customerRepository, IProductRepository productRepository, IServiceScopeFactory serviceScopeFactory, IHttpContextCurrentUser currentUser)
             : base(repository, query, unitOfWork, customerRepository, productRepository, serviceScopeFactory, new("Orçamento", "orcamento"))
         {
             _mapper = mapper;
             _orderService = orderService;
+            _currentUser = currentUser;
         }
 
         protected override IEnumerable<DocumentProduct> GetProducts(Budget entity) => entity.Products;
@@ -36,7 +39,7 @@ namespace Application.Services.Commercial.Documents.Budgets
 
             Payment payment = CreatePayment(dto);
 
-            return new Budget(dto.UserId, dto.CreationDateTime, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products);
+            return new Budget(_currentUser.UserId, dto.CreationDateTime, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products);
         }
 
         protected override void UpdateEntity(BudgetSaveDto dto, Budget entity)
@@ -44,7 +47,7 @@ namespace Application.Services.Commercial.Documents.Budgets
             IReadOnlyCollection<BudgetProduct> products = _mapper.Map<IReadOnlyCollection<BudgetProduct>>(dto.Products);
             Payment payment = CreatePayment(dto);
 
-            entity.Fill(dto.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products);
+            entity.Fill(_currentUser.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products);
         }
 
         public async Task<OrderDetailDto> CreateOrderByBudget(long id, OrderByBudgetDto orderByBudgetDto, CancellationToken cancellationToken)
