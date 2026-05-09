@@ -1,7 +1,6 @@
 using Application.DataTransferObjects.Commercial.Documents.Orders;
 using Application.DataTransferObjects.Commercial.Documents.Orders.Listings;
 using Application.Interfaces.Queries.Commercial.Documents.Orders;
-using System;
 using Application.Interfaces.Security;
 using Application.Interfaces.Services.Commercial.Documents.Orders;
 using AutoMapper;
@@ -18,13 +17,11 @@ namespace Application.Services.Commercial.Documents.Orders
     public class OrderService : DocumentService<Order, OrderSaveDto, OrderDetailDto, OrderProductSaveDto, OrderListing, OrderListingFilter>, IOrderService
     {
         private readonly IMapper _mapper;
-        private readonly IHttpContextCurrentUser _currentUser;
 
         public OrderService(IOrderRepository repository, IOrderQuery query, IUnitOfWork unitOfWork, IMapper mapper, ICustomerRepository customerRepository, IProductRepository productRepository, IServiceScopeFactory serviceScopeFactory, IHttpContextCurrentUser currentUser)
-            : base(repository, query, unitOfWork, customerRepository, productRepository, serviceScopeFactory, new("Pedido", "pedido"))
+            : base(repository, query, unitOfWork, customerRepository, productRepository, serviceScopeFactory, new("Pedido", "pedido"), currentUser)
         {
             _mapper = mapper;
-            _currentUser = currentUser;
         }
 
         protected override IEnumerable<DocumentProduct> GetProducts(Order entity) => entity.Products;

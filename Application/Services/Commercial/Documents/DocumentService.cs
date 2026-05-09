@@ -4,6 +4,7 @@ using Application.DataTransferObjects.Email;
 using Application.DataTransferObjects.Entities;
 using Application.DataTransferObjects.Listings;
 using Application.Interfaces.Queries;
+using Application.Interfaces.Security;
 using Application.Interfaces.Services;
 using Domain.Entities;
 using Domain.Entities.Commercial.Documents;
@@ -25,6 +26,8 @@ namespace Application.Services.Commercial.Documents
         where TListing : EntityListing
         where TFilter : ListingFilter
     {
+        protected readonly IHttpContextCurrentUser _currentUser;
+
         private readonly ICustomerRepository _customerRepository;
         private readonly DocumentTypeInfo _documentTypeInfo;
         private readonly IProductRepository _productRepository;
@@ -36,11 +39,13 @@ namespace Application.Services.Commercial.Documents
             ICustomerRepository customerRepository,
             IProductRepository productRepository,
             IServiceScopeFactory serviceScopeFactory,
-            DocumentTypeInfo documentTypeInfo)
+            DocumentTypeInfo documentTypeInfo,
+            IHttpContextCurrentUser httpContextCurrentUser)
             : base(repository, query, unitOfWork)
         {
             _customerRepository = customerRepository;
             _documentTypeInfo = documentTypeInfo;
+            _currentUser = httpContextCurrentUser;
             _productRepository = productRepository;
             _serviceScopeFactory = serviceScopeFactory;
         }

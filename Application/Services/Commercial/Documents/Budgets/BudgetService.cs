@@ -21,14 +21,12 @@ namespace Application.Services.Commercial.Documents.Budgets
     {
         private readonly IMapper _mapper;
         private readonly IOrderService _orderService;
-        private readonly IHttpContextCurrentUser _currentUser;
 
         public BudgetService(IBudgetRepository repository, IBudgetQuery query, IUnitOfWork unitOfWork, IMapper mapper, IOrderService orderService, ICustomerRepository customerRepository, IProductRepository productRepository, IServiceScopeFactory serviceScopeFactory, IHttpContextCurrentUser currentUser)
-            : base(repository, query, unitOfWork, customerRepository, productRepository, serviceScopeFactory, new("Orçamento", "orcamento"))
+            : base(repository, query, unitOfWork, customerRepository, productRepository, serviceScopeFactory, new("Orçamento", "orcamento"), currentUser)
         {
             _mapper = mapper;
             _orderService = orderService;
-            _currentUser = currentUser;
         }
 
         protected override IEnumerable<DocumentProduct> GetProducts(Budget entity) => entity.Products;
