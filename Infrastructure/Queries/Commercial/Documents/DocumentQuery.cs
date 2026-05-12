@@ -18,7 +18,7 @@ namespace Infrastructure.Queries.Commercial.Documents
         {
         }
 
-        public async Task<List<TListing>> GetAll(TFilter filter, CancellationToken cancellationToken)
+        public virtual async Task<List<TListing>> GetAll(TFilter filter, CancellationToken cancellationToken)
         {
             IQueryable<TEntity> query = _query;
 
