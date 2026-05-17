@@ -4,5 +4,13 @@
     "strict": true,
     "jsx": "react-native"
   },
-  "include": ["**/*.ts", "**/*.tsx"]
+  "include": [
+    "*.ts",
+    "*.tsx",
+    "Application/**/*.ts",
+    "Application/**/*.tsx",
+    "Presentation/**/*.ts",
+    "Presentation/**/*.tsx"
+  ],
+  "exclude": ["node_modules", "bin", "obj"]
 }

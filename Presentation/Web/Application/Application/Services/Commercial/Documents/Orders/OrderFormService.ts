@@ -3,6 +3,8 @@ import { PaymentMethod } from '../../../../Domain/ValueObjects/Enums/Commercial/
 import { IOrderDetailDto } from '../../../../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderDetailDto';
 import { IOrderProductSaveDto } from '../../../../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderProductSaveDto';
 import { IOrderSaveDto } from '../../../../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderSaveDto';
+import { DocumentInstallmentFormState } from '../Payments/InstallmentFormService';
+import { formatCurrencyInput } from '../../../Utilities/CurrencyInputUtilities';
 import { CommercialDocumentFormService } from '../CommercialDocumentFormService';
 
 export interface OrderFormState {
@@ -13,7 +15,6 @@ export interface OrderFormState {
   signature: string | null;
   paymentMethod: PaymentMethod;
   discountValue: string;
-  installmentQty: string;
   productLines: IOrderProductSaveDto[];
 }
 
@@ -25,9 +26,8 @@ export class OrderFormService {
       budgetId: '',
       observations: '',
       signature: null,
-      paymentMethod: PaymentMethod.Money,
-      discountValue: '0',
-      installmentQty: '',
+      paymentMethod: PaymentMethod.Check,
+      discountValue: '',
       productLines: [CommercialDocumentFormService.createEmptyProductLine<IOrderProductSaveDto>()],
     };
   }
@@ -39,22 +39,26 @@ export class OrderFormService {
       budgetId: detail.budgetId ? String(detail.budgetId) : '',
       observations: detail.observations ?? '',
       signature: detail.customerSignatureImage ?? null,
-      paymentMethod: detail.payment?.method ?? PaymentMethod.Money,
-      discountValue: String(detail.payment?.discountValue ?? 0),
-      installmentQty: String(detail.payment?.installment?.quantity ?? ''),
+      paymentMethod: detail.payment.method,
+      discountValue: formatCurrencyInput(detail.payment.discountValue),
       productLines: CommercialDocumentFormService.detailProductsToForm<IOrderProductSaveDto>(detail.products),
     };
   }
 
-  static buildSaveDto(id: number | undefined, form: OrderFormState): IOrderSaveDto {
+  static buildSaveDto(
+    id: number | undefined,
+    form: OrderFormState,
+    installment: DocumentInstallmentFormState,
+  ): IOrderSaveDto {
     return {
       id: id ?? 0,
+      creationDateTime: new Date(),
       customerId: form.customerId,
       budgetId: form.budgetId ? parseInt(form.budgetId, 10) : undefined,
       payment: CommercialDocumentFormService.buildPayment(
         form.paymentMethod,
         form.discountValue,
-        form.installmentQty,
+        installment,
       ),
       observations: form.observations.trim() || undefined,
       customerSignatureImage: form.signature ?? undefined,

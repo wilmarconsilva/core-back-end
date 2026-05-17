@@ -1,17 +1,10 @@
 using Application.DataTransferObjects.Persons.Customers.CustomerAddresses;
-using AutoMapper;
 using Domain.Entities.Persons.Customers;
 
 namespace Application.Mappings.Persons.Customers
 {
-    public class CustomerAddressProfile : Profile
+    public class CustomerAddressProfile : CrudProfile<CustomerAddressSaveDto, CustomerAddress>
     {
-        public CustomerAddressProfile()
-        {
-            CreateMap<CustomerAddressSaveDto, CustomerAddress>()
-                .ForMember(d => d.Locality, opt => opt.Ignore());
 
-            CreateMap<CustomerAddress, CustomerAddressSaveDto>();
-        }
     }
 }

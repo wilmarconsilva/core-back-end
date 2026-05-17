@@ -1,5 +1,6 @@
 export { colors } from './colors';
 export { formStyles } from './formStyles';
+export { checkboxFieldStyles } from './checkboxFieldStyles';
 export { formScreenCommonStyles } from './formScreenCommonStyles';
 export { buttonStyles } from './buttonStyles';
 export { layoutStyles } from './layoutStyles';

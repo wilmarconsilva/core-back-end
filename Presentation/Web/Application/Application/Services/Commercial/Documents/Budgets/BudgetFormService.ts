@@ -3,6 +3,8 @@ import { PaymentMethod } from '../../../../Domain/ValueObjects/Enums/Commercial/
 import { IBudgetDetailDto } from '../../../../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetDetailDto';
 import { IBudgetProductSaveDto } from '../../../../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetProductSaveDto';
 import { IBudgetSaveDto } from '../../../../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetSaveDto';
+import { DocumentInstallmentFormState } from '../Payments/InstallmentFormService';
+import { formatCurrencyInput } from '../../../Utilities/CurrencyInputUtilities';
 import { CommercialDocumentFormService } from '../CommercialDocumentFormService';
 
 export interface BudgetFormState {
@@ -12,7 +14,6 @@ export interface BudgetFormState {
   signature: string | null;
   paymentMethod: PaymentMethod;
   discountValue: string;
-  installmentQty: string;
   productLines: IBudgetProductSaveDto[];
 }
 
@@ -23,9 +24,8 @@ export class BudgetFormService {
       customerDisplayLabel: '',
       observations: '',
       signature: null,
-      paymentMethod: PaymentMethod.Money,
-      discountValue: '0',
-      installmentQty: '',
+      paymentMethod: PaymentMethod.Check,
+      discountValue: '',
       productLines: [CommercialDocumentFormService.createEmptyProductLine<IBudgetProductSaveDto>()],
     };
   }
@@ -36,21 +36,25 @@ export class BudgetFormService {
       customerDisplayLabel: CommercialDocumentFormService.entitySelectLabel(detail.customer),
       observations: detail.observations ?? '',
       signature: detail.customerSignatureImage ?? null,
-      paymentMethod: detail.payment?.method ?? PaymentMethod.Money,
-      discountValue: String(detail.payment?.discountValue ?? 0),
-      installmentQty: String(detail.payment?.installment?.quantity ?? ''),
+      paymentMethod: detail.payment.method,
+      discountValue: formatCurrencyInput(detail.payment.discountValue),
       productLines: CommercialDocumentFormService.detailProductsToForm<IBudgetProductSaveDto>(detail.products),
     };
   }
 
-  static buildSaveDto(id: number | undefined, form: BudgetFormState): IBudgetSaveDto {
+  static buildSaveDto(
+    id: number | undefined,
+    form: BudgetFormState,
+    installment: DocumentInstallmentFormState,
+  ): IBudgetSaveDto {
     return {
       id: id ?? 0,
+      creationDateTime: new Date(),
       customerId: form.customerId,
       payment: CommercialDocumentFormService.buildPayment(
         form.paymentMethod,
         form.discountValue,
-        form.installmentQty,
+        installment,
       ),
       observations: form.observations.trim() || undefined,
       customerSignatureImage: form.signature ?? undefined,

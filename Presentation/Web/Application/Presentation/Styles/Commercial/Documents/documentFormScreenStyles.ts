@@ -13,7 +13,11 @@ const documentOnly = StyleSheet.create({
     padding: 12,
     marginBottom: 10,
     backgroundColor: colors.surfaceAlt,
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
+  },
+  productRowDelete: {
+    alignSelf: 'flex-start',
+    paddingBottom: 0,
   },
   productField: { flex: 1 },
   productSmallField: { width: 90 },

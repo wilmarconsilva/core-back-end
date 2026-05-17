@@ -8,6 +8,7 @@ import { ICustomerListing } from '../Interfaces/DataTransferObjects/Persons/Cust
 import { IOrderProductSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderProductSaveDto';
 import { CommercialDocumentFormService } from '../Services/Commercial/Documents/CommercialDocumentFormService';
 import { OrderFormService } from '../Services/Commercial/Documents/Orders/OrderFormService';
+import { UseDocumentInstallmentForm } from './UseDocumentInstallmentForm';
 
 const PAGE_SIZE = 50;
 
@@ -26,10 +27,16 @@ export function UseOrderForm(id: number | undefined, onGoBack: () => void) {
   const [signature, setSignature] = useState<string | null>(initialForm.signature);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(initialForm.paymentMethod);
   const [discountValue, setDiscountValue] = useState(initialForm.discountValue);
-  const [installmentQty, setInstallmentQty] = useState(initialForm.installmentQty);
   const [productLines, setProductLines] = useState<IOrderProductSaveDto[]>(initialForm.productLines);
   const [filterCustomerName, setFilterCustomerName] = useState('');
   const [filterProductDescription, setFilterProductDescription] = useState('');
+
+  const valueTotal = CommercialDocumentFormService.calculateTotal(productLines, discountValue);
+  const {
+    loadFromPayment: loadInstallmentFromPayment,
+    getInstallmentState,
+    ...installmentFields
+  } = UseDocumentInstallmentForm(valueTotal);
 
   useEffect(() => {
     loadCustomers({ registersStart: 0, registersEnd: PAGE_SIZE });
@@ -50,8 +57,8 @@ export function UseOrderForm(id: number | undefined, onGoBack: () => void) {
     setSignature(form.signature);
     setPaymentMethod(form.paymentMethod);
     setDiscountValue(form.discountValue);
-    setInstallmentQty(form.installmentQty);
     setProductLines(form.productLines);
+    loadInstallmentFromPayment(currentItem.payment);
   }, [currentItem]);
 
   const currentForm = () => ({
@@ -62,7 +69,6 @@ export function UseOrderForm(id: number | undefined, onGoBack: () => void) {
     signature,
     paymentMethod,
     discountValue,
-    installmentQty,
     productLines,
   });
 
@@ -101,7 +107,10 @@ export function UseOrderForm(id: number | undefined, onGoBack: () => void) {
 
     if (!isValid) return;
 
-    const success = await save(id ?? null, OrderFormService.buildSaveDto(id, form));
+    const success = await save(
+      id ?? null,
+      OrderFormService.buildSaveDto(id, form, getInstallmentState()),
+    );
     if (success) onGoBack();
   };
 
@@ -130,14 +139,13 @@ export function UseOrderForm(id: number | undefined, onGoBack: () => void) {
     paymentMethodOptions: CommercialDocumentFormService.paymentMethodOptions,
     discountValue,
     setDiscountValue,
-    installmentQty,
-    setInstallmentQty,
+    ...installmentFields,
     productLines,
     updateProductLine,
     selectProductLine,
     addProductLine,
     removeProductLine,
-    valueTotal: CommercialDocumentFormService.calculateTotal(productLines, discountValue),
+    valueTotal,
     filterCustomerName,
     setFilterCustomerName,
     filterProductDescription,

@@ -1,69 +1,29 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { PaymentMethod } from '../../../../Application/Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
-import { IDocumentProductSaveDto } from '../../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/IDocumentProductSaveDto';
 import { ICustomerListing } from '../../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerListing';
 import { ICustomerListingFilter } from '../../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerListingFilter';
 import { IProductListing } from '../../../../Application/Interfaces/DataTransferObjects/Products/IProductListing';
 import { IProductListingFilter } from '../../../../Application/Interfaces/DataTransferObjects/Products/IProductListingFilter';
-import { ValidationErrors } from '../../../../Application/Hooks/UseFormValidation';
 import { Breadcrumb } from '../../../Components/Breadcrumb';
 import { EntitySelectField } from '../../../Components/EntitySelectField';
 import { FormField } from '../../../Components/FormField';
+import { CheckboxField } from '../../../Components/CheckboxField';
+import { CurrencyField } from '../../../Components/CurrencyField';
 import { NumberField } from '../../../Components/NumberField';
+import { DecimalField } from '../../../Components/DecimalField';
 import { PrimaryButton } from '../../../Components/PrimaryButton';
 import { SecondaryButton } from '../../../Components/SecondaryButton';
 import { SelectField } from '../../../Components/SelectField';
 import { SignatureCanvas } from '../../../Components/SignatureCanvas';
 import { TextAreaField } from '../../../Components/TextAreaField';
 import { colors, documentFormScreenStyles as styles, layoutStyles, typographyStyles } from '../../../Styles';
-
-type ProductLineEditableField = 'quantity' | 'valueUnit';
-
-interface CommercialDocumentFormScreenProps {
-  title: string;
-  breadcrumbEntityLabel: string;
-  breadcrumbCurrentLabel: string;
-  observationsPlaceholder: string;
-  onGoBack: () => void;
-  renderGeneralExtraFields?: () => ReactNode;
-  pageSize: number;
-  isEditing: boolean;
-  isLoadingItem: boolean;
-  isSaving: boolean;
-  customers: ICustomerListing[];
-  isLoadingCustomers: boolean;
-  loadCustomers: (filter: ICustomerListingFilter) => Promise<void>;
-  products: IProductListing[];
-  isLoadingProducts: boolean;
-  loadProducts: (filter: IProductListingFilter) => Promise<void>;
-  errors: ValidationErrors;
-  customerId: number;
-  customerDisplayLabel: string;
-  selectCustomer: (customer: ICustomerListing) => void;
-  observations: string;
-  setObservations: (value: string) => void;
-  setSignature: (value: string | null) => void;
-  paymentMethod: PaymentMethod;
-  setPaymentMethod: (value: PaymentMethod) => void;
-  paymentMethodOptions: { label: string; value: PaymentMethod }[];
-  discountValue: string;
-  setDiscountValue: (value: string) => void;
-  installmentQty: string;
-  setInstallmentQty: (value: string) => void;
-  productLines: IDocumentProductSaveDto[];
-  updateProductLine: (index: number, field: ProductLineEditableField, value: number) => void;
-  selectProductLine: (index: number, product: { id: number; description: string }) => void;
-  addProductLine: () => void;
-  removeProductLine: (index: number) => void;
-  valueTotal: number;
-  filterCustomerName: string;
-  setFilterCustomerName: (value: string) => void;
-  filterProductDescription: string;
-  setFilterProductDescription: (value: string) => void;
-  handleSave: () => Promise<void>;
-}
+import {
+  formatCurrencyInput,
+  parseCurrencyInput,
+} from '../../../../Application/Services/Utilities/CurrencyInputUtilities';
+import { ICommercialDocumentFormScreenProps } from '../../../Interfaces/Screens/ICommercialDocumentFormScreenProps';
 
 export function CommercialDocumentFormScreen({
   title,
@@ -93,8 +53,19 @@ export function CommercialDocumentFormScreen({
   paymentMethodOptions,
   discountValue,
   setDiscountValue,
+  hasInstallment,
+  setHasInstallment,
   installmentQty,
   setInstallmentQty,
+  installmentValue,
+  hasDownPayment,
+  setHasDownPayment,
+  downPaymentMethod,
+  setDownPaymentMethod,
+  downPaymentValue,
+  setDownPaymentValue,
+  downPaymentPercentage,
+  setDownPaymentPercentage,
   productLines,
   updateProductLine,
   selectProductLine,
@@ -106,7 +77,7 @@ export function CommercialDocumentFormScreen({
   filterProductDescription,
   setFilterProductDescription,
   handleSave,
-}: CommercialDocumentFormScreenProps) {
+}: ICommercialDocumentFormScreenProps) {
   return (
     <View style={layoutStyles.screenWrapper}>
       <ScrollView contentContainerStyle={[layoutStyles.scrollContainer, { justifyContent: 'flex-start' }]}>
@@ -165,33 +136,6 @@ export function CommercialDocumentFormScreen({
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Pagamento</Text>
-          <SelectField
-            label="Método de Pagamento *"
-            value={paymentMethod}
-            options={paymentMethodOptions}
-            onValueChange={(value) => setPaymentMethod(value as PaymentMethod)}
-            disabled={isSaving}
-          />
-          <NumberField
-            label="Desconto (R$)"
-            placeholder="0.00"
-            value={discountValue}
-            onChangeText={setDiscountValue}
-            editable={!isSaving}
-          />
-          {paymentMethod === PaymentMethod.CreditCard && (
-            <NumberField
-              label="Parcelas"
-              placeholder="Número de parcelas"
-              value={installmentQty}
-              onChangeText={setInstallmentQty}
-              editable={!isSaving}
-            />
-          )}
-        </View>
-
-        <View style={styles.card}>
           <Text style={styles.sectionTitle}>Produtos</Text>
           {productLines.map((line, index) => (
             <View key={index} style={styles.productRow}>
@@ -231,26 +175,29 @@ export function CommercialDocumentFormScreen({
                 />
               </View>
               <View style={styles.productSmallField}>
-                <NumberField
+                <DecimalField
                   label="Qtd."
-                  value={String(line.quantity)}
-                  onChangeText={(value) => updateProductLine(index, 'quantity', parseFloat(value))}
+                  placeholder="0,00"
+                  value={line.quantity}
+                  onChangeValue={(value) => updateProductLine(index, 'quantity', value)}
                   editable={!isSaving}
                 />
               </View>
               <View style={styles.productSmallField}>
-                <NumberField
+                <CurrencyField
                   label="Vl. Unit."
-                  value={String(line.valueUnit)}
-                  onChangeText={(value) => updateProductLine(index, 'valueUnit', parseFloat(value))}
+                  placeholder="R$ 0,00"
+                  value={formatCurrencyInput(line.valueUnit)}
+                  onChangeText={(value) => updateProductLine(index, 'valueUnit', parseCurrencyInput(value))}
                   editable={!isSaving}
                 />
-                <Text style={styles.totalText}>
-                  Total: {line.valueTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                </Text>
               </View>
               {productLines.length > 1 && (
-                <TouchableOpacity onPress={() => removeProductLine(index)} activeOpacity={0.7} style={{ paddingBottom: 12 }}>
+                <TouchableOpacity
+                  onPress={() => removeProductLine(index)}
+                  activeOpacity={0.7}
+                  style={styles.productRowDelete}
+                >
                   <Ionicons name="trash-outline" size={18} color={colors.error} />
                 </TouchableOpacity>
               )}
@@ -265,6 +212,78 @@ export function CommercialDocumentFormScreen({
               Total: {valueTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
             </Text>
           </View>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Pagamento</Text>
+          <SelectField
+            label="Método de Pagamento *"
+            value={paymentMethod}
+            options={paymentMethodOptions}
+            onValueChange={(value) => setPaymentMethod(value as PaymentMethod)}
+            disabled={isSaving}
+          />
+          <CurrencyField
+            label="Desconto"
+            placeholder="R$ 0,00"
+            value={discountValue}
+            onChangeText={setDiscountValue}
+            editable={!isSaving}
+          />
+          <CheckboxField
+            label="Contém parcelamento"
+            value={hasInstallment}
+            onValueChange={setHasInstallment}
+            disabled={isSaving}
+          />
+          {hasInstallment ? (
+            <>
+              <NumberField
+                label="Quantidade de parcelas *"
+                placeholder="0"
+                value={installmentQty}
+                onChangeText={setInstallmentQty}
+                editable={!isSaving}
+              />
+              <CurrencyField
+                label="Valor da parcela *"
+                placeholder="R$ 0,00"
+                value={installmentValue}
+                editable={false}
+              />
+              <CheckboxField
+                label="Contém entrada"
+                value={hasDownPayment}
+                onValueChange={setHasDownPayment}
+                disabled={isSaving}
+              />
+              {hasDownPayment ? (
+                <>
+                  <SelectField
+                    label="Forma de pagamento da entrada *"
+                    value={downPaymentMethod}
+                    options={paymentMethodOptions}
+                    onValueChange={(value) => setDownPaymentMethod(value as PaymentMethod)}
+                    disabled={isSaving}
+                  />
+                  <CurrencyField
+                    label="Valor de entrada *"
+                    placeholder="R$ 0,00"
+                    value={downPaymentValue}
+                    onChangeText={setDownPaymentValue}
+                    editable={!isSaving}
+                  />
+                  <DecimalField
+                    label="Percentual de entrada *"
+                    placeholder="000,00%"
+                    value={downPaymentPercentage}
+                    onChangeValue={setDownPaymentPercentage}
+                    editable={!isSaving}
+                  />
+                </>
+              ) : null}
+            </>
+          ) : null}
         </View>
 
         <View style={styles.card}>

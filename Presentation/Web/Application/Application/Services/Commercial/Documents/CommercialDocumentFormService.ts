@@ -2,6 +2,8 @@ import { PaymentMethod, PaymentMethodLabels } from '../../../Domain/ValueObjects
 import { IDocumentProductSaveDto } from '../../../Interfaces/DataTransferObjects/Commercial/Documents/IDocumentProductSaveDto';
 import { IPaymentSaveDto } from '../../../Interfaces/DataTransferObjects/Commercial/Documents/Payments/IPaymentSaveDto';
 import { IEntityReferenceDto } from '../../../Interfaces/DataTransferObjects/Entities/IEntityReferenceDto';
+import { DocumentInstallmentFormState, InstallmentFormService } from './Payments/InstallmentFormService';
+import { parseCurrencyInput } from '../../Utilities/CurrencyInputUtilities';
 
 interface DocumentProductDetail {
   id: number;
@@ -79,21 +81,23 @@ export class CommercialDocumentFormService {
     );
   }
 
-  static buildPayment(paymentMethod: PaymentMethod, discountValue: string, installmentQty: string): IPaymentSaveDto {
-    const discount = parseFloat(discountValue) || 0;
+  static buildPayment(
+    paymentMethod: PaymentMethod,
+    discountValue: string,
+    installment: DocumentInstallmentFormState,
+  ): IPaymentSaveDto {
+    const discount = parseCurrencyInput(discountValue);
 
     return {
       method: paymentMethod,
       discountValue: discount,
-      installment: paymentMethod === PaymentMethod.CreditCard && installmentQty
-        ? { quantity: parseInt(installmentQty, 10) || 1 }
-        : undefined,
+      installment: InstallmentFormService.toInstallmentSaveDto(installment),
     };
   }
 
   static calculateTotal(productLines: IDocumentProductSaveDto[], discountValue: string): number {
     const valueSubtotal = productLines.reduce((sum, productLine) => sum + productLine.valueTotal, 0);
-    const discount = parseFloat(discountValue) || 0;
+    const discount = parseCurrencyInput(discountValue);
 
     return Math.max(0, valueSubtotal - discount);
   }

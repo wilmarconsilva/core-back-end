@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Expo Web",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://localhost:8081",
+      "webRoot": "${workspaceFolder}/Presentation/Web/Application",
+      "preLaunchTask": "expo web"
+    }
+  ]
+}

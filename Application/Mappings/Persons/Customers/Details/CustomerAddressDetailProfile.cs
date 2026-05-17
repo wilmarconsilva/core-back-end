@@ -1,17 +1,14 @@
 using Application.DataTransferObjects.Entities;
-using Application.DataTransferObjects.Persons.Customers;
 using Application.DataTransferObjects.Persons.Customers.CustomerAddresses;
 using AutoMapper;
 using Domain.Entities.Persons.Customers;
 
-namespace Application.Mappings.Persons.Customers
+namespace Application.Mappings.Persons.Customers.Details
 {
-    public class CustomerDetailProfile : Profile
+    public class CustomerAddressDetailProfile : Profile
     {
-        public CustomerDetailProfile()
+        public CustomerAddressDetailProfile()
         {
-            CreateMap<Customer, CustomerDetailDto>();
-
             CreateMap<CustomerAddress, CustomerAddressDetailDto>()
                 .ForMember(d => d.Locality, opt => opt.MapFrom(s =>
                     new EntityReferenceDto
