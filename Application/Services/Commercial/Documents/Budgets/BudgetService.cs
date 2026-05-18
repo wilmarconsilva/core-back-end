@@ -37,7 +37,7 @@ namespace Application.Services.Commercial.Documents.Budgets
 
             Payment payment = CreatePayment(dto);
 
-            return new Budget(_currentUser.UserId, dto.CreationDateTime, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products);
+            return new Budget(_currentUser.UserId, dto.CreationDateTime, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, dto.PDF, products);
         }
 
         protected override void UpdateEntity(BudgetSaveDto dto, Budget entity)
@@ -45,7 +45,7 @@ namespace Application.Services.Commercial.Documents.Budgets
             IReadOnlyCollection<BudgetProduct> products = _mapper.Map<IReadOnlyCollection<BudgetProduct>>(dto.Products);
             Payment payment = CreatePayment(dto);
 
-            entity.Fill(_currentUser.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products);
+            entity.Fill(_currentUser.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, dto.PDF, products);
         }
 
         public async Task<OrderDetailDto> CreateOrderByBudget(long id, OrderByBudgetDto orderByBudgetDto, CancellationToken cancellationToken)

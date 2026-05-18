@@ -30,6 +30,7 @@ export interface ICommercialDocumentFormScreenProps {
     selectCustomer: (customer: ICustomerListing) => void;
     observations: string;
     setObservations: (value: string) => void;
+    signature: string | null;
     setSignature: (value: string | null) => void;
     paymentMethod: PaymentMethod;
     setPaymentMethod: (value: PaymentMethod) => void;
@@ -38,7 +39,7 @@ export interface ICommercialDocumentFormScreenProps {
     setDiscountValue: (value: string) => void;
     hasInstallment: boolean;
     setHasInstallment: (value: boolean) => void;
-    installmentQty: string;
+    installmentQty: number;
     setInstallmentQty: (value: string) => void;
     installmentValue: string;
     hasDownPayment: boolean;

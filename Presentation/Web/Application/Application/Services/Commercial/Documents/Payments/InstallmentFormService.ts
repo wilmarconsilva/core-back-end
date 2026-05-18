@@ -1,3 +1,4 @@
+import { IValidationRule } from '../../../../Hooks/UseFormValidation';
 import { PaymentMethod } from '../../../../Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
 import { InstallmentSaveDto } from '../../../../Interfaces/DataTransferObjects/Commercial/Documents/Payments/IInstallmentSaveDto';
 import { IPaymentSaveDto } from '../../../../Interfaces/DataTransferObjects/Commercial/Documents/Payments/IPaymentSaveDto';
@@ -41,6 +42,24 @@ export class InstallmentFormService {
       downPaymentPercentage: downPayment?.percentage ?? 0,
       downPaymentSyncSource: 'percentage',
     };
+  }
+
+  static buildValidationRules(state: DocumentInstallmentFormState): IValidationRule[] {
+    if (!state.hasInstallment) return [];
+
+    const rules: IValidationRule[] = [
+      { key: 'installmentQty', isValid: state.installmentQty > 0 },
+    ];
+
+    if (state.hasDownPayment) {
+      rules.push(
+        { key: 'downPaymentMethod', isValid: !!state.downPaymentMethod },
+        { key: 'downPaymentValue', isValid: parseCurrencyInput(state.downPaymentValue) > 0 },
+        { key: 'downPaymentPercentage', isValid: state.downPaymentPercentage > 0 },
+      );
+    }
+
+    return rules;
   }
 
   static toInstallmentSaveDto(

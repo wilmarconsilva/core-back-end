@@ -17,6 +17,7 @@ export const signatureCanvasStyles = StyleSheet.create({
     marginBottom: 8,
   },
   canvasWrapper: {
+    width: '100%',
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 8,

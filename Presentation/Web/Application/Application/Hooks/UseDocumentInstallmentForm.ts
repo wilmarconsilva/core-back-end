@@ -1,81 +1,89 @@
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 import { PaymentMethod } from '../Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
-import { IPaymentSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Payments/IPaymentSaveDto';
 import {
   DocumentInstallmentFormState,
   InstallmentFormService,
 } from '../Services/Commercial/Documents/Payments/InstallmentFormService';
 import { formatCurrencyInput } from '../Services/Utilities/CurrencyInputUtilities';
 
-export function UseDocumentInstallmentForm(valueTotal: number) {
-  const [state, setState] = useState<DocumentInstallmentFormState>(
-    InstallmentFormService.createInitialState(),
-  );
-
+export function UseDocumentInstallmentForm(
+  valueTotal: number,
+  installment: DocumentInstallmentFormState,
+  setInstallment: Dispatch<SetStateAction<DocumentInstallmentFormState>>,
+  clearError: (key: string) => void,
+) {
   useEffect(() => {
-    setState((previous) => InstallmentFormService.recalculateOnTotalChange(previous, valueTotal));
-  }, [valueTotal]);
+    setInstallment((previous) => InstallmentFormService.recalculateOnTotalChange(previous, valueTotal));
+  }, [valueTotal, setInstallment]);
 
   const installmentValue = formatCurrencyInput(
     InstallmentFormService.calculateInstallmentValue(
       valueTotal,
-      state.installmentQty,
-      state.downPaymentValue,
-      state.hasDownPayment,
+      installment.installmentQty,
+      installment.downPaymentValue,
+      installment.hasDownPayment,
     ),
   );
 
-  const loadFromPayment = (payment: IPaymentSaveDto) => {
-    setState(InstallmentFormService.fromPayment(payment));
-  };
-
   const setHasInstallment = (hasInstallment: boolean) => {
-    setState((previous) => InstallmentFormService.applyHasInstallment(previous, hasInstallment));
+    setInstallment((previous) => InstallmentFormService.applyHasInstallment(previous, hasInstallment));
+    clearError('installmentQty');
+    clearError('downPaymentMethod');
+    clearError('downPaymentValue');
+    clearError('downPaymentPercentage');
   };
 
-  const setInstallmentQty = (installmentQty: number) => {
-    setState((previous) => ({ ...previous, installmentQty }));
+  const setInstallmentQty = (text: string) => {
+    const installmentQty = parseInt(text, 10) || 0;
+    setInstallment((previous) => ({ ...previous, installmentQty }));
+    clearError('installmentQty');
   };
 
   const setHasDownPayment = (hasDownPayment: boolean) => {
-    setState((previous) => InstallmentFormService.applyHasDownPayment(previous, hasDownPayment));
+    setInstallment((previous) => InstallmentFormService.applyHasDownPayment(previous, hasDownPayment));
+    clearError('downPaymentMethod');
+    clearError('downPaymentValue');
+    clearError('downPaymentPercentage');
   };
 
   const setDownPaymentMethod = (downPaymentMethod: PaymentMethod) => {
-    setState((previous) => ({ ...previous, downPaymentMethod }));
+    setInstallment((previous) => ({ ...previous, downPaymentMethod }));
+    clearError('downPaymentMethod');
   };
 
   const setDownPaymentValue = (downPaymentValue: string) => {
-    setState((previous) =>
+    setInstallment((previous) =>
       InstallmentFormService.syncFromDownPaymentValue(previous, downPaymentValue, valueTotal),
     );
+    clearError('downPaymentValue');
+    clearError('downPaymentPercentage');
   };
 
   const setDownPaymentPercentage = (downPaymentPercentage: number) => {
-    setState((previous) =>
+    setInstallment((previous) =>
       InstallmentFormService.syncFromDownPaymentPercentage(
         previous,
         downPaymentPercentage,
         valueTotal,
       ),
     );
+    clearError('downPaymentPercentage');
+    clearError('downPaymentValue');
   };
 
   return {
-    hasInstallment: state.hasInstallment,
+    hasInstallment: installment.hasInstallment,
     setHasInstallment,
-    installmentQty: state.installmentQty,
+    installmentQty: installment.installmentQty,
     setInstallmentQty,
     installmentValue,
-    hasDownPayment: state.hasDownPayment,
+    hasDownPayment: installment.hasDownPayment,
     setHasDownPayment,
-    downPaymentMethod: state.downPaymentMethod,
+    downPaymentMethod: installment.downPaymentMethod,
     setDownPaymentMethod,
-    downPaymentValue: state.downPaymentValue,
+    downPaymentValue: installment.downPaymentValue,
     setDownPaymentValue,
-    downPaymentPercentage: state.downPaymentPercentage,
+    downPaymentPercentage: installment.downPaymentPercentage,
     setDownPaymentPercentage,
-    loadFromPayment,
-    getInstallmentState: () => state,
   };
 }

@@ -11,7 +11,7 @@ import { EntitySelectField } from '../../../Components/EntitySelectField';
 import { FormField } from '../../../Components/FormField';
 import { CheckboxField } from '../../../Components/CheckboxField';
 import { CurrencyField } from '../../../Components/CurrencyField';
-import { NumberField } from '../../../Components/NumberField';
+import { IntField } from '../../../Components/IntField';
 import { DecimalField } from '../../../Components/DecimalField';
 import { PrimaryButton } from '../../../Components/PrimaryButton';
 import { SecondaryButton } from '../../../Components/SecondaryButton';
@@ -24,6 +24,7 @@ import {
   parseCurrencyInput,
 } from '../../../../Application/Services/Utilities/CurrencyInputUtilities';
 import { ICommercialDocumentFormScreenProps } from '../../../Interfaces/Screens/ICommercialDocumentFormScreenProps';
+import { PercentageField } from '../../../Components/PercentageField';
 
 export function CommercialDocumentFormScreen({
   title,
@@ -47,6 +48,7 @@ export function CommercialDocumentFormScreen({
   selectCustomer,
   observations,
   setObservations,
+  signature,
   setSignature,
   paymentMethod,
   setPaymentMethod,
@@ -220,11 +222,12 @@ export function CommercialDocumentFormScreen({
             label="Método de Pagamento *"
             value={paymentMethod}
             options={paymentMethodOptions}
+            error={errors.paymentMethod}
             onValueChange={(value) => setPaymentMethod(value as PaymentMethod)}
             disabled={isSaving}
           />
           <CurrencyField
-            label="Desconto"
+            label="Desconto (R$)"
             placeholder="R$ 0,00"
             value={discountValue}
             onChangeText={setDiscountValue}
@@ -238,16 +241,17 @@ export function CommercialDocumentFormScreen({
           />
           {hasInstallment ? (
             <>
-              <NumberField
+              <IntField
                 label="Quantidade de parcelas *"
                 placeholder="0"
                 value={installmentQty}
+                error={errors.installmentQty}
                 onChangeText={setInstallmentQty}
                 editable={!isSaving}
               />
               <CurrencyField
-                label="Valor da parcela *"
-                placeholder="R$ 0,00"
+                label="Valor da parcela (R$) *"
+                placeholder="Definido automaticamente pela quantidade de parcelas"
                 value={installmentValue}
                 editable={false}
               />
@@ -263,20 +267,23 @@ export function CommercialDocumentFormScreen({
                     label="Forma de pagamento da entrada *"
                     value={downPaymentMethod}
                     options={paymentMethodOptions}
+                    error={errors.downPaymentMethod}
                     onValueChange={(value) => setDownPaymentMethod(value as PaymentMethod)}
                     disabled={isSaving}
                   />
                   <CurrencyField
-                    label="Valor de entrada *"
+                    label="Valor de entrada (R$) *"
                     placeholder="R$ 0,00"
                     value={downPaymentValue}
+                    error={errors.downPaymentValue}
                     onChangeText={setDownPaymentValue}
                     editable={!isSaving}
                   />
-                  <DecimalField
-                    label="Percentual de entrada *"
+                  <PercentageField
+                    label="Percentual de entrada (%) *"
                     placeholder="000,00%"
                     value={downPaymentPercentage}
+                    error={errors.downPaymentPercentage}
                     onChangeValue={setDownPaymentPercentage}
                     editable={!isSaving}
                   />
@@ -288,7 +295,7 @@ export function CommercialDocumentFormScreen({
 
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Assinatura</Text>
-          <SignatureCanvas onSignatureChange={setSignature} width={500} height={180} />
+          <SignatureCanvas value={signature} onSignatureChange={setSignature} height={180} />
         </View>
 
         <View style={styles.documentFooterActions}>

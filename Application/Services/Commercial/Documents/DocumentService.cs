@@ -137,25 +137,25 @@ namespace Application.Services.Commercial.Documents
             {
                 Customer? customer = customers.Find(c => c.Id == entity.CustomerId);
 
-                if (customer?.Email is null)
+                if (customer?.Email is null || entity.PDF is null)
                     continue;
 
                 _ = Task.Run(async () =>
                 {
-                    await SentDocumentEmailToCustomerAsync(entitiesIdsToBeUpdated, products, entity, customer);
+                    await SentDocumentEmailToCustomerAsync(entitiesIdsToBeUpdated, entity, customer);
                 }, CancellationToken.None);
             }
         }
 
-        private async Task SentDocumentEmailToCustomerAsync(long[] entitiesIdsToBeUpdated, List<Product> products, TEntity entity, Customer customer)
+        private async Task SentDocumentEmailToCustomerAsync(long[] entitiesIdsToBeUpdated, TEntity entity, Customer customer)
         {
+            //remover pdf e template para deixar só no front.
             await using AsyncServiceScope scope = _serviceScopeFactory.CreateAsyncScope();
             IPdfService pdfService = scope.ServiceProvider.GetRequiredService<IPdfService>();
             ITemplateRenderer templateRenderer = scope.ServiceProvider.GetRequiredService<ITemplateRenderer>();
             IEmailService emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
 
-            byte[] pdfBytes = await pdfService.GenerateFromHtmlAsync(templateRenderer.Render("document", GetTemplateModel(entity, customer, products)), CancellationToken.None);
-            EmailAttachmentDto attachment = new(GetDocumentFileName(entity), pdfBytes, "application/pdf");
+            EmailAttachmentDto attachment = new(GetDocumentFileName(entity), entity.PDF!, "application/pdf");
             string action = entitiesIdsToBeUpdated.Contains(entity.Id) ? "atualizado" : "criado";
             EmailMessageDto email = new(customer.Email!, $"{_documentTypeInfo.Title} {action} com sucesso!", $"Seu {_documentTypeInfo.Title.ToLower()} de código: {entity.Id} foi {action} com sucesso e encontra-se em anexo.", [attachment]);
             await emailService.SendAsync(email, CancellationToken.None);

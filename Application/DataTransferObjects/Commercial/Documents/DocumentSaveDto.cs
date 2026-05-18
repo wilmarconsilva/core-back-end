@@ -21,6 +21,8 @@ namespace Application.DataTransferObjects.Commercial.Documents
 
         public byte[]? CustomerSignatureImage { get; set; }
 
+        public byte[]? PDF { get; set; }
+
         public required List<TDocumentProductSaveDto> Products { get; set; }
     }
 }

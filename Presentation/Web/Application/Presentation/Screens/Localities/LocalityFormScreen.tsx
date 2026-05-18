@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text } from 'react-native';
 import { FormField } from '../../Components/FormField';
-import { NumberField } from '../../Components/NumberField';
+import { IntField } from '../../Components/IntField';
 import { UseLocalityForm } from '../../../Application/Hooks/UseLocalityForm';
 import { IEntityFormScreenProps } from '../../Interfaces/Screens/IEntityFormScreenProps';
 import { CrudFormScreen } from '../CrudFormScreen';
@@ -39,7 +39,7 @@ export function LocalityFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
         editable={!isSaving}
         error={errors.description}
       />
-      <NumberField
+      <IntField
         label="Estado (código)"
         placeholder="ID do estado (opcional)"
         value={stateId}
