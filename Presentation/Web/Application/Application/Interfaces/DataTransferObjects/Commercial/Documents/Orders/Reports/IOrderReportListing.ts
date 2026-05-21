@@ -1,4 +1,4 @@
-import { IDocumentReportListing } from '../IDocumentReportListing';
+import { IDocumentReportListing } from '../Reports/IDocumentReportListing';
 import { IOrderReport } from './IOrderReport';
 import { IOrderReportSummary } from './IOrderReportSummary';
 

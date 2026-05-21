@@ -65,6 +65,7 @@ namespace Domain.Entities.Commercial.Documents
             SetValues();
             Observations = observations;
             CustomerSignatureImage = customerSignatureImage;
+            PDF = pdf;
         }
 
         protected override string GetDescription()

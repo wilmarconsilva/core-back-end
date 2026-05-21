@@ -22,8 +22,8 @@ namespace Application.Services.Commercial.Documents.Budgets
         private readonly IMapper _mapper;
         private readonly IOrderService _orderService;
 
-        public BudgetService(IBudgetRepository repository, IBudgetQuery query, IUnitOfWork unitOfWork, IMapper mapper, IOrderService orderService, ICustomerRepository customerRepository, IProductRepository productRepository, IServiceScopeFactory serviceScopeFactory, IHttpContextCurrentUser currentUser)
-            : base(repository, query, unitOfWork, customerRepository, productRepository, serviceScopeFactory, new("Orçamento", "orcamento"), currentUser)
+        public BudgetService(IBudgetRepository repository, IBudgetQuery query, IUnitOfWork unitOfWork, IMapper mapper, IOrderService orderService, ICustomerRepository customerRepository, IServiceScopeFactory serviceScopeFactory, IHttpContextCurrentUser currentUser)
+            : base(repository, query, unitOfWork, customerRepository, serviceScopeFactory, new("Orçamento", "orcamento"), currentUser)
         {
             _mapper = mapper;
             _orderService = orderService;

@@ -3,9 +3,9 @@ import { ActivityIndicator, Platform, ScrollView, Text, TouchableOpacity, View }
 import { Breadcrumb } from '../../../../Components/Breadcrumb';
 import { DateField } from '../../../../Components/DateField';
 import { PrimaryButton } from '../../../../Components/PrimaryButton';
-import { BudgetReportService } from '../../../../../Application/Services/Commercial/Documents/Budgets/BudgetReportService';
-import { TemplateService } from '../../../../../Application/Services/TemplateService';
-import { renderTemplate } from '../../../../../Application/Services/TemplateRendererService';
+import { BudgetReportService } from '../../../../../Application/Services/Commercial/Documents/Budgets/Reports/BudgetReportService';
+import { TemplateService } from '../../../../../Application/Services/Reports/Templates/TemplateService';
+import { renderTemplate } from '../../../../../Application/Services/Reports/Templates/TemplateRendererService';
 import { IBudgetReportFilter } from '../../../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetReportFilter';
 import { IBudgetReportListing } from '../../../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetReportListing';
 import { IBudgetReport } from '../../../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetReport';
@@ -48,7 +48,7 @@ export function BudgetReportScreen({ onGoBack }: IBackOnlyScreenProps) {
   const handleGeneratePdf = async (report: IBudgetReport) => {
     if (Platform.OS !== 'web') return;
     try {
-      const template = await templateService.getTemplate('document');
+      const template = templateService.getTemplate(0);
       const html = renderTemplate(template, {
         DocumentTitle: 'Orçamento',
         Id: report.id,
@@ -59,12 +59,21 @@ export function BudgetReportScreen({ onGoBack }: IBackOnlyScreenProps) {
         ValueTotal: report.valueTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
         PaymentMethod: report.paymentMethodDescription,
       });
-      const win = (window as Window).open('', '_blank');
+      const url = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+      const win = (window as Window).open(url, '_blank');
       if (win) {
-        win.document.write(html);
-        win.document.close();
-        win.focus();
-        win.print();
+        const printAndCleanup = () => {
+          win.focus();
+          win.print();
+          URL.revokeObjectURL(url);
+        };
+        if (win.document.readyState === 'complete') {
+          printAndCleanup();
+        } else {
+          win.addEventListener('load', printAndCleanup, { once: true });
+        }
+      } else {
+        URL.revokeObjectURL(url);
       }
     } catch {
       // Handled by service

@@ -1,4 +1,4 @@
-import { IListingFilter } from '../../IListingFilter';
+import { IListingFilter } from '../../../IListingFilter';
 
 export interface IDocumentReportFilter extends IListingFilter {
   creationDateTimeStart?: string;

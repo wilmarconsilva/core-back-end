@@ -4,8 +4,6 @@ using Application.Interfaces.Services;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
 using Infrastructure.Email;
-using Infrastructure.Pdf;
-using Infrastructure.Templates;
 using Infrastructure.Persistece;
 using Infrastructure.Repositories.Commercial.Documents.Budgets;
 using Infrastructure.Repositories.Commercial.Documents.Orders;
@@ -56,8 +54,6 @@ public static class InfrastructureServiceExtensions
     {
         services.Configure<EmailOptions>(configuration.GetSection(EmailOptions.SectionName));
         services.AddScoped<IEmailService, SmtpEmailService>();
-        services.AddScoped<IPdfService, PdfService>();
-        services.AddSingleton<ITemplateRenderer, EmbeddedTemplateRenderer>();
     }
 
     private static void AddRepositories(IServiceCollection services)

@@ -1,15 +1,10 @@
-import { APIConsumerService } from '../../../APIConsumerService';
 import { IOrderReportService } from '../../../../Interfaces/Services/IOrderReportService';
 import { IOrderReportFilter } from '../../../../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReportFilter';
 import { IOrderReportListing } from '../../../../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReportListing';
-import { buildQueryParams } from '../../../Utilities/QueryUtilities';
+import { ReportService } from '../../../Reports/ReportService';
 
-export class OrderReportService extends APIConsumerService implements IOrderReportService {
+export class OrderReportService extends ReportService implements IOrderReportService {
   async getReport(filter: IOrderReportFilter): Promise<IOrderReportListing> {
-    const params = buildQueryParams(filter);
-    return this.request<IOrderReportListing>(`/ordersreport?${params}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return super.getReport(filter, '/ordersreport');
   }
 }

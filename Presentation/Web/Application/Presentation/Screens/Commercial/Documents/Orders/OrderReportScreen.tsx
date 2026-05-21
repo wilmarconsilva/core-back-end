@@ -4,8 +4,8 @@ import { Breadcrumb } from '../../../../Components/Breadcrumb';
 import { DateField } from '../../../../Components/DateField';
 import { PrimaryButton } from '../../../../Components/PrimaryButton';
 import { OrderReportService } from '../../../../../Application/Services/Commercial/Documents/Orders/OrderReportService';
-import { TemplateService } from '../../../../../Application/Services/TemplateService';
-import { renderTemplate } from '../../../../../Application/Services/TemplateRendererService';
+import { TemplateService } from '../../../../../Application/Services/Reports/Templates/TemplateService';
+import { renderTemplate } from '../../../../../Application/Services/Reports/Templates/TemplateRendererService';
 import { IOrderReportFilter } from '../../../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReportFilter';
 import { IOrderReportListing } from '../../../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReportListing';
 import { IOrderReport } from '../../../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReport';
@@ -48,7 +48,7 @@ export function OrderReportScreen({ onGoBack }: IBackOnlyScreenProps) {
   const handleGeneratePdf = async (report: IOrderReport) => {
     if (Platform.OS !== 'web') return;
     try {
-      const template = await templateService.getTemplate('document');
+      const template = templateService.getTemplate(0);
       const html = renderTemplate(template, {
         DocumentTitle: 'Pedido',
         Id: report.id,
@@ -59,12 +59,21 @@ export function OrderReportScreen({ onGoBack }: IBackOnlyScreenProps) {
         ValueTotal: report.valueTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
         PaymentMethod: report.paymentMethodDescription,
       });
-      const win = (window as Window).open('', '_blank');
+      const url = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+      const win = (window as Window).open(url, '_blank');
       if (win) {
-        win.document.write(html);
-        win.document.close();
-        win.focus();
-        win.print();
+        const printAndCleanup = () => {
+          win.focus();
+          win.print();
+          URL.revokeObjectURL(url);
+        };
+        if (win.document.readyState === 'complete') {
+          printAndCleanup();
+        } else {
+          win.addEventListener('load', printAndCleanup, { once: true });
+        }
+      } else {
+        URL.revokeObjectURL(url);
       }
     } catch {
       // Handled by service
