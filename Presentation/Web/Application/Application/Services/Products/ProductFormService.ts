@@ -1,5 +1,5 @@
 import { IValidationRule } from '../../Hooks/UseFormValidation';
-import { MeasureUnit, MeasureUnitLabels } from '../../Domain/ValueObjects/Enums/Products/MeasureUnit';
+import { MeasureUnit, MeasureUnitLabels } from '../../../Domain/ValueObjects/Enums/Products/MeasureUnit';
 import { IProductDetailDto } from '../../Interfaces/DataTransferObjects/Products/IProductDetailDto';
 import { IProductSaveDto } from '../../Interfaces/DataTransferObjects/Products/IProductSaveDto';
 

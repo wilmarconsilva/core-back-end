@@ -6,6 +6,7 @@ import { UseBudgets } from '../../../../../Application/Hooks/UseBudgets';
 import { IBudgetListing } from '../../../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListing';
 import { IBudgetListingFilter } from '../../../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListingFilter';
 import { ICrudListScreenProps } from '../../../../Interfaces/Screens/ICrudListScreenProps';
+import { ConfirmDialog } from '../../../../Components/ConfirmDialog';
 import { colors } from '../../../../Styles';
 import { CommercialDocumentListScreen } from '../CommercialDocumentListScreen';
 
@@ -13,6 +14,8 @@ export function BudgetsListScreen({ onGoBack, onNavigateToForm }: ICrudListScree
   const { listings, isLoadingList, isDeleting, loadAll, remove, isCreatingOrder, createOrderByBudget } = UseBudgets();
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [createOrderDialogVisible, setCreateOrderDialogVisible] = useState(false);
+  const [createOrderTarget, setCreateOrderTarget] = useState<IBudgetListing | null>(null);
 
   const buildFilter = useCallback((p: number, pageSize: number): IBudgetListingFilter => ({
     registersStart: (p - 1) * pageSize,
@@ -27,12 +30,27 @@ export function BudgetsListScreen({ onGoBack, onNavigateToForm }: ICrudListScree
     buildFilter,
   });
 
-  const handleCreateOrder = async (budgetId: number) => {
-    await createOrderByBudget(budgetId);
-    listState.reloadCurrentPage();
+  const openCreateOrderConfirm = (item: IBudgetListing) => {
+    setCreateOrderTarget(item);
+    setCreateOrderDialogVisible(true);
+  };
+
+  const closeCreateOrderConfirm = () => {
+    setCreateOrderDialogVisible(false);
+    setCreateOrderTarget(null);
+  };
+
+  const confirmCreateOrder = async () => {
+    if (!createOrderTarget) return;
+    const success = await createOrderByBudget(createOrderTarget.id);
+    if (success) {
+      listState.reloadCurrentPage();
+      closeCreateOrderConfirm();
+    }
   };
 
   return (
+    <>
     <CommercialDocumentListScreen<IBudgetListing>
       title="Orçamentos"
       listings={listings}
@@ -48,7 +66,7 @@ export function BudgetsListScreen({ onGoBack, onNavigateToForm }: ICrudListScree
       showCreationDate
       extraActions={(item) => (
         <TouchableOpacity
-          onPress={() => handleCreateOrder(item.id)}
+          onPress={() => openCreateOrderConfirm(item)}
           activeOpacity={0.7}
           disabled={isCreatingOrder}
         >
@@ -58,6 +76,16 @@ export function BudgetsListScreen({ onGoBack, onNavigateToForm }: ICrudListScree
       onGoBack={onGoBack}
       onNavigateToForm={onNavigateToForm}
     />
+    <ConfirmDialog
+      visible={createOrderDialogVisible}
+      title="Criar Pedido"
+      message={createOrderTarget ? `Deseja criar um pedido a partir do orçamento ${createOrderTarget.id}?` : ''}
+      onConfirm={confirmCreateOrder}
+      onCancel={closeCreateOrderConfirm}
+      isLoading={isCreatingOrder}
+      confirmLabel="Criar Pedido"
+    />
+    </>
   );
 }
 

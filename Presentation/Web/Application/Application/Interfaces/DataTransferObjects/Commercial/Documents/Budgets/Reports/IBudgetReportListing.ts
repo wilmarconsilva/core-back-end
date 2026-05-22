@@ -1,5 +1,5 @@
-import { IDocumentReportListing } from '../Reports/IDocumentReportListing';
-import { IBudgetReport } from './IBudgetReport';
-import { IBudgetReportSummary } from './IBudgetReportSummary';
+import { IDocumentReportListing } from '../../Reports/IDocumentReportListing';
+import { IDocumentReport } from '../../Reports/IDocumentReport';
+import { IDocumentReportSummary } from '../../Reports/IDocumentReportSummary';
 
-export interface IBudgetReportListing extends IDocumentReportListing<IBudgetReport, IBudgetReportSummary> {}
+export interface IBudgetReportListing extends IDocumentReportListing<IDocumentReport, IDocumentReportSummary> {}

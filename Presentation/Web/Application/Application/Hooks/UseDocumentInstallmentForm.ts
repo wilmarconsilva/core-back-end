@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useEffect } from 'react';
-import { PaymentMethod } from '../Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
+import { PaymentMethod } from '../../Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
 import {
   DocumentInstallmentFormState,
   InstallmentFormService,

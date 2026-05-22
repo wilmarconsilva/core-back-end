@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { PaymentMethod } from '../../../../Application/Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
+import { Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { PaymentMethod } from '../../../../Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
 import { ICustomerListing } from '../../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerListing';
 import { ICustomerListingFilter } from '../../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerListingFilter';
 import { IProductListing } from '../../../../Application/Interfaces/DataTransferObjects/Products/IProductListing';
@@ -79,6 +79,7 @@ export function CommercialDocumentFormScreen({
   filterProductDescription,
   setFilterProductDescription,
   handleSave,
+  onGeneratePdf,
 }: ICommercialDocumentFormScreenProps) {
   return (
     <View style={layoutStyles.screenWrapper}>
@@ -300,6 +301,14 @@ export function CommercialDocumentFormScreen({
 
         <View style={styles.documentFooterActions}>
           <SecondaryButton title="Cancelar" onPress={onGoBack} style={{ flex: 1 }} disabled={isSaving} />
+          {Platform.OS === 'web' && onGeneratePdf ? (
+            <SecondaryButton
+              title="Gerar PDF"
+              onPress={onGeneratePdf}
+              style={{ flex: 1 }}
+              disabled={isSaving || isLoadingItem}
+            />
+          ) : null}
           <PrimaryButton
             title={breadcrumbCurrentLabel === 'Editar' ? 'Salvar' : 'Criar'}
             isLoading={isSaving || isLoadingItem}

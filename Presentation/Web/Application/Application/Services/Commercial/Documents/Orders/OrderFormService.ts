@@ -35,4 +35,11 @@ export class OrderFormService {
   static buildValidationRules(form: OrderFormState) {
     return CommercialDocumentFormService.buildValidationRules(form);
   }
+
+  static formToDetail(id: number | undefined, form: OrderFormState): IOrderDetailDto {
+    return {
+      ...(CommercialDocumentFormService.formToDetailDto(id, form) as IOrderDetailDto),
+      budgetId: form.budgetId ? parseInt(form.budgetId, 10) : undefined,
+    };
+  }
 }

@@ -1,5 +1,5 @@
 import { IValidationRule } from '../../../../Hooks/UseFormValidation';
-import { PaymentMethod } from '../../../../Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
+import { PaymentMethod } from '../../../../../Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
 import { InstallmentSaveDto } from '../../../../Interfaces/DataTransferObjects/Commercial/Documents/Payments/IInstallmentSaveDto';
 import { IPaymentSaveDto } from '../../../../Interfaces/DataTransferObjects/Commercial/Documents/Payments/IPaymentSaveDto';
 import { formatCurrencyInput, parseCurrencyInput } from '../../../Utilities/CurrencyInputUtilities';

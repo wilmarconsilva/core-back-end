@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { Breadcrumb } from '../../../../Components/Breadcrumb';
 import { DateField } from '../../../../Components/DateField';
 import { PrimaryButton } from '../../../../Components/PrimaryButton';
 import { OrderReportService } from '../../../../../Application/Services/Commercial/Documents/Orders/OrderReportService';
-import { TemplateService } from '../../../../../Application/Services/Reports/Templates/TemplateService';
-import { renderTemplate } from '../../../../../Application/Services/Reports/Templates/TemplateRendererService';
-import { IOrderReportFilter } from '../../../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReportFilter';
-import { IOrderReportListing } from '../../../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReportListing';
-import { IOrderReport } from '../../../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderReport';
+import { IOrderReportFilter } from '../../../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/Reports/IOrderReportFilter';
+import { IOrderReportListing } from '../../../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/Reports/IOrderReportListing';
 import { IBackOnlyScreenProps } from '../../../../Interfaces/Screens/IBackOnlyScreenProps';
 import {
   colors,
@@ -19,7 +16,6 @@ import {
 } from '../../../../Styles';
 
 const orderReportService = new OrderReportService();
-const templateService = new TemplateService();
 
 export function OrderReportScreen({ onGoBack }: IBackOnlyScreenProps) {
   const [startDate, setStartDate] = useState('');
@@ -36,47 +32,12 @@ export function OrderReportScreen({ onGoBack }: IBackOnlyScreenProps) {
         creationDateTimeStart: startDate || undefined,
         creationDateTimeEnd: endDate || undefined,
       };
-      const result = await orderReportService.getReport(filter);
+      const result = await orderReportService.get(filter);
       setData(result);
     } catch {
       // Error handled by service
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleGeneratePdf = async (report: IOrderReport) => {
-    if (Platform.OS !== 'web') return;
-    try {
-      const template = templateService.getTemplate(0);
-      const html = renderTemplate(template, {
-        DocumentTitle: 'Pedido',
-        Id: report.id,
-        CustomerName: report.customerName,
-        CreationDateTime: new Date(report.creationDateTime).toLocaleDateString('pt-BR'),
-        Observations: report.observations ?? '',
-        ValueSubtotal: report.valueSubtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-        ValueTotal: report.valueTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-        PaymentMethod: report.paymentMethodDescription,
-      });
-      const url = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
-      const win = (window as Window).open(url, '_blank');
-      if (win) {
-        const printAndCleanup = () => {
-          win.focus();
-          win.print();
-          URL.revokeObjectURL(url);
-        };
-        if (win.document.readyState === 'complete') {
-          printAndCleanup();
-        } else {
-          win.addEventListener('load', printAndCleanup, { once: true });
-        }
-      } else {
-        URL.revokeObjectURL(url);
-      }
-    } catch {
-      // Handled by service
     }
   };
 
@@ -133,11 +94,6 @@ export function OrderReportScreen({ onGoBack }: IBackOnlyScreenProps) {
                   <Text style={styles.reportCity}>{report.customerLocalityState}</Text>
                   <Text style={styles.reportDate}>{formatDate(report.creationDateTime)}</Text>
                   <Text style={styles.reportPayment}>{report.paymentMethodDescription}</Text>
-                  {Platform.OS === 'web' && (
-                    <TouchableOpacity style={styles.pdfButton} onPress={() => handleGeneratePdf(report)} activeOpacity={0.7}>
-                      <Text style={styles.pdfButtonText}>📄 Gerar PDF</Text>
-                    </TouchableOpacity>
-                  )}
                 </View>
               ))
             )}

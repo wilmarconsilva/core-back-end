@@ -4,7 +4,7 @@ import { ICustomerListingFilter } from "../../../Application/Interfaces/DataTran
 import { IProductListing } from "../../../Application/Interfaces/DataTransferObjects/Products/IProductListing";
 import { IProductListingFilter } from "../../../Application/Interfaces/DataTransferObjects/Products/IProductListingFilter";
 import { ValidationErrors } from "../../../Application/Hooks/UseFormValidation";
-import { PaymentMethod } from "../../../Application/Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod";
+import { PaymentMethod } from "../../../Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod";
 import { IDocumentProductSaveDto } from "../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/IDocumentProductSaveDto";
 
 export interface ICommercialDocumentFormScreenProps {
@@ -61,4 +61,5 @@ export interface ICommercialDocumentFormScreenProps {
     filterProductDescription: string;
     setFilterProductDescription: (value: string) => void;
     handleSave: () => Promise<void>;
+    onGeneratePdf?: () => void;
   }

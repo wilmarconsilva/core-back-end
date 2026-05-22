@@ -1,5 +1,5 @@
 import { IValidationRule } from '../../../Hooks/UseFormValidation';
-import { PaymentMethod, PaymentMethodLabels } from '../../../Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
+import { PaymentMethod, PaymentMethodLabels } from '../../../../Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
 import { IDocumentProductSaveDto } from '../../../Interfaces/DataTransferObjects/Commercial/Documents/IDocumentProductSaveDto';
 import { IDocumentSaveDto } from '../../../Interfaces/DataTransferObjects/Commercial/Documents/IDocumentSaveDto';
 import { IPaymentSaveDto } from '../../../Interfaces/DataTransferObjects/Commercial/Documents/Payments/IPaymentSaveDto';
@@ -215,5 +215,33 @@ export class CommercialDocumentFormService {
 
         return saveProductLine as TProduct;
       });
+  }
+
+  static formToDetailDto(
+    id: number | undefined,
+    form: CommercialDocumentFormState<IDocumentProductSaveDto>,
+  ): ICommercialDocumentDetailDto & { id: number; userId: number } {
+    return {
+      id: id ?? 0,
+      userId: 0,
+      customer: { id: form.customerId, description: form.customerDisplayLabel },
+      payment: CommercialDocumentFormService.buildPayment(
+        form.paymentMethod,
+        form.discountValue,
+        form.installment,
+      ),
+      observations: form.observations.trim() || undefined,
+      customerSignatureImage: form.signature ?? undefined,
+      products: CommercialDocumentFormService.saveProductLines(form.productLines).map((line) => ({
+        id: line.id,
+        product: {
+          id: line.productId,
+          description: line.productDescription ?? '',
+        },
+        quantity: line.quantity,
+        valueUnit: line.valueUnit,
+        valueTotal: line.valueTotal,
+      })),
+    };
   }
 }

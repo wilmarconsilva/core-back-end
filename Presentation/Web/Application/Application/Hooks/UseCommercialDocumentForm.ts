@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { UseCustomers } from './UseCustomers';
 import { UseFormValidation } from './UseFormValidation';
 import { UseProducts } from './UseProducts';
-import { PaymentMethod } from '../Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
+import { PaymentMethod } from '../../Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
 import { ICustomerListing } from '../Interfaces/DataTransferObjects/Persons/Customers/ICustomerListing';
 import { IDocumentProductSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/IDocumentProductSaveDto';
 import { IPaymentSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Payments/IPaymentSaveDto';
@@ -35,6 +35,7 @@ interface ICommercialDocumentFormService<
   detailToForm: (detail: TDetail) => TFormState;
   buildValidationRules: (form: TFormState) => IValidationRule[];
   buildSaveDto: (id: number | undefined, form: TFormState) => TSaveDto;
+  formToDetail: (id: number | undefined, form: TFormState) => TDetail;
 }
 
 interface UseCommercialDocumentFormConfig<
@@ -205,6 +206,7 @@ export function UseCommercialDocumentForm<
     filterProductDescription,
     setFilterProductDescription,
     handleSave,
+    buildDetailFromForm: () => formService.formToDetail(id, currentForm()),
     ...extraReturn,
   };
 }

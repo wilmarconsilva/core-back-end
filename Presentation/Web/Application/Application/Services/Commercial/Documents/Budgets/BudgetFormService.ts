@@ -24,4 +24,8 @@ export class BudgetFormService {
   static buildValidationRules(form: BudgetFormState) {
     return CommercialDocumentFormService.buildValidationRules(form);
   }
+
+  static formToDetail(id: number | undefined, form: BudgetFormState): IBudgetDetailDto {
+    return CommercialDocumentFormService.formToDetailDto(id, form) as IBudgetDetailDto;
+  }
 }
