@@ -34,6 +34,8 @@ namespace Domain.Entities.Commercial.Documents
 
         public byte[]? CustomerSignatureImage { get; set; }
 
+        public byte[]? PDF { get; set; }
+
         public IReadOnlyCollection<TProduct> Products => _products;
 
         /// <summary>
@@ -41,18 +43,19 @@ namespace Domain.Entities.Commercial.Documents
         /// </summary>
         protected Document() { }
 
-        protected Document(long userId, long customerId, Payment payment, string? observations, byte[]? customerSignatureImage, IReadOnlyCollection<TProduct> products)
+        protected Document(long userId, DateTime creationDateTime, long customerId, Payment payment, string? observations, byte[]? customerSignatureImage, byte[]? pdf, IReadOnlyCollection<TProduct> products)
         {
-            CreationDateTime = DateTime.UtcNow;
-            Fill(userId, customerId, payment, observations, customerSignatureImage, products);
+            CreationDateTime = creationDateTime;
+            Fill(userId, customerId, payment, observations, customerSignatureImage, pdf, products);
         }
 
-        public void Fill(long userId, long customerId, Payment payment, string? observations, byte[]? customerSignatureImage, IReadOnlyCollection<TProduct> products)
+        public void Fill(long userId, long customerId, Payment payment, string? observations, byte[]? customerSignatureImage, byte[]? pdf, IReadOnlyCollection<TProduct> products)
         {
             LastUpdateDateTime = DateTime.UtcNow;
             SetUserId(userId);
             SetCustomerId(customerId);
             _payment = payment;
+            PDF = pdf;
 
             if (products == null || !products.Any())
                 throw new BusinessRuleException($"O Orçamento: {this.Description} deve possuir ao menos um produto.");
@@ -62,6 +65,7 @@ namespace Domain.Entities.Commercial.Documents
             SetValues();
             Observations = observations;
             CustomerSignatureImage = customerSignatureImage;
+            PDF = pdf;
         }
 
         protected override string GetDescription()

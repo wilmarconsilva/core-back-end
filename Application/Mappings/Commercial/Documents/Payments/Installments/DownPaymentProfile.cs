@@ -5,9 +5,6 @@ namespace Application.Mappings.Commercial.Documents.Budgets
 {
     public class DownPaymentProfile : CrudProfile<DownPaymentSaveDto, DownPayment>
     {
-        public DownPaymentProfile()
-        {
 
-        }
     }
 }

@@ -11,5 +11,7 @@ namespace Domain.Interfaces.Entities.Commercial
         string? Observations { get; }
 
         DateTime CreationDateTime { get; }
+
+        public byte[]? PDF { get; }
     }
 }

@@ -1,8 +1,8 @@
-import { IProductReferenceDto } from '../../../Products/IProductReferenceDto';
+import { IEntityReferenceDto } from '../../../Entities/IEntityReferenceDto';
 
 export interface IOrderProductDetailDto {
   id: number;
-  product: IProductReferenceDto;
+  product: IEntityReferenceDto;
   quantity: number;
   valueUnit: number;
   valueTotal: number;

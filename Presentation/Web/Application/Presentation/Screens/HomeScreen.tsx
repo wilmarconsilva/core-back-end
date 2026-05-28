@@ -14,12 +14,12 @@ import { ProductsListScreen } from './Products/ProductsListScreen';
 import { ProductFormScreen } from './Products/ProductFormScreen';
 import { LocalitiesListScreen } from './Localities/LocalitiesListScreen';
 import { LocalityFormScreen } from './Localities/LocalityFormScreen';
-import { BudgetsListScreen } from './Budgets/BudgetsListScreen';
-import { BudgetFormScreen } from './Budgets/BudgetFormScreen';
-import { OrdersListScreen } from './Orders/OrdersListScreen';
-import { OrderFormScreen } from './Orders/OrderFormScreen';
-import { BudgetReportScreen } from './Budgets/BudgetReportScreen';
-import { OrderReportScreen } from './Orders/OrderReportScreen';
+import { BudgetsListScreen } from './Commercial/Documents/Budgets/BudgetsListScreen';
+import { BudgetFormScreen } from './Commercial/Documents/Budgets/BudgetFormScreen';
+import { OrdersListScreen } from './Commercial/Documents/Orders/OrdersListScreen';
+import { OrderFormScreen } from './Commercial/Documents/Orders/OrderFormScreen';
+import { BudgetReportScreen } from './Commercial/Documents/Budgets/BudgetReportScreen';
+import { OrderReportScreen } from './Commercial/Documents/Orders/OrderReportScreen';
 
 function HomeMenuScreen({ userName, navigate }: IHomeMenuProps) {
   return (

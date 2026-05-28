@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { CustomerService } from '../Services/CustomerService';
+import { CustomerService } from '../Services/Customers/CustomerService';
 import { ICustomerSaveDto } from '../Interfaces/DataTransferObjects/Persons/Customers/ICustomerSaveDto';
 import { ICustomerDetailDto } from '../Interfaces/DataTransferObjects/Persons/Customers/ICustomerDetailDto';
 import { ICustomerListing } from '../Interfaces/DataTransferObjects/Persons/Customers/ICustomerListing';

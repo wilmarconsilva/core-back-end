@@ -5,9 +5,6 @@ namespace Application.Mappings.Commercial.Documents.Budgets
 {
     public class InstallmentProfile : CrudProfile<InstallmentSaveDto, Installment>
     {
-        public InstallmentProfile()
-        {
 
-        }
     }
 }

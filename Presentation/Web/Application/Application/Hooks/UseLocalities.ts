@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { LocalityService } from '../Services/LocalityService';
+import { LocalityService } from '../Services/Localities/LocalityService';
 import { ILocalitySaveDto } from '../Interfaces/DataTransferObjects/Localities/ILocalitySaveDto';
 import { ILocalityDetailDto } from '../Interfaces/DataTransferObjects/Localities/ILocalityDetailDto';
 import { ILocalityListing } from '../Interfaces/DataTransferObjects/Localities/ILocalityListing';

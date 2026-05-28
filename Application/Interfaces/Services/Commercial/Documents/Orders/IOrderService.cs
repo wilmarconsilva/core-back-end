@@ -6,6 +6,6 @@ namespace Application.Interfaces.Services.Commercial.Documents.Orders
 {
     public interface IOrderService : ICrudService<OrderSaveDto, OrderDetailDto, OrderListing, OrderListingFilter>
     {
-        Task<OrderDetailDto> CreateByBudgetAsync(Budget budget, CancellationToken cancellationToken);
+        Task<OrderDetailDto> CreateByBudgetAsync(Budget budget, OrderByBudgetDto orderByBudgetDto, CancellationToken cancellationToken);
     }
 }

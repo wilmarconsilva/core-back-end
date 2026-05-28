@@ -1,7 +1,7 @@
-import { IStateReferenceDto } from '../Territories/IStateReferenceDto';
+import { IEntityReferenceDto } from '../Entities/IEntityReferenceDto';
 
 export interface ILocalityDetailDto {
   id: number;
   description: string;
-  state?: IStateReferenceDto;
+  state?: IEntityReferenceDto;
 }
