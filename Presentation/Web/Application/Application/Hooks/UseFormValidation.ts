@@ -18,7 +18,7 @@ interface UseFormValidationResult {
 }
 
 const DEFAULT_REQUIRED_MESSAGE = 'Campo obrigatório';
-const REQUIRED_FIELDS_TOAST_MESSAGE = 'Por favor, preencha os campos obrigatórios.';
+const REQUIRED_FIELDS_TOAST_MESSAGE = 'Por favor, preencha os campos obrigatórios com valores válidos.';
 
 function removeKey(record: ValidationErrors, key: string): ValidationErrors {
   if (!(key in record)) return record;

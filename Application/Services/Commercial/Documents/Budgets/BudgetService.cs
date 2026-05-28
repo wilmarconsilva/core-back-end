@@ -3,6 +3,7 @@ using Application.DataTransferObjects.Commercial.Documents.Budgets;
 using Application.DataTransferObjects.Commercial.Documents.Budgets.Listings;
 using Application.DataTransferObjects.Commercial.Documents.Orders;
 using Application.Interfaces.Queries.Commercial.Documents.Budgets;
+using Application.Interfaces.Security;
 using Application.Interfaces.Services.Commercial.Documents;
 using Application.Interfaces.Services.Commercial.Documents.Orders;
 using AutoMapper;
@@ -21,8 +22,8 @@ namespace Application.Services.Commercial.Documents.Budgets
         private readonly IMapper _mapper;
         private readonly IOrderService _orderService;
 
-        public BudgetService(IBudgetRepository repository, IBudgetQuery query, IUnitOfWork unitOfWork, IMapper mapper, IOrderService orderService, ICustomerRepository customerRepository, IProductRepository productRepository, IServiceScopeFactory serviceScopeFactory)
-            : base(repository, query, unitOfWork, customerRepository, productRepository, serviceScopeFactory, new("Orçamento", "orcamento"))
+        public BudgetService(IBudgetRepository repository, IBudgetQuery query, IUnitOfWork unitOfWork, IMapper mapper, IOrderService orderService, ICustomerRepository customerRepository, IServiceScopeFactory serviceScopeFactory, IHttpContextCurrentUser currentUser)
+            : base(repository, query, unitOfWork, customerRepository, serviceScopeFactory, new("Orçamento", "orcamento"), currentUser)
         {
             _mapper = mapper;
             _orderService = orderService;
@@ -36,7 +37,7 @@ namespace Application.Services.Commercial.Documents.Budgets
 
             Payment payment = CreatePayment(dto);
 
-            return new Budget(dto.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products);
+            return new Budget(_currentUser.UserId, dto.CreationDateTime, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, dto.PDF, products);
         }
 
         protected override void UpdateEntity(BudgetSaveDto dto, Budget entity)
@@ -44,17 +45,17 @@ namespace Application.Services.Commercial.Documents.Budgets
             IReadOnlyCollection<BudgetProduct> products = _mapper.Map<IReadOnlyCollection<BudgetProduct>>(dto.Products);
             Payment payment = CreatePayment(dto);
 
-            entity.Fill(dto.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products);
+            entity.Fill(_currentUser.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, dto.PDF, products);
         }
 
-        public async Task<OrderDetailDto> CreateOrderByBudget(long id, CancellationToken cancellationToken)
+        public async Task<OrderDetailDto> CreateOrderByBudget(long id, OrderByBudgetDto orderByBudgetDto, CancellationToken cancellationToken)
         {
             Budget? budget = (await _repositoryCrud.GetByIdsAsync([id], cancellationToken)).FirstOrDefault();
 
             if (budget == null)
                 throw new BusinessRuleException(GetNotFoundMessage([id]));
 
-            return await _orderService.CreateByBudgetAsync(budget, cancellationToken);
+            return await _orderService.CreateByBudgetAsync(budget, orderByBudgetDto, cancellationToken);
         }
 
         protected override Task<bool> EntitiesCanBeDeleted(IEnumerable<long> ids)

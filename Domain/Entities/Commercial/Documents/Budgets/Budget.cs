@@ -9,8 +9,8 @@ namespace Domain.Entities.Commercial.Documents.Budgets
         /// </summary>
         public Budget() { }
 
-        public Budget(long userId, long customerId, Payment payment, string? observations, byte[]? customerSignatureImage, IReadOnlyCollection<BudgetProduct> products)
-            : base(userId, customerId, payment, observations, customerSignatureImage, products)
+        public Budget(long userId, DateTime creationDateTime, long customerId, Payment payment, string? observations, byte[]? customerSignatureImage, byte[]? pdf, IReadOnlyCollection<BudgetProduct> products)
+            : base(userId, creationDateTime, customerId, payment, observations, customerSignatureImage, pdf, products)
         {
         }
     }

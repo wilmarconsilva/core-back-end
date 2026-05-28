@@ -1,10 +1,10 @@
-import { ILocalityReferenceDto } from '../../Localities/ILocalityReferenceDto';
+import { IEntityReferenceDto } from '../../Entities/IEntityReferenceDto';
 
 export interface ICustomerAddressDetailDto {
   id: number;
   neighborhood: string;
   street: string;
-  locality: ILocalityReferenceDto;
+  locality: IEntityReferenceDto;
   complement?: string;
   postalCode?: string;
   number?: string;

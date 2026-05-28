@@ -1,11 +1,11 @@
-import { ICustomerReferenceDto } from '../../../Persons/Customers/ICustomerReferenceDto';
+import { IEntityReferenceDto } from '../../../Entities/IEntityReferenceDto';
 import { IPaymentSaveDto } from '../Payments/IPaymentSaveDto';
 import { IOrderProductDetailDto } from './IOrderProductDetailDto';
 
 export interface IOrderDetailDto {
   id: number;
   userId: number;
-  customer: ICustomerReferenceDto;
+  customer: IEntityReferenceDto;
   budgetId?: number;
   payment: IPaymentSaveDto;
   observations?: string;

@@ -1,7 +1,7 @@
 using Application.DataTransferObjects.Commercial.Documents.Orders;
 using Application.DataTransferObjects.Commercial.Documents.Orders.Listings;
 using Application.Interfaces.Queries.Commercial.Documents.Orders;
-using System;
+using Application.Interfaces.Security;
 using Application.Interfaces.Services.Commercial.Documents.Orders;
 using AutoMapper;
 using Domain.Entities.Commercial.Documents;
@@ -18,23 +18,17 @@ namespace Application.Services.Commercial.Documents.Orders
     {
         private readonly IMapper _mapper;
 
-        public OrderService(IOrderRepository repository, IOrderQuery query, IUnitOfWork unitOfWork, IMapper mapper, ICustomerRepository customerRepository, IProductRepository productRepository, IServiceScopeFactory serviceScopeFactory)
-            : base(repository, query, unitOfWork, customerRepository, productRepository, serviceScopeFactory, new("Pedido", "pedido"))
+        public OrderService(IOrderRepository repository, IOrderQuery query, IUnitOfWork unitOfWork, IMapper mapper, ICustomerRepository customerRepository, IServiceScopeFactory serviceScopeFactory, IHttpContextCurrentUser currentUser)
+            : base(repository, query, unitOfWork, customerRepository, serviceScopeFactory, new("Pedido", "pedido"), currentUser)
         {
             _mapper = mapper;
         }
 
         protected override IEnumerable<DocumentProduct> GetProducts(Order entity) => entity.Products;
 
-        protected override void AppendExtraTemplateFields(Order entity, Dictionary<string, object> model)
+        public async Task<OrderDetailDto> CreateByBudgetAsync(Budget budget, OrderByBudgetDto orderByBudgetDto, CancellationToken cancellationToken)
         {
-            if (entity.BudgetId.HasValue)
-                model["BudgetId"] = entity.BudgetId.Value;
-        }
-
-        public async Task<OrderDetailDto> CreateByBudgetAsync(Budget budget, CancellationToken cancellationToken)
-        {
-            Order order = new Order(budget);
+            Order order = new Order(budget, orderByBudgetDto.CreationDateTime);
 
             await SaveAsync([order], cancellationToken);
 
@@ -51,7 +45,7 @@ namespace Application.Services.Commercial.Documents.Orders
 
             Payment payment = CreatePayment(dto);
 
-            return new Order(dto.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products, dto.BudgetId);
+            return new Order(_currentUser.UserId, dto.CreationDateTime, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, dto.PDF, products, dto.BudgetId);
         }
 
         protected override void UpdateEntity(OrderSaveDto dto, Order entity)
@@ -59,7 +53,7 @@ namespace Application.Services.Commercial.Documents.Orders
             List<OrderProduct> products = _mapper.Map<List<OrderProduct>>(dto.Products);
             Payment payment = CreatePayment(dto);
 
-            entity.Fill(dto.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, products);
+            entity.Fill(_currentUser.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, dto.PDF, products);
         }
 
         protected override Task<bool> EntitiesCanBeDeleted(IEnumerable<long> ids)

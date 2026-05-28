@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { ProductService } from '../Services/ProductService';
+import { ProductService } from '../Services/Products/ProductService';
 import { IProductSaveDto } from '../Interfaces/DataTransferObjects/Products/IProductSaveDto';
 import { IProductDetailDto } from '../Interfaces/DataTransferObjects/Products/IProductDetailDto';
 import { IProductListing } from '../Interfaces/DataTransferObjects/Products/IProductListing';

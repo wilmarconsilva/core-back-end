@@ -18,7 +18,7 @@ namespace Infrastructure.Queries.Commercial.Documents
         {
         }
 
-        public async Task<List<TListing>> GetAll(TFilter filter, CancellationToken cancellationToken)
+        public virtual async Task<List<TListing>> GetAll(TFilter filter, CancellationToken cancellationToken)
         {
             IQueryable<TEntity> query = _query;
 
@@ -44,6 +44,7 @@ namespace Infrastructure.Queries.Commercial.Documents
                             .Select(address => address.Locality!.Description + (address.Locality.State == null ? string.Empty : $" - {address.Locality.State.Acronym}"))
                             .FirstOrDefault() ?? string.Empty,
                     ValueTotal = document.ValueTotal,
+                    CreationDateTime = document.CreationDateTime
                 })
                 .ToListAsync(cancellationToken);
         }

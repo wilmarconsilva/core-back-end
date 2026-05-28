@@ -1,0 +1,26 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "expo web",
+      "type": "process",
+      "command": "npm.cmd",
+      "args": ["run", "web"],
+      "options": {
+        "cwd": "${workspaceFolder}/Presentation/Web/Application"
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "expo",
+        "pattern": {
+          "regexp": "."
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting Metro Bundler",
+          "endsPattern": "(Web: http://localhost|Web Bundled)"
+        }
+      }
+    }
+  ]
+}

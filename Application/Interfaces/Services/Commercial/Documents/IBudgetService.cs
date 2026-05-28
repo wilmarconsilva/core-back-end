@@ -7,6 +7,6 @@ namespace Application.Interfaces.Services.Commercial.Documents
 {
     public interface IBudgetService : ICrudService<BudgetSaveDto, DocumentDetailDto, BudgetListing, BudgetListingFilter>
     {
-        Task<OrderDetailDto> CreateOrderByBudget(long id, CancellationToken cancellationToken);
+        Task<OrderDetailDto> CreateOrderByBudget(long id, OrderByBudgetDto orderByBudgetDto, CancellationToken cancellationToken);
     }
 }

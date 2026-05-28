@@ -9,7 +9,7 @@ namespace Application.DataTransferObjects.Commercial.Documents
         [System.Text.Json.Serialization.JsonIgnore]
         public override long Id { get; set; }
 
-        public required long UserId { get; set; }
+        public required DateTime CreationDateTime { get; set; }
 
         public required long CustomerId { get; set; }
 
@@ -20,6 +20,8 @@ namespace Application.DataTransferObjects.Commercial.Documents
         public string? Observations { get; set; }
 
         public byte[]? CustomerSignatureImage { get; set; }
+
+        public byte[]? PDF { get; set; }
 
         public required List<TDocumentProductSaveDto> Products { get; set; }
     }

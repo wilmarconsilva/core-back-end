@@ -1,97 +1,110 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import SignaturePad from 'signature_pad';
 import { ISignatureCanvasProps } from '../Interfaces/SignatureCanvas/ISignatureCanvasProps';
 import { signatureCanvasStyles as styles } from '../Styles';
 
-export function SignatureCanvas({ onSignatureChange, width = 400, height = 200 }: ISignatureCanvasProps) {
+function toPngBase64(dataUrl: string): string {
+  return dataUrl.replace(/^data:image\/png;base64,/, '');
+}
+
+function toDataUrl(base64: string): string {
+  return base64.startsWith('data:') ? base64 : `data:image/png;base64,${base64}`;
+}
+
+function resizeCanvas(canvas: HTMLCanvasElement): void {
+  const ratio = Math.max(window.devicePixelRatio || 1, 1);
+  const displayWidth = canvas.offsetWidth;
+  const displayHeight = canvas.offsetHeight;
+  if (displayWidth === 0 || displayHeight === 0) return;
+
+  canvas.width = Math.floor(displayWidth * ratio);
+  canvas.height = Math.floor(displayHeight * ratio);
+  canvas.getContext('2d')?.scale(ratio, ratio);
+}
+
+export function SignatureCanvas({ value = null, onSignatureChange, width, height = 200 }: ISignatureCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const isDrawingRef = useRef(false);
+  const padRef = useRef<SignaturePad | null>(null);
+  const loadedValueRef = useRef<string | null>(null);
   const [hasSignature, setHasSignature] = useState(false);
 
-  const getContext = useCallback(() => {
-    return canvasRef.current?.getContext('2d') ?? null;
+  const applyValue = useCallback(async (base64: string | null) => {
+    const pad = padRef.current;
+    if (!pad) return;
+
+    if (!base64) {
+      pad.clear();
+      setHasSignature(false);
+      return;
+    }
+
+    await pad.fromDataURL(toDataUrl(base64));
+    setHasSignature(!pad.isEmpty());
   }, []);
 
-  const getPos = useCallback((e: MouseEvent | TouchEvent, canvas: HTMLCanvasElement) => {
-    const rect = canvas.getBoundingClientRect();
-    const clientX = 'touches' in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : (e as MouseEvent).clientY;
-    return {
-      x: clientX - rect.left,
-      y: clientY - rect.top,
-    };
-  }, []);
-
-  const emitSignature = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const dataUrl = canvas.toDataURL('image/png');
-    onSignatureChange(dataUrl.replace(/^data:image\/png;base64,/, ''));
+  const syncSignature = useCallback(() => {
+    const pad = padRef.current;
+    if (!pad || pad.isEmpty()) return;
+    const base64 = toPngBase64(pad.toDataURL('image/png'));
+    loadedValueRef.current = base64;
+    onSignatureChange(base64);
     setHasSignature(true);
   }, [onSignatureChange]);
 
   const handleClear = useCallback(() => {
-    const canvas = canvasRef.current;
-    const ctx = getContext();
-    if (!canvas || !ctx) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    padRef.current?.clear();
+    loadedValueRef.current = null;
     onSignatureChange(null);
     setHasSignature(false);
-  }, [getContext, onSignatureChange]);
+  }, [onSignatureChange]);
 
   useEffect(() => {
     if (Platform.OS !== 'web') return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const pad = new SignaturePad(canvas, {
+      penColor: '#000000',
+      minWidth: 1,
+      maxWidth: 2.5,
+    });
+    padRef.current = pad;
+    pad.addEventListener('endStroke', syncSignature);
 
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 2;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
-    const onStart = (e: MouseEvent | TouchEvent) => {
-      e.preventDefault();
-      isDrawingRef.current = true;
-      const pos = getPos(e, canvas);
-      ctx.beginPath();
-      ctx.moveTo(pos.x, pos.y);
+    const handleResize = () => {
+      const snapshot = !pad.isEmpty() ? pad.toDataURL() : null;
+      resizeCanvas(canvas);
+      pad.clear();
+      if (snapshot) {
+        void pad.fromDataURL(snapshot);
+      }
     };
 
-    const onMove = (e: MouseEvent | TouchEvent) => {
-      e.preventDefault();
-      if (!isDrawingRef.current) return;
-      const pos = getPos(e, canvas);
-      ctx.lineTo(pos.x, pos.y);
-      ctx.stroke();
-    };
+    handleResize();
+    loadedValueRef.current = value;
+    void applyValue(value);
 
-    const onEnd = () => {
-      if (!isDrawingRef.current) return;
-      isDrawingRef.current = false;
-      emitSignature();
-    };
-
-    canvas.addEventListener('mousedown', onStart);
-    canvas.addEventListener('mousemove', onMove);
-    canvas.addEventListener('mouseup', onEnd);
-    canvas.addEventListener('mouseleave', onEnd);
-    canvas.addEventListener('touchstart', onStart, { passive: false });
-    canvas.addEventListener('touchmove', onMove, { passive: false });
-    canvas.addEventListener('touchend', onEnd);
+    const resizeObserver = new ResizeObserver(handleResize);
+    resizeObserver.observe(canvas);
+    window.addEventListener('resize', handleResize);
 
     return () => {
-      canvas.removeEventListener('mousedown', onStart);
-      canvas.removeEventListener('mousemove', onMove);
-      canvas.removeEventListener('mouseup', onEnd);
-      canvas.removeEventListener('mouseleave', onEnd);
-      canvas.removeEventListener('touchstart', onStart);
-      canvas.removeEventListener('touchmove', onMove);
-      canvas.removeEventListener('touchend', onEnd);
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', handleResize);
+      pad.removeEventListener('endStroke', syncSignature);
+      pad.off();
+      padRef.current = null;
     };
-  }, [getPos, emitSignature]);
+  }, [syncSignature, applyValue, width, height]);
+
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+    const next = value ?? null;
+    if (next === loadedValueRef.current) return;
+    loadedValueRef.current = next;
+    void applyValue(next);
+  }, [value, applyValue]);
 
   if (Platform.OS !== 'web') {
     return (
@@ -104,18 +117,21 @@ export function SignatureCanvas({ onSignatureChange, width = 400, height = 200 }
     );
   }
 
+  const canvasStyle = {
+    width: width ?? '100%',
+    height,
+    display: 'block' as const,
+    cursor: 'crosshair',
+    touchAction: 'none' as const,
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Assinatura do Cliente</Text>
-      <Text style={styles.instructions}>Assine no campo abaixo usando o mouse ou toque.</Text>
-      <View style={styles.canvasWrapper}>
-        {/* @ts-ignore */}
-        <canvas
-          ref={canvasRef}
-          width={width}
-          height={height}
-          style={{ display: 'block', cursor: 'crosshair', touchAction: 'none' }}
-        />
+      <Text style={styles.instructions}>Assine no campo abaixo usando o mouse, toque ou caneta.</Text>
+      <View style={[styles.canvasWrapper, { height }]}>
+        {/* @ts-ignore — canvas é elemento web */}
+        <canvas ref={canvasRef} style={canvasStyle} />
       </View>
       {hasSignature && (
         <TouchableOpacity style={styles.clearButton} onPress={handleClear} activeOpacity={0.7}>
