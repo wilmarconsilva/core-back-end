@@ -22,6 +22,7 @@ export class DocumentTemplateMapper {
       valueSubtotal: currencyFormat(valueSubtotal),
       valueTotal: currencyFormat(valueTotal),
       paymentMethod: PaymentMethodLabels[detail.payment.method],
+      customerSignatureImage: detail.customerSignatureImage,
     };
   }
 }

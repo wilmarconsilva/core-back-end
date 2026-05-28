@@ -10,7 +10,7 @@ const budgetService = new BudgetService();
 
 export function BudgetFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
   const form = UseBudgetForm(id, onGoBack);
-  const { printHtml, printHost } = UseDocumentPrint();
+  const { printHtml } = UseDocumentPrint();
 
   const handleGeneratePdf = () => budgetService.generatePdf(form.buildDetailFromForm(), printHtml);
 
@@ -25,7 +25,6 @@ export function BudgetFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
         onGoBack={onGoBack}
         onGeneratePdf={handleGeneratePdf}
       />
-      {printHost}
     </View>
   );
 }

@@ -10,7 +10,7 @@ const orderService = new OrderService();
 
 export function OrderFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
   const form = UseOrderForm(id, onGoBack);
-  const { printHtml, printHost } = UseDocumentPrint();
+  const { printHtml } = UseDocumentPrint();
 
   const handleGeneratePdf = () => orderService.generatePdf(form.buildDetailFromForm(), printHtml);
 
@@ -25,7 +25,6 @@ export function OrderFormScreen({ id, onGoBack }: IEntityFormScreenProps) {
         onGoBack={onGoBack}
         onGeneratePdf={handleGeneratePdf}
       />
-      {printHost}
     </View>
   );
 }

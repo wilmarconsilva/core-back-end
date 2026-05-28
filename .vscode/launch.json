@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "Expo Web",
-      "type": "msedge",
+      "type": "chrome",
       "request": "launch",
       "url": "http://localhost:8081",
       "webRoot": "${workspaceFolder}/Presentation/Web/Application",

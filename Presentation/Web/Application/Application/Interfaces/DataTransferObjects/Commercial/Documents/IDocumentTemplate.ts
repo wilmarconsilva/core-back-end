@@ -7,4 +7,5 @@ export interface IDocumentTemplate {
   valueSubtotal: string;
   valueTotal: string;
   paymentMethod: string;
+  customerSignatureImage?: string;
 }

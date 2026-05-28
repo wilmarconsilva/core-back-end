@@ -93,6 +93,8 @@ namespace Infrastructure.Persistence.Mappings.Commercial.Documents
                 .HasColumnName("last_update_date_time")
                 .IsRequired();
 
+            builder.Ignore(d => d.PDF);
+
             // Relacionamentos
             builder.Property(dp => dp.UserId)
                 .HasColumnName("user_id")
