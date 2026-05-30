@@ -19,9 +19,9 @@ export function DecimalField({
     <FormField label={label} error={error}>
       <CurrencyInput
         value={value}
-        onChangeValue={(newValue) => onChangeValue(newValue ?? 0)}
+        onChangeValue={(newValue) => onChangeValue?.(newValue ?? 0)}
         separator=","
-        delimiter=""
+        delimiter="."
         precision={PRECISION}
         minValue={0}
         editable={editable}

@@ -5,8 +5,6 @@ import { IDocumentSaveDto } from '../../../Interfaces/DataTransferObjects/Commer
 import { IPaymentSaveDto } from '../../../Interfaces/DataTransferObjects/Commercial/Documents/Payments/IPaymentSaveDto';
 import { IEntityReferenceDto } from '../../../Interfaces/DataTransferObjects/Entities/IEntityReferenceDto';
 import { DocumentInstallmentFormState, InstallmentFormService } from './Payments/InstallmentFormService';
-import { formatCurrencyInput, parseCurrencyInput } from '../../Utilities/CurrencyInputUtilities';
-
 interface DocumentProductDetail {
   id: number;
   product: {
@@ -24,7 +22,7 @@ export interface CommercialDocumentFormState<TProduct extends IDocumentProductSa
   observations: string;
   signature: string | null;
   paymentMethod: PaymentMethod;
-  discountValue: string;
+  discountValue: number;
   installment: DocumentInstallmentFormState;
   productLines: TProduct[];
 }
@@ -43,7 +41,7 @@ export interface CommercialDocumentFormBaseSetters<TProduct extends IDocumentPro
   setObservations: (value: string) => void;
   setSignature: (value: string | null) => void;
   setPaymentMethod: (value: PaymentMethod) => void;
-  setDiscountValue: (value: string) => void;
+  setDiscountValue: (value: number) => void;
   setInstallment: (value: DocumentInstallmentFormState) => void;
   setProductLines: (value: TProduct[]) => void;
 }
@@ -64,7 +62,7 @@ export class CommercialDocumentFormService {
       observations: '',
       signature: null,
       paymentMethod: PaymentMethod.Check,
-      discountValue: '',
+      discountValue: 0,
       installment: InstallmentFormService.createInitialState(),
       productLines: [CommercialDocumentFormService.createEmptyProductLine<TProduct>()],
     };
@@ -79,7 +77,7 @@ export class CommercialDocumentFormService {
       observations: detail.observations ?? '',
       signature: detail.customerSignatureImage ?? null,
       paymentMethod: detail.payment.method,
-      discountValue: formatCurrencyInput(detail.payment.discountValue),
+      discountValue: detail.payment.discountValue,
       installment: InstallmentFormService.fromPayment(detail.payment),
       productLines: CommercialDocumentFormService.detailProductsToForm<TProduct>(detail.products),
     };
@@ -188,23 +186,20 @@ export class CommercialDocumentFormService {
 
   static buildPayment(
     paymentMethod: PaymentMethod,
-    discountValue: string,
+    discountValue: number,
     installment: DocumentInstallmentFormState,
   ): IPaymentSaveDto {
-    const discount = parseCurrencyInput(discountValue);
-
     return {
       method: paymentMethod,
-      discountValue: discount,
+      discountValue,
       installment: InstallmentFormService.toInstallmentSaveDto(installment),
     };
   }
 
-  static calculateTotal(productLines: IDocumentProductSaveDto[], discountValue: string): number {
+  static calculateTotal(productLines: IDocumentProductSaveDto[], discountValue: number): number {
     const valueSubtotal = productLines.reduce((sum, productLine) => sum + productLine.valueTotal, 0);
-    const discount = parseCurrencyInput(discountValue);
 
-    return Math.max(0, valueSubtotal - discount);
+    return Math.max(0, valueSubtotal - discountValue);
   }
 
   static saveProductLines<TProduct extends IDocumentProductSaveDto>(productLines: TProduct[]): TProduct[] {

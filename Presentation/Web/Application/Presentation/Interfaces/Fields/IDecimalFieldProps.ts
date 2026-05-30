@@ -5,5 +5,5 @@ export interface IDecimalFieldProps
   extends Omit<TextInputProps, 'keyboardType' | 'value' | 'onChangeText'>,
     ILabeledFieldBase {
   value: number;
-  onChangeValue: (value: number) => void;
+  onChangeValue?: (value: number) => void;
 }
