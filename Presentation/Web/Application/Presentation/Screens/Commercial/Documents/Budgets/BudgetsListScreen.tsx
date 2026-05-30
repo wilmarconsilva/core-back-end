@@ -37,7 +37,6 @@ export function BudgetsListScreen({ onGoBack, onNavigateToForm }: ICrudListScree
 
   const closeCreateOrderConfirm = () => {
     setCreateOrderDialogVisible(false);
-    setCreateOrderTarget(null);
   };
 
   const confirmCreateOrder = async () => {
