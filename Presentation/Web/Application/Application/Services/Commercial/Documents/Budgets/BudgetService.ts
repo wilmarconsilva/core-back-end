@@ -5,6 +5,7 @@ import { IBudgetSaveDto } from '../../../../Interfaces/DataTransferObjects/Comme
 import { IBudgetDetailDto } from '../../../../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetDetailDto';
 import { IBudgetListing } from '../../../../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListing';
 import { IBudgetListingFilter } from '../../../../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListingFilter';
+import { IOrderByBudgetDto } from '../../../../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderByBudgetDto';
 import { IOrderDetailDto } from '../../../../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderDetailDto';
 import { IDocumentTemplate } from '../../../../Interfaces/DataTransferObjects/Commercial/Documents/IDocumentTemplate';
 import { BudgetTemplateService } from './BudgetTemplateService';
@@ -19,10 +20,11 @@ export class BudgetService
     super('/budgets');
   }
 
-  async createOrderByBudget(id: number): Promise<IOrderDetailDto> {
+  async createOrderByBudget(id: number, dto: IOrderByBudgetDto): Promise<IOrderDetailDto> {
     return this.request<IOrderDetailDto>(`/budgets/${id}/orders`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dto),
     });
   }
 

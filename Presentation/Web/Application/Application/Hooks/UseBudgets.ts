@@ -24,7 +24,7 @@ export function UseBudgets(): UseBudgetsResult {
   const createOrderByBudget = useCallback(async (budgetId: number): Promise<boolean> => {
     setIsCreatingOrder(true);
     try {
-      const order = await budgetService.createOrderByBudget(budgetId);
+      const order = await budgetService.createOrderByBudget(budgetId, { creationDateTime: new Date() });
       setCreatedOrder(order);
       return true;
     } catch {
