@@ -4,8 +4,6 @@ import {
   DocumentInstallmentFormState,
   InstallmentFormService,
 } from '../Services/Commercial/Documents/Payments/InstallmentFormService';
-import { formatCurrencyInput } from '../Services/Utilities/CurrencyInputUtilities';
-
 export function UseDocumentInstallmentForm(
   valueTotal: number,
   installment: DocumentInstallmentFormState,
@@ -16,13 +14,11 @@ export function UseDocumentInstallmentForm(
     setInstallment((previous) => InstallmentFormService.recalculateOnTotalChange(previous, valueTotal));
   }, [valueTotal, setInstallment]);
 
-  const installmentValue = formatCurrencyInput(
-    InstallmentFormService.calculateInstallmentValue(
-      valueTotal,
-      installment.installmentQty,
-      installment.downPaymentValue,
-      installment.hasDownPayment,
-    ),
+  const installmentValue = InstallmentFormService.calculateInstallmentValue(
+    valueTotal,
+    installment.installmentQty,
+    installment.downPaymentValue,
+    installment.hasDownPayment,
   );
 
   const setHasInstallment = (hasInstallment: boolean) => {
@@ -51,7 +47,7 @@ export function UseDocumentInstallmentForm(
     clearError('downPaymentMethod');
   };
 
-  const setDownPaymentValue = (downPaymentValue: string) => {
+  const setDownPaymentValue = (downPaymentValue: number) => {
     setInstallment((previous) =>
       InstallmentFormService.syncFromDownPaymentValue(previous, downPaymentValue, valueTotal),
     );

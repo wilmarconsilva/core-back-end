@@ -10,7 +10,6 @@ import { Breadcrumb } from '../../../Components/Breadcrumb';
 import { EntitySelectField } from '../../../Components/EntitySelectField';
 import { FormField } from '../../../Components/FormField';
 import { CheckboxField } from '../../../Components/CheckboxField';
-import { CurrencyField } from '../../../Components/CurrencyField';
 import { IntField } from '../../../Components/IntField';
 import { DecimalField } from '../../../Components/DecimalField';
 import { PrimaryButton } from '../../../Components/PrimaryButton';
@@ -19,10 +18,6 @@ import { SelectField } from '../../../Components/SelectField';
 import { SignatureCanvas } from '../../../Components/SignatureCanvas';
 import { TextAreaField } from '../../../Components/TextAreaField';
 import { colors, documentFormScreenStyles as styles, layoutStyles, typographyStyles } from '../../../Styles';
-import {
-  formatCurrencyInput,
-  parseCurrencyInput,
-} from '../../../../Application/Services/Utilities/CurrencyInputUtilities';
 import { ICommercialDocumentFormScreenProps } from '../../../Interfaces/Screens/ICommercialDocumentFormScreenProps';
 import { PercentageField } from '../../../Components/PercentageField';
 
@@ -187,11 +182,11 @@ export function CommercialDocumentFormScreen({
                 />
               </View>
               <View style={styles.productSmallField}>
-                <CurrencyField
+                <DecimalField
                   label="Vl. Unit."
-                  placeholder="R$ 0,00"
-                  value={formatCurrencyInput(line.valueUnit)}
-                  onChangeText={(value) => updateProductLine(index, 'valueUnit', parseCurrencyInput(value))}
+                  placeholder="0,00"
+                  value={line.valueUnit}
+                  onChangeValue={(value) => updateProductLine(index, 'valueUnit', value)}
                   editable={!isSaving}
                 />
               </View>
@@ -227,11 +222,11 @@ export function CommercialDocumentFormScreen({
             onValueChange={(value) => setPaymentMethod(value as PaymentMethod)}
             disabled={isSaving}
           />
-          <CurrencyField
+          <DecimalField
             label="Desconto (R$)"
-            placeholder="R$ 0,00"
+            placeholder="0,00"
             value={discountValue}
-            onChangeText={setDiscountValue}
+            onChangeValue={setDiscountValue}
             editable={!isSaving}
           />
           <CheckboxField
@@ -250,7 +245,7 @@ export function CommercialDocumentFormScreen({
                 onChangeText={setInstallmentQty}
                 editable={!isSaving}
               />
-              <CurrencyField
+              <DecimalField
                 label="Valor da parcela (R$) *"
                 placeholder="Definido automaticamente pela quantidade de parcelas"
                 value={installmentValue}
@@ -272,12 +267,12 @@ export function CommercialDocumentFormScreen({
                     onValueChange={(value) => setDownPaymentMethod(value as PaymentMethod)}
                     disabled={isSaving}
                   />
-                  <CurrencyField
+                  <DecimalField
                     label="Valor de entrada (R$) *"
-                    placeholder="R$ 0,00"
+                    placeholder="0,00"
                     value={downPaymentValue}
                     error={errors.downPaymentValue}
-                    onChangeText={setDownPaymentValue}
+                    onChangeValue={setDownPaymentValue}
                     editable={!isSaving}
                   />
                   <PercentageField
