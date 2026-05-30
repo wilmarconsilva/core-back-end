@@ -2,8 +2,6 @@ import { IValidationRule } from '../../../../Hooks/UseFormValidation';
 import { PaymentMethod } from '../../../../../Domain/ValueObjects/Enums/Commercial/Documents/Payments/PaymentMethod';
 import { InstallmentSaveDto } from '../../../../Interfaces/DataTransferObjects/Commercial/Documents/Payments/IInstallmentSaveDto';
 import { IPaymentSaveDto } from '../../../../Interfaces/DataTransferObjects/Commercial/Documents/Payments/IPaymentSaveDto';
-import { formatCurrencyInput, parseCurrencyInput } from '../../../Utilities/CurrencyInputUtilities';
-
 export type DownPaymentSyncSource = 'value' | 'percentage';
 
 export interface DocumentInstallmentFormState {
@@ -11,7 +9,7 @@ export interface DocumentInstallmentFormState {
   installmentQty: number;
   hasDownPayment: boolean;
   downPaymentMethod: PaymentMethod;
-  downPaymentValue: string;
+  downPaymentValue: number;
   downPaymentPercentage: number;
   downPaymentSyncSource: DownPaymentSyncSource;
 }
@@ -23,7 +21,7 @@ export class InstallmentFormService {
       installmentQty: 0,
       hasDownPayment: false,
       downPaymentMethod: PaymentMethod.Check,
-      downPaymentValue: '',
+      downPaymentValue: 0,
       downPaymentPercentage: 0,
       downPaymentSyncSource: 'percentage',
     };
@@ -38,7 +36,7 @@ export class InstallmentFormService {
       installmentQty: installment?.quantity ?? 0,
       hasDownPayment: !!downPayment,
       downPaymentMethod: downPayment?.method ?? PaymentMethod.Check,
-      downPaymentValue: formatCurrencyInput(downPayment?.value ?? 0),
+      downPaymentValue: downPayment?.value ?? 0,
       downPaymentPercentage: downPayment?.percentage ?? 0,
       downPaymentSyncSource: 'percentage',
     };
@@ -54,7 +52,7 @@ export class InstallmentFormService {
     if (state.hasDownPayment) {
       rules.push(
         { key: 'downPaymentMethod', isValid: !!state.downPaymentMethod },
-        { key: 'downPaymentValue', isValid: parseCurrencyInput(state.downPaymentValue) > 0 },
+        { key: 'downPaymentValue', isValid: state.downPaymentValue > 0 },
         { key: 'downPaymentPercentage', isValid: state.downPaymentPercentage > 0 },
       );
     }
@@ -70,7 +68,7 @@ export class InstallmentFormService {
     const quantity = state.installmentQty;
     const downPayment = state.hasDownPayment
       ? {
-        value: parseCurrencyInput(state.downPaymentValue),
+        value: state.downPaymentValue,
         percentage: state.downPaymentPercentage,
         method: state.downPaymentMethod,
       }
@@ -102,7 +100,7 @@ export class InstallmentFormService {
       return {
         ...state,
         hasDownPayment: false,
-        downPaymentValue: '',
+        downPaymentValue: 0,
         downPaymentPercentage: 0,
         downPaymentSyncSource: 'percentage',
       };
@@ -114,11 +112,11 @@ export class InstallmentFormService {
   static calculateInstallmentValue(
     valueTotal: number,
     installmentQty: number,
-    downPaymentValue: string,
+    downPaymentValue: number,
     hasDownPayment: boolean,
   ): number {
     const quantity = installmentQty;
-    const downPayment = hasDownPayment ? parseCurrencyInput(downPaymentValue) : 0;
+    const downPayment = hasDownPayment ? downPaymentValue : 0;
     const remaining = Math.max(0, valueTotal - downPayment);
 
     return quantity > 0 ? remaining / quantity : 0;
@@ -126,11 +124,10 @@ export class InstallmentFormService {
 
   static syncFromDownPaymentValue(
     state: DocumentInstallmentFormState,
-    downPaymentValue: string,
+    downPaymentValue: number,
     valueTotal: number,
   ): DocumentInstallmentFormState {
-    const value = parseCurrencyInput(downPaymentValue);
-    const percentage = InstallmentFormService.calculatePercentageFromValue(value, valueTotal);
+    const percentage = InstallmentFormService.calculatePercentageFromValue(downPaymentValue, valueTotal);
 
     return {
       ...state,
@@ -150,7 +147,7 @@ export class InstallmentFormService {
     return {
       ...state,
       downPaymentPercentage,
-      downPaymentValue: formatCurrencyInput(value),
+      downPaymentValue: value,
       downPaymentSyncSource: 'percentage',
     };
   }
