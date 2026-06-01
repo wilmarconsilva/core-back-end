@@ -9,8 +9,10 @@
     "*.tsx",
     "Application/**/*.ts",
     "Application/**/*.tsx",
+    "Configuration/**/*.ts",
     "Presentation/**/*.ts",
-    "Presentation/**/*.tsx"
+    "Presentation/**/*.tsx",
+    "scripts/**/*.ts"
   ],
   "exclude": ["node_modules", "bin", "obj"]
 }

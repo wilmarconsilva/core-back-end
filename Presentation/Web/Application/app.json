@@ -9,12 +9,12 @@
     "splash": {
       "image": "./assets/logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#FFFFFF"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#FFFFFF"
       },
       "newArchEnabled": true,
       "edgeToEdge": {
@@ -27,7 +27,17 @@
       "newArchEnabled": true
     },
     "web": {
-      "favicon": "./assets/logo.png"
+      "favicon": "./assets/logo.png",
+      "name": "Core",
+      "shortName": "Core",
+      "description": "Sistema ERP Core.",
+      "themeColor": "#1e501b",
+      "backgroundColor": "#FFFFFF",
+      "display": "standalone",
+      "orientation": "any",
+      "lang": "pt-BR",
+      "scope": "/",
+      "startUrl": "/"
     },
     "plugins": [
       "expo-font"
