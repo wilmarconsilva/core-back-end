@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { FormField } from '../../Components/FormField';
 import { UsePagedCrudList } from '../../../Application/Hooks/UsePagedCrudList';
 import { UseProducts } from '../../../Application/Hooks/UseProducts';
+import { UseOperationMode } from '../../../Application/Hooks/UseOperationMode';
 import { IProductListing } from '../../../Application/Interfaces/DataTransferObjects/Products/IProductListing';
 import { IProductListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Products/IProductListingFilter';
 import { ICrudListScreenProps } from '../../Interfaces/Screens/ICrudListScreenProps';
@@ -11,6 +12,7 @@ import { CrudListScreen } from '../CrudListScreen';
 
 export function ProductsListScreen({ onGoBack, onNavigateToForm }: ICrudListScreenProps) {
   const { listings, isLoadingList, isDeleting, loadAll, remove } = UseProducts();
+  const { isOffline } = UseOperationMode();
   const [description, setDescription] = useState('');
 
   const buildFilter = useCallback((p: number, pageSize: number): IProductListingFilter => ({
@@ -59,6 +61,7 @@ export function ProductsListScreen({ onGoBack, onNavigateToForm }: ICrudListScre
       getDeleteMessage={(item) => `Deseja excluir o produto "${item?.description}"?`}
       onConfirmDelete={listState.confirmDelete}
       onCancelDelete={listState.closeDeleteConfirm}
+      readOnly={isOffline}
     />
   );
 }

@@ -30,6 +30,8 @@ interface CrudListScreenProps<TListing extends { id: number }> {
   keyExtractor?: (item: TListing) => string;
   newLabel?: string;
   extraActions?: (item: TListing) => ReactNode;
+  /** When true (e.g. offline), creation/edit/delete actions are hidden. */
+  readOnly?: boolean;
 }
 
 export function CrudListScreen<TListing extends { id: number }>({
@@ -55,6 +57,7 @@ export function CrudListScreen<TListing extends { id: number }>({
   keyExtractor = (item) => String(item.id),
   newLabel,
   extraActions,
+  readOnly = false,
 }: CrudListScreenProps<TListing>) {
   return (
     <View style={layoutStyles.screenWrapper}>
@@ -63,7 +66,11 @@ export function CrudListScreen<TListing extends { id: number }>({
         <Text style={typographyStyles.title}>{title}</Text>
 
         <View style={layoutStyles.sectionCard}>
-          <FilterActionBar onSearch={onSearch} onNew={() => onNavigateToForm()} newLabel={newLabel}>
+          <FilterActionBar
+            onSearch={onSearch}
+            onNew={readOnly ? undefined : () => onNavigateToForm()}
+            newLabel={newLabel}
+          >
             {filterContent}
           </FilterActionBar>
 
@@ -74,8 +81,8 @@ export function CrudListScreen<TListing extends { id: number }>({
             page={page}
             pageSize={pageSize}
             onPageChange={onPageChange}
-            onEdit={(item) => onNavigateToForm(item.id)}
-            onDelete={onDelete}
+            onEdit={readOnly ? undefined : (item) => onNavigateToForm(item.id)}
+            onDelete={readOnly ? undefined : onDelete}
             keyExtractor={keyExtractor}
             extraActions={extraActions}
           />

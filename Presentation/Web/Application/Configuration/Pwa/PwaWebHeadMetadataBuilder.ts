@@ -25,6 +25,19 @@ export class PwaWebHeadMetadataBuilder implements IPwaWebHeadMetadataBuilder {
       `<meta name="apple-mobile-web-app-status-bar-style" content="default" />`,
       `<meta name="apple-mobile-web-app-title" content="${metadata.appleMobileWebAppTitle}" />`,
       `<link rel="apple-touch-icon" href="${metadata.appleTouchIconPath}" />`,
+      this.serviceWorkerRegistrationScript(),
     ].join('\n    ');
+  }
+
+  private serviceWorkerRegistrationScript(): string {
+    return [
+      '<script>',
+      "      if ('serviceWorker' in navigator) {",
+      "        window.addEventListener('load', function () {",
+      `          navigator.serviceWorker.register('${PwaPublicAssetUrls.serviceWorker}').catch(function () {});`,
+      '        });',
+      '      }',
+      '    </script>',
+    ].join('\n');
   }
 }

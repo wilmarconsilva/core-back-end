@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
-import { ProductService } from '../Services/Products/ProductService';
+import { OfflineCompositionRoot } from '../../Configuration/Offline/OfflineCompositionRoot';
 import { IProductSaveDto } from '../Interfaces/DataTransferObjects/Products/IProductSaveDto';
 import { IProductDetailDto } from '../Interfaces/DataTransferObjects/Products/IProductDetailDto';
 import { IProductListing } from '../Interfaces/DataTransferObjects/Products/IProductListing';
 import { IProductListingFilter } from '../Interfaces/DataTransferObjects/Products/IProductListingFilter';
 import { UseCrud, UseCrudResult } from './UseCrud';
 
-const productService = new ProductService();
+const productService = OfflineCompositionRoot.createProductService();
 
 export function UseProducts(): UseCrudResult<IProductSaveDto, IProductDetailDto, IProductListing, IProductListingFilter> {
   const service = useMemo(() => productService, []);

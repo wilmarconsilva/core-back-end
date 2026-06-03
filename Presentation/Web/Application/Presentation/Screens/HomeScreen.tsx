@@ -3,8 +3,10 @@ import { ScrollView, Text, View } from 'react-native';
 import { Breadcrumb } from '../Components/Breadcrumb';
 import { MenuItem } from '../Components/MenuItem';
 import { ScreenTransition } from '../Components/ScreenTransition';
+import { DataSynchronizationIndicator } from '../Components/DataSynchronizationIndicator';
 import { gridStyles, layoutStyles, typographyStyles } from '../Styles';
 import { UseNavigation, Screen } from '../../Application/Hooks/UseNavigation';
+import { UseOperationMode } from '../../Application/Hooks/UseOperationMode';
 import { IHomeMenuProps } from '../Interfaces/Home/IHomeMenuProps';
 import { IHomeScreenProps } from '../Interfaces/Home/IHomeScreenProps';
 import { ReportsScreen } from './ReportsScreen';
@@ -21,7 +23,11 @@ import { OrderFormScreen } from './Commercial/Documents/Orders/OrderFormScreen';
 import { BudgetReportScreen } from './Commercial/Documents/Budgets/BudgetReportScreen';
 import { OrderReportScreen } from './Commercial/Documents/Orders/OrderReportScreen';
 
-function HomeMenuScreen({ userName, navigate }: IHomeMenuProps) {
+function HomeMenuScreen({ userName, navigate, isOffline }: IHomeMenuProps) {
+  // Offline, Budgets/Orders allow creation only, so the menu goes straight to the form.
+  const budgetTarget: Screen = isOffline ? { name: 'budgetForm' } : { name: 'budgets' };
+  const orderTarget: Screen = isOffline ? { name: 'orderForm' } : { name: 'orders' };
+
   return (
     <View style={layoutStyles.screenWrapper}>
       <ScrollView contentContainerStyle={layoutStyles.scrollContainer}>
@@ -31,10 +37,14 @@ function HomeMenuScreen({ userName, navigate }: IHomeMenuProps) {
         <View style={gridStyles.grid}>
           <MenuItem icon="people-outline" label="Clientes" onPress={() => navigate({ name: 'customers' })} />
           <MenuItem icon="cube-outline" label="Produtos" onPress={() => navigate({ name: 'products' })} />
-          <MenuItem icon="cash-outline" label="Orçamentos" onPress={() => navigate({ name: 'budgets' })} />
-          <MenuItem icon="clipboard-outline" label="Pedidos" onPress={() => navigate({ name: 'orders' })} />
-          <MenuItem icon="location-outline" label="Localidades" onPress={() => navigate({ name: 'localities' })} />
-          <MenuItem icon="bar-chart-outline" label="Relatórios" onPress={() => navigate({ name: 'reports' })} />
+          <MenuItem icon="cash-outline" label="Orçamentos" onPress={() => navigate(budgetTarget)} />
+          <MenuItem icon="clipboard-outline" label="Pedidos" onPress={() => navigate(orderTarget)} />
+          {!isOffline && (
+            <>
+              <MenuItem icon="location-outline" label="Localidades" onPress={() => navigate({ name: 'localities' })} />
+              <MenuItem icon="bar-chart-outline" label="Relatórios" onPress={() => navigate({ name: 'reports' })} />
+            </>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -47,6 +57,7 @@ function screenKey(screen: Screen): string {
 
 export function HomeScreen({ userName }: IHomeScreenProps) {
   const { currentScreen, navigate, goBack } = UseNavigation();
+  const { isOffline } = UseOperationMode();
 
   function renderScreen() {
     switch (currentScreen.name) {
@@ -89,14 +100,17 @@ export function HomeScreen({ userName }: IHomeScreenProps) {
         return <OrderReportScreen onGoBack={goBack} />;
 
       default:
-        return <HomeMenuScreen userName={userName} navigate={navigate} />;
+        return <HomeMenuScreen userName={userName} navigate={navigate} isOffline={isOffline} />;
     }
   }
 
   return (
-    <ScreenTransition screenKey={screenKey(currentScreen)}>
-      {renderScreen()}
-    </ScreenTransition>
+    <View style={{ flex: 1 }}>
+      <ScreenTransition screenKey={screenKey(currentScreen)}>
+        {renderScreen()}
+      </ScreenTransition>
+      <DataSynchronizationIndicator />
+    </View>
   );
 }
 
