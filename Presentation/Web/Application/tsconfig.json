@@ -13,6 +13,6 @@
     "Presentation/**/*.ts",
     "Presentation/**/*.tsx",
     "scripts/**/*.ts"
-  ],
+, "Domain/Exceptions/OfflineUnavailableError.ts"  ],
   "exclude": ["node_modules", "bin", "obj"]
 }

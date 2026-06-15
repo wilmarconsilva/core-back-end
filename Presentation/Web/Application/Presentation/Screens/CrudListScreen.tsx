@@ -6,6 +6,7 @@ import { ConfirmDialog } from '../Components/ConfirmDialog';
 import { DataGrid } from '../Components/DataGrid';
 import { FilterActionBar } from '../Components/FilterActionBar';
 import { layoutStyles, typographyStyles } from '../Styles';
+import { CrudOperationType, CrudOperationTypeUtility } from '../../Infrastructure/Persistence/Enums/CrudOperationType';
 
 interface CrudListScreenProps<TListing extends { id: number }> {
   title: string;
@@ -30,8 +31,9 @@ interface CrudListScreenProps<TListing extends { id: number }> {
   keyExtractor?: (item: TListing) => string;
   newLabel?: string;
   extraActions?: (item: TListing) => ReactNode;
-  /** When true (e.g. offline), creation/edit/delete actions are hidden. */
-  readOnly?: boolean;
+  allowedCrudOperationTypes?: CrudOperationType[];
+  canMutateItem?: (item: TListing) => boolean;
+  emptyGridMessage?: string;
 }
 
 export function CrudListScreen<TListing extends { id: number }>({
@@ -57,7 +59,9 @@ export function CrudListScreen<TListing extends { id: number }>({
   keyExtractor = (item) => String(item.id),
   newLabel,
   extraActions,
-  readOnly = false,
+  allowedCrudOperationTypes = CrudOperationTypeUtility.getAll(),
+  canMutateItem,
+  emptyGridMessage = 'Nenhum registro encontrado.',
 }: CrudListScreenProps<TListing>) {
   return (
     <View style={layoutStyles.screenWrapper}>
@@ -68,7 +72,7 @@ export function CrudListScreen<TListing extends { id: number }>({
         <View style={layoutStyles.sectionCard}>
           <FilterActionBar
             onSearch={onSearch}
-            onNew={readOnly ? undefined : () => onNavigateToForm()}
+            onNew={allowedCrudOperationTypes.includes(CrudOperationType.Create) ? () => onNavigateToForm() : undefined}
             newLabel={newLabel}
           >
             {filterContent}
@@ -81,10 +85,12 @@ export function CrudListScreen<TListing extends { id: number }>({
             page={page}
             pageSize={pageSize}
             onPageChange={onPageChange}
-            onEdit={readOnly ? undefined : (item) => onNavigateToForm(item.id)}
-            onDelete={readOnly ? undefined : onDelete}
+            onEdit={allowedCrudOperationTypes.includes(CrudOperationType.Update) ? (item) => onNavigateToForm(item.id) : undefined}
+            onDelete={allowedCrudOperationTypes.includes(CrudOperationType.Delete) ? onDelete : undefined}
+            canMutateItem={canMutateItem}
             keyExtractor={keyExtractor}
             extraActions={extraActions}
+            emptyGridMessage={emptyGridMessage}
           />
         </View>
       </ScrollView>

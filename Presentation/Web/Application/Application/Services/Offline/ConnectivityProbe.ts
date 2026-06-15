@@ -8,6 +8,7 @@ const REACHABILITY_TIMEOUT_MS = 3000;
  * side-effect-free reachability probe against the API base URL.
  */
 export class ConnectivityProbe implements IConnectivityProbe {
+  
   async isOnline(): Promise<boolean> {
     if (typeof navigator !== 'undefined' && navigator.onLine === false) {
       return false;

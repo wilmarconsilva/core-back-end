@@ -1,6 +1,7 @@
 import { IListingFilter } from '../../Interfaces/DataTransferObjects/IListingFilter';
-import { IOfflineReadRepository } from '../../Interfaces/Persistence/IOfflineReadRepository';
-import { IPendingDocumentRepository } from '../../Interfaces/Persistence/IPendingDocumentRepository';
+import { IDocumentSaveDto } from '../../Interfaces/DataTransferObjects/Commercial/Documents/IDocumentSaveDto';
+import { IDocumentProductSaveDto } from '../../Interfaces/DataTransferObjects/Commercial/Documents/IDocumentProductSaveDto';
+import { IOfflineRepository } from '../../Interfaces/Persistence/IOfflineRepository';
 import {
   IDataSynchronizationService,
   SynchronizationListener,
@@ -8,16 +9,19 @@ import {
 } from '../../Interfaces/Services/IDataSynchronizationService';
 import { IProductListing } from '../../Interfaces/DataTransferObjects/Products/IProductListing';
 import { IProductListingFilter } from '../../Interfaces/DataTransferObjects/Products/IProductListingFilter';
+import { IProductSaveDto } from '../../Interfaces/DataTransferObjects/Products/IProductSaveDto';
 import { ICustomerListing } from '../../Interfaces/DataTransferObjects/Persons/Customers/ICustomerListing';
 import { ICustomerListingFilter } from '../../Interfaces/DataTransferObjects/Persons/Customers/ICustomerListingFilter';
+import { ICustomerSaveDto } from '../../Interfaces/DataTransferObjects/Persons/Customers/ICustomerSaveDto';
 import { IOrderSaveDto } from '../../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderSaveDto';
 import { IBudgetSaveDto } from '../../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetSaveDto';
+import { toApiCreatePayload } from '../Utilities/OfflineUtilities';
+import { remapDocumentReferences } from './OfflineMappersService';
 
-const FETCH_PAGE_SIZE = 500;
+const FETCH_PAGE_SIZE = 50;
 
-/** Narrow segregated contracts (ISP): the sync only needs these capabilities. */
-interface IDocumentPushService<TSaveDto> {
-  create(dto: TSaveDto): Promise<unknown>;
+interface ICreatePushService<TSaveDto> {
+  create(dto: TSaveDto): Promise<TSaveDto>;
 }
 
 interface IListingFetchService<TListing, TFilter extends IListingFilter> {
@@ -25,22 +29,22 @@ interface IListingFetchService<TListing, TFilter extends IListingFilter> {
 }
 
 interface DataSynchronizationDependencies {
-  productApi: IListingFetchService<IProductListing, IProductListingFilter>;
-  customerApi: IListingFetchService<ICustomerListing, ICustomerListingFilter>;
-  orderApi: IDocumentPushService<IOrderSaveDto>;
-  budgetApi: IDocumentPushService<IBudgetSaveDto>;
-  productRepository: IOfflineReadRepository<IProductListing, IProductListingFilter>;
-  customerRepository: IOfflineReadRepository<ICustomerListing, ICustomerListingFilter>;
-  pendingOrderRepository: IPendingDocumentRepository<IOrderSaveDto>;
-  pendingBudgetRepository: IPendingDocumentRepository<IBudgetSaveDto>;
+  productApi: IListingFetchService<IProductListing, IProductListingFilter> & ICreatePushService<IProductSaveDto>;
+  customerApi: IListingFetchService<ICustomerListing, ICustomerListingFilter> & ICreatePushService<ICustomerSaveDto>;
+  orderApi: ICreatePushService<IOrderSaveDto>;
+  budgetApi: ICreatePushService<IBudgetSaveDto>;
+  productRepository: IOfflineRepository<IProductSaveDto, IProductListing, IProductListingFilter>;
+  customerRepository: IOfflineRepository<ICustomerSaveDto, ICustomerListing, ICustomerListingFilter>;
+  orderRepository: IOfflineRepository<IOrderSaveDto, unknown, unknown>;
+  budgetRepository: IOfflineRepository<IBudgetSaveDto, unknown, unknown>;
 }
 
 /**
  * Orchestrates startup synchronization following a fixed sequence:
- *   1. push pending Orders   2. push pending Budgets
- *   3. refresh Products      4. refresh Customers
- * Each step is isolated so a failure never interrupts the application; the
- * overall status is exposed to observers (the visual indicator).
+ *   1. push local Products    2. push local Customers
+ *   3. remap FKs              4. push local Orders
+ *   5. push local Budgets     6. refresh Products
+ *   7. refresh Customers
  */
 export class DataSynchronizationService implements IDataSynchronizationService {
   private status: SynchronizationStatus = 'idle';
@@ -77,38 +81,78 @@ export class DataSynchronizationService implements IDataSynchronizationService {
       }
     };
 
-    await runStep(() => this.pushPendingOrders());
-    await runStep(() => this.pushPendingBudgets());
+    let productIdMap = new Map<number, number>();
+    let customerIdMap = new Map<number, number>();
+
+    await runStep(async () => {
+      productIdMap = await this.pushLocalRecords(
+        this.dependencies.productRepository,
+        this.dependencies.productApi,
+      );
+    });
+    await runStep(async () => {
+      customerIdMap = await this.pushLocalRecords(
+        this.dependencies.customerRepository,
+        this.dependencies.customerApi,
+      );
+    });
+    await runStep(() => this.pushLocalDocuments(
+      this.dependencies.orderRepository,
+      this.dependencies.orderApi,
+      customerIdMap,
+      productIdMap,
+    ));
+    await runStep(() => this.pushLocalDocuments(
+      this.dependencies.budgetRepository,
+      this.dependencies.budgetApi,
+      customerIdMap,
+      productIdMap,
+    ));
     await runStep(() => this.refreshProducts());
     await runStep(() => this.refreshCustomers());
 
     this.setStatus(hadError ? 'error' : 'success');
   }
 
-  private async pushPendingOrders(): Promise<void> {
-    const pending = await this.dependencies.pendingOrderRepository.getAll();
+  private async pushLocalRecords<T extends { id: number }>(
+    repository: IOfflineRepository<T, unknown, unknown>,
+    api: ICreatePushService<T>,
+  ): Promise<Map<number, number>> {
+    const idMap = new Map<number, number>();
+    const pending = await repository.getLocalRecords();
+
     for (const record of pending) {
-      await this.dependencies.orderApi.create(record.payload);
-      await this.dependencies.pendingOrderRepository.remove(record.localId);
+      const created = await api.create(toApiCreatePayload(record));
+      idMap.set(record.id, created.id);
+      await repository.remove(record.id);
     }
+
+    return idMap;
   }
 
-  private async pushPendingBudgets(): Promise<void> {
-    const pending = await this.dependencies.pendingBudgetRepository.getAll();
+  private async pushLocalDocuments<T extends IDocumentSaveDto<IDocumentProductSaveDto>>(
+    repository: IOfflineRepository<T, unknown, unknown>,
+    api: ICreatePushService<T>,
+    customerIdMap: Map<number, number>,
+    productIdMap: Map<number, number>,
+  ): Promise<void> {
+    const pending = await repository.getLocalRecords();
+
     for (const record of pending) {
-      await this.dependencies.budgetApi.create(record.payload);
-      await this.dependencies.pendingBudgetRepository.remove(record.localId);
+      const remapped = remapDocumentReferences(record, customerIdMap, productIdMap);
+      await api.create(toApiCreatePayload(remapped));
+      await repository.remove(record.id);
     }
   }
 
   private async refreshProducts(): Promise<void> {
     const products = await this.fetchAll(this.dependencies.productApi);
-    await this.dependencies.productRepository.replaceAll(products);
+    await this.dependencies.productRepository.replaceSynced(products);
   }
 
   private async refreshCustomers(): Promise<void> {
     const customers = await this.fetchAll(this.dependencies.customerApi);
-    await this.dependencies.customerRepository.replaceAll(customers);
+    await this.dependencies.customerRepository.replaceSynced(customers);
   }
 
   private async fetchAll<TListing, TFilter extends IListingFilter>(

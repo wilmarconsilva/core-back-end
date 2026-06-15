@@ -3,6 +3,7 @@ import { Text, View } from 'react-native';
 import { IDocumentListing } from '../../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/IDocumentListing';
 import { IColumn } from '../../../Interfaces/DataGrid/IColumn';
 import { ICrudListScreenProps } from '../../../Interfaces/Screens/ICrudListScreenProps';
+import { CrudOperationType, CrudOperationTypeUtility } from '../../../../Infrastructure/Persistence/Enums/CrudOperationType';
 import { DateField } from '../../../Components/DateField';
 import { CrudListScreen } from '../../CrudListScreen';
 import { listScreenStyles, tableStyles } from '../../../Styles';
@@ -34,6 +35,8 @@ interface CommercialDocumentListScreenProps<TListing extends IDocumentListing> e
   showCreationDate?: boolean;
   extraColumns?: IColumn<TListing>[];
   extraActions?: (item: TListing) => ReactNode;
+  allowedCrudOperationTypes?: CrudOperationType[];
+  canMutateItem?: (item: TListing) => boolean;
 }
 
 export function CommercialDocumentListScreen<TListing extends IDocumentListing>({
@@ -51,6 +54,8 @@ export function CommercialDocumentListScreen<TListing extends IDocumentListing>(
   showCreationDate = false,
   extraColumns = [],
   extraActions,
+  allowedCrudOperationTypes = CrudOperationTypeUtility.getAll(),
+  canMutateItem,
   onGoBack,
   onNavigateToForm,
 }: CommercialDocumentListScreenProps<TListing>) {
@@ -127,6 +132,9 @@ export function CommercialDocumentListScreen<TListing extends IDocumentListing>(
       onConfirmDelete={listState.confirmDelete}
       onCancelDelete={listState.closeDeleteConfirm}
       extraActions={extraActions}
+      allowedCrudOperationTypes={allowedCrudOperationTypes}
+      canMutateItem={canMutateItem}
+      emptyGridMessage={isOffline ? 'Somente registros gerados no modo offline serão exibidos.' : null}
     />
   );
 }

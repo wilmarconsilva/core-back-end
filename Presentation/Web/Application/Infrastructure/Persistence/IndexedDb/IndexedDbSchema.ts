@@ -1,32 +1,24 @@
 import { DBSchema } from 'idb';
 
 export const INDEXED_DB_NAME = 'core-offline-db';
-export const INDEXED_DB_VERSION = 1;
+export const INDEXED_DB_VERSION = 3;
 
 export const OfflineStoreNames = {
   products: 'products',
   customers: 'customers',
-  pendingOrders: 'pendingOrders',
-  pendingBudgets: 'pendingBudgets',
+  orders: 'orders',
+  budgets: 'budgets',
 } as const;
 
-export type OfflineReadStoreName =
+export type OfflineStoreName =
   | typeof OfflineStoreNames.products
-  | typeof OfflineStoreNames.customers;
-
-export type OfflinePendingStoreName =
-  | typeof OfflineStoreNames.pendingOrders
-  | typeof OfflineStoreNames.pendingBudgets;
-
-interface PendingRecord {
-  localId?: number;
-  payload: unknown;
-  createdAt: string;
-}
+  | typeof OfflineStoreNames.customers
+  | typeof OfflineStoreNames.orders
+  | typeof OfflineStoreNames.budgets;
 
 export interface CoreDbSchema extends DBSchema {
   products: { key: number; value: { id: number } & Record<string, unknown> };
   customers: { key: number; value: { id: number } & Record<string, unknown> };
-  pendingOrders: { key: number; value: PendingRecord };
-  pendingBudgets: { key: number; value: PendingRecord };
+  orders: { key: number; value: { id: number } & Record<string, unknown> };
+  budgets: { key: number; value: { id: number } & Record<string, unknown> };
 }

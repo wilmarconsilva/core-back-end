@@ -21,9 +21,11 @@ export function DataGrid<T>({
   onPageChange,
   onEdit,
   onDelete,
+  canMutateItem,
   onRowPress,
   keyExtractor,
   extraActions,
+  emptyGridMessage = 'Nenhum registro encontrado.',
 }: IDataGridProps<T>) {
   const hasActions = onEdit || onDelete || extraActions;
   const [containerWidth, setContainerWidth] = useState(0);
@@ -64,11 +66,12 @@ export function DataGrid<T>({
 
           {/* Empty */}
           {!isLoading && data.length === 0 && (
-            <Text style={tableStyles.emptyText}>Nenhum registro encontrado.</Text>
+            <Text style={tableStyles.emptyText}>{emptyGridMessage}</Text>
           )}
 
           {/* Rows */}
           {!isLoading && data.map((item, rowIdx) => {
+            const canMutate = canMutateItem?.(item) ?? true;
             const rowStyle = [
               tableStyles.row,
               rowIdx === data.length - 1 && { borderBottomWidth: 0 },
@@ -88,7 +91,7 @@ export function DataGrid<T>({
                 ))}
                 {hasActions && (
                   <View style={[tableStyles.actionsCell, { width: 100 }]}>
-                    {onEdit && (
+                    {onEdit && canMutate && (
                       <TouchableOpacity
                         onPress={() => onEdit(item)}
                         activeOpacity={0.7}
@@ -97,7 +100,7 @@ export function DataGrid<T>({
                         <Ionicons name="pencil-outline" size={15} color={colors.textSecondary} />
                       </TouchableOpacity>
                     )}
-                    {onDelete && (
+                    {onDelete && canMutate && (
                       <TouchableOpacity
                         onPress={() => onDelete(item)}
                         activeOpacity={0.7}

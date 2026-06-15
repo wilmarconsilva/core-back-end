@@ -24,9 +24,8 @@ import { BudgetReportScreen } from './Commercial/Documents/Budgets/BudgetReportS
 import { OrderReportScreen } from './Commercial/Documents/Orders/OrderReportScreen';
 
 function HomeMenuScreen({ userName, navigate, isOffline }: IHomeMenuProps) {
-  // Offline, Budgets/Orders allow creation only, so the menu goes straight to the form.
-  const budgetTarget: Screen = isOffline ? { name: 'budgetForm' } : { name: 'budgets' };
-  const orderTarget: Screen = isOffline ? { name: 'orderForm' } : { name: 'orders' };
+  const budgetTarget: Screen = { name: 'budgets' };
+  const orderTarget: Screen = { name: 'orders' };
 
   return (
     <View style={layoutStyles.screenWrapper}>

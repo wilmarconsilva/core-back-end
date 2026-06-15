@@ -2,14 +2,18 @@ import React, { useCallback, useState } from 'react';
 import { Text } from 'react-native';
 import { UsePagedCrudList } from '../../../../../Application/Hooks/UsePagedCrudList';
 import { UseOrders } from '../../../../../Application/Hooks/UseOrders';
+import { UseOperationMode } from '../../../../../Application/Hooks/UseOperationMode';
+import { isLocalRecord } from '../../../../../Application/Services/Utilities/OfflineUtilities';
 import { IOrderListing } from '../../../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderListing';
 import { IOrderListingFilter } from '../../../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderListingFilter';
 import { ICrudListScreenProps } from '../../../../Interfaces/Screens/ICrudListScreenProps';
+import { CrudOperationType, CrudOperationTypeUtility } from '../../../../../Infrastructure/Persistence/Enums/CrudOperationType';
 import { tableStyles } from '../../../../Styles';
 import { CommercialDocumentListScreen } from '../CommercialDocumentListScreen';
 
 export function OrdersListScreen({ onGoBack, onNavigateToForm }: ICrudListScreenProps) {
   const { listings, isLoadingList, isDeleting, loadAll, remove } = UseOrders();
+  const { isOffline } = UseOperationMode();
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
@@ -53,6 +57,7 @@ export function OrdersListScreen({ onGoBack, onNavigateToForm }: ICrudListScreen
       ]}
       onGoBack={onGoBack}
       onNavigateToForm={onNavigateToForm}
+      canMutateItem={isOffline ? (item) => isLocalRecord(item.id) : undefined}
     />
   );
 }

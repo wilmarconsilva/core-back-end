@@ -27,24 +27,22 @@ export class IndexedDbContext implements IIndexedDbContext {
   getDatabase(): Promise<IDBPDatabase<CoreDbSchema>> {
     if (!this.databasePromise) {
       this.databasePromise = openDB<CoreDbSchema>(INDEXED_DB_NAME, INDEXED_DB_VERSION, {
-        upgrade(database) {
+        upgrade(database) 
+        {
           if (!database.objectStoreNames.contains(OfflineStoreNames.products)) {
             database.createObjectStore(OfflineStoreNames.products, { keyPath: 'id' });
           }
+
           if (!database.objectStoreNames.contains(OfflineStoreNames.customers)) {
             database.createObjectStore(OfflineStoreNames.customers, { keyPath: 'id' });
           }
-          if (!database.objectStoreNames.contains(OfflineStoreNames.pendingOrders)) {
-            database.createObjectStore(OfflineStoreNames.pendingOrders, {
-              keyPath: 'localId',
-              autoIncrement: true,
-            });
+
+          if (!database.objectStoreNames.contains(OfflineStoreNames.orders)) {
+            database.createObjectStore(OfflineStoreNames.orders, { keyPath: 'id' });
           }
-          if (!database.objectStoreNames.contains(OfflineStoreNames.pendingBudgets)) {
-            database.createObjectStore(OfflineStoreNames.pendingBudgets, {
-              keyPath: 'localId',
-              autoIncrement: true,
-            });
+
+          if (!database.objectStoreNames.contains(OfflineStoreNames.budgets)) {
+            database.createObjectStore(OfflineStoreNames.budgets, { keyPath: 'id' });
           }
         },
       });

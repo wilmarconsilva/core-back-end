@@ -9,6 +9,8 @@ import { ICustomerListingFilter } from '../../../Application/Interfaces/DataTran
 import { ICrudListScreenProps } from '../../Interfaces/Screens/ICrudListScreenProps';
 import { listScreenStyles } from '../../Styles';
 import { CrudListScreen } from '../CrudListScreen';
+import { CrudOperationType, CrudOperationTypeUtility } from '../../../Infrastructure/Persistence/Enums/CrudOperationType';
+import { isLocalRecord } from '../../../Application/Services/Utilities/OfflineUtilities';
 
 export function CustomersListScreen({ onGoBack, onNavigateToForm }: ICrudListScreenProps) {
   const { listings, isLoadingList, isDeleting, loadAll, remove } = UseCustomers();
@@ -62,7 +64,7 @@ export function CustomersListScreen({ onGoBack, onNavigateToForm }: ICrudListScr
       getDeleteMessage={(item) => `Deseja excluir o cliente "${item?.name}"?`}
       onConfirmDelete={listState.confirmDelete}
       onCancelDelete={listState.closeDeleteConfirm}
-      readOnly={isOffline}
+      canMutateItem={isOffline ? (item) => isLocalRecord(item.id) : undefined}
     />
   );
 }

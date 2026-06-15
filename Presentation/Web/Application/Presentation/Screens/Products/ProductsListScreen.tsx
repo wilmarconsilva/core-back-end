@@ -9,6 +9,9 @@ import { IProductListingFilter } from '../../../Application/Interfaces/DataTrans
 import { ICrudListScreenProps } from '../../Interfaces/Screens/ICrudListScreenProps';
 import { listScreenStyles } from '../../Styles';
 import { CrudListScreen } from '../CrudListScreen';
+import { CrudOperationType } from '../../../Infrastructure/Persistence/Enums/CrudOperationType';
+import { CrudOperationTypeUtility } from '../../../Infrastructure/Persistence/Enums/CrudOperationType';
+import { isLocalRecord } from '../../../Application/Services/Utilities/OfflineUtilities';
 
 export function ProductsListScreen({ onGoBack, onNavigateToForm }: ICrudListScreenProps) {
   const { listings, isLoadingList, isDeleting, loadAll, remove } = UseProducts();
@@ -61,7 +64,7 @@ export function ProductsListScreen({ onGoBack, onNavigateToForm }: ICrudListScre
       getDeleteMessage={(item) => `Deseja excluir o produto "${item?.description}"?`}
       onConfirmDelete={listState.confirmDelete}
       onCancelDelete={listState.closeDeleteConfirm}
-      readOnly={isOffline}
+      canMutateItem={isOffline ? (item) => isLocalRecord(item.id) : undefined}
     />
   );
 }

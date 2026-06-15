@@ -1,10 +1,21 @@
 import { ICrudService } from '../../Application/Interfaces/Services/ICrudService';
-import { IOfflineReadRepository } from '../../Application/Interfaces/Persistence/IOfflineReadRepository';
-import { IPendingDocumentRepository } from '../../Application/Interfaces/Persistence/IPendingDocumentRepository';
+import { IOfflineRepository } from '../../Application/Interfaces/Persistence/IOfflineRepository';
 import { OfflineCrudService } from '../../Application/Services/Offline/OfflineCrudService';
-import { OfflineDocumentService } from '../../Application/Services/Offline/OfflineDocumentService';
 import { DataSynchronizationService } from '../../Application/Services/Offline/DataSynchronizationService';
 import { IDataSynchronizationService } from '../../Application/Interfaces/Services/IDataSynchronizationService';
+import {
+  buildBudgetDetail,
+  buildBudgetListing,
+  buildOrderDetail,
+  buildOrderListing,
+  customerSaveToDetail,
+  listingToCustomerSaveDto,
+  listingToProductSaveDto,
+  matchesCustomerFilter,
+  matchesDocumentListingFilter,
+  matchesProductFilter,
+  productSaveToDetail,
+} from '../../Application/Services/Offline/OfflineMappersService';
 import { ProductService } from '../../Application/Services/Products/ProductService';
 import { CustomerService } from '../../Application/Services/Customers/CustomerService';
 import { OrderService } from '../../Application/Services/Commercial/Documents/Orders/OrderService';
@@ -26,18 +37,8 @@ import { IBudgetDetailDto } from '../../Application/Interfaces/DataTransferObjec
 import { IBudgetListing } from '../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListing';
 import { IBudgetListingFilter } from '../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListingFilter';
 import { IndexedDbContext } from '../../Infrastructure/Persistence/IndexedDb/IndexedDbContext';
-import { IndexedDbReadRepository } from '../../Infrastructure/Persistence/IndexedDb/IndexedDbReadRepository';
-import { IndexedDbPendingRepository } from '../../Infrastructure/Persistence/IndexedDb/IndexedDbPendingRepository';
+import { IndexedDbOfflineRepository } from '../../Infrastructure/Persistence/IndexedDb/IndexedDbOfflineRepository';
 import { OfflineStoreNames } from '../../Infrastructure/Persistence/IndexedDb/IndexedDbSchema';
-
-function containsIgnoreCase(value: string, term?: string): boolean {
-  if (!term) return true;
-  return value.toLowerCase().includes(term.toLowerCase());
-}
-
-function matchesId(id: number, filterId?: number): boolean {
-  return filterId === undefined || id === filterId;
-}
 
 /**
  * Composition root that wires the IndexedDB persistence into the offline-aware
@@ -47,27 +48,45 @@ function matchesId(id: number, filterId?: number): boolean {
 class OfflineCompositionRootImpl {
   private readonly context = IndexedDbContext.getInstance();
 
-  readonly productRepository: IOfflineReadRepository<IProductListing, IProductListingFilter> =
-    new IndexedDbReadRepository<IProductListing, IProductListingFilter>(
+  readonly productRepository: IOfflineRepository<IProductSaveDto, IProductListing, IProductListingFilter> =
+    new IndexedDbOfflineRepository(
       this.context,
       OfflineStoreNames.products,
-      (item, filter) =>
-        matchesId(item.id, filter.id) && containsIgnoreCase(item.description, filter.description),
+      (dto) => ({ id: dto.id, description: dto.description }),
+      matchesProductFilter,
+      listingToProductSaveDto,
     );
 
-  readonly customerRepository: IOfflineReadRepository<ICustomerListing, ICustomerListingFilter> =
-    new IndexedDbReadRepository<ICustomerListing, ICustomerListingFilter>(
+  readonly customerRepository: IOfflineRepository<ICustomerSaveDto, ICustomerListing, ICustomerListingFilter> =
+    new IndexedDbOfflineRepository(
       this.context,
       OfflineStoreNames.customers,
-      (item, filter) =>
-        matchesId(item.id, filter.id) && containsIgnoreCase(item.name, filter.name),
+      (dto) => ({ id: dto.id, name: dto.name }),
+      matchesCustomerFilter,
+      listingToCustomerSaveDto,
     );
 
-  readonly pendingOrderRepository: IPendingDocumentRepository<IOrderSaveDto> =
-    new IndexedDbPendingRepository<IOrderSaveDto>(this.context, OfflineStoreNames.pendingOrders);
+  readonly orderRepository: IOfflineRepository<IOrderSaveDto, IOrderListing, IOrderListingFilter> =
+    new IndexedDbOfflineRepository(
+      this.context,
+      OfflineStoreNames.orders,
+      (dto) => buildOrderListing(dto, this.customerRepository),
+      matchesDocumentListingFilter,
+      () => {
+        throw new Error('Orders store does not accept synced listings.');
+      },
+    );
 
-  readonly pendingBudgetRepository: IPendingDocumentRepository<IBudgetSaveDto> =
-    new IndexedDbPendingRepository<IBudgetSaveDto>(this.context, OfflineStoreNames.pendingBudgets);
+  readonly budgetRepository: IOfflineRepository<IBudgetSaveDto, IBudgetListing, IBudgetListingFilter> =
+    new IndexedDbOfflineRepository(
+      this.context,
+      OfflineStoreNames.budgets,
+      (dto) => buildBudgetListing(dto, this.customerRepository),
+      matchesDocumentListingFilter,
+      () => {
+        throw new Error('Budgets store does not accept synced listings.');
+      },
+    );
 
   readonly dataSynchronizationService: IDataSynchronizationService =
     new DataSynchronizationService({
@@ -77,24 +96,44 @@ class OfflineCompositionRootImpl {
       budgetApi: new BudgetService(),
       productRepository: this.productRepository,
       customerRepository: this.customerRepository,
-      pendingOrderRepository: this.pendingOrderRepository,
-      pendingBudgetRepository: this.pendingBudgetRepository,
+      orderRepository: this.orderRepository,
+      budgetRepository: this.budgetRepository,
     });
 
   createProductService(): ICrudService<IProductSaveDto, IProductDetailDto, IProductListing, IProductListingFilter> {
-    return new OfflineCrudService(new ProductService(), this.productRepository);
+    return new OfflineCrudService(new ProductService(), {
+      repository: this.productRepository,
+      toListing: (dto) => ({ id: dto.id, description: dto.description }),
+      toDetail: async (dto) => productSaveToDetail(dto),
+      listingScope: 'snapshot',
+    });
   }
 
   createCustomerService(): ICrudService<ICustomerSaveDto, ICustomerDetailDto, ICustomerListing, ICustomerListingFilter> {
-    return new OfflineCrudService(new CustomerService(), this.customerRepository);
+    return new OfflineCrudService(new CustomerService(), {
+      repository: this.customerRepository,
+      toListing: (dto) => ({ id: dto.id, name: dto.name }),
+      toDetail: async (dto) => customerSaveToDetail(dto),
+      listingScope: 'snapshot',
+    });
   }
 
   createOrderService(): ICrudService<IOrderSaveDto, IOrderDetailDto, IOrderListing, IOrderListingFilter> {
-    return new OfflineDocumentService(new OrderService(), this.pendingOrderRepository);
+    return new OfflineCrudService(new OrderService(), {
+      repository: this.orderRepository,
+      toListing: (dto) => buildOrderListing(dto, this.customerRepository),
+      toDetail: (dto) => buildOrderDetail(dto, this.customerRepository, this.productRepository),
+      listingScope: 'localOnly',
+    });
   }
 
   createBudgetService(): ICrudService<IBudgetSaveDto, IBudgetDetailDto, IBudgetListing, IBudgetListingFilter> {
-    return new OfflineDocumentService(new BudgetService(), this.pendingBudgetRepository);
+    return new OfflineCrudService(new BudgetService(), {
+      repository: this.budgetRepository,
+      toListing: (dto) => buildBudgetListing(dto, this.customerRepository),
+      toDetail: (dto) => buildBudgetDetail(dto, this.customerRepository, this.productRepository),
+      listingScope: 'localOnly',
+    });
   }
 }
 

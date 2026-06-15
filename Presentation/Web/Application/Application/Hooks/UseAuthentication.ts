@@ -54,10 +54,15 @@ export function UseAuthentication(): UseAuthenticationResult {
     // The operation mode is resolved ONCE, at startup, and never re-evaluated
     // during the session (per the offline requirements).
     const bootstrap = async (): Promise<void> => {
-      const online = await connectivityProbe.isOnline();
-      OperationModeService.resolve(online ? OperationMode.Online : OperationMode.Offline);
+      const operationMode = process.env.EXPO_PUBLIC_OPERATION_MODE;
+      if (operationMode) {
+        OperationModeService.resolve(operationMode as OperationMode);
+      } else {
+        const online = await connectivityProbe.isOnline();
+        OperationModeService.resolve(online ? OperationMode.Online : OperationMode.Offline);
+      }
 
-      if (online) {
+      if (OperationModeService.getMode() === OperationMode.Online) {
         try {
           const token = await authenticationService.refresh();
           storeToken(token);
