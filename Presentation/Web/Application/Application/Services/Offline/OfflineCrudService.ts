@@ -1,6 +1,6 @@
 import { ICrudService } from '../../Interfaces/Services/ICrudService';
 import { IOfflineRepository } from '../../Interfaces/Persistence/IOfflineRepository';
-import { OperationModeService } from './OperationModeService';
+import { OperationMode, OperationModeService } from './OperationModeService';
 import {
   assignLocalId,
   blockIfNotLocalWhenOffline,
@@ -32,14 +32,14 @@ export class OfflineCrudService<TSaveDto extends { id: number }, TDetailDto, TLi
   ) {}
 
   async getAll(filter: TFilter): Promise<TListing[]> {
-    if (OperationModeService.isOffline()) {
+    if (OperationModeService.getMode() === OperationMode.Offline) {
       return this.config.repository.getAll(filter);
     }
     return this.apiService.getAll(filter);
   }
 
   async getById(id: number): Promise<TDetailDto> {
-    if (OperationModeService.isOffline()) {
+    if (OperationModeService.getMode() === OperationMode.Offline) {
       blockIfNotLocalWhenOffline(id);
       const record = await this.config.repository.getById(id);
       if (!record) {
@@ -51,7 +51,7 @@ export class OfflineCrudService<TSaveDto extends { id: number }, TDetailDto, TLi
   }
 
   async create(dto: TSaveDto): Promise<TSaveDto> {
-    if (OperationModeService.isOffline()) {
+    if (OperationModeService.getMode() === OperationMode.Offline) {
       const records = await this.config.repository.getAllRecords();
       const offlineDto = assignLocalId(dto, records.map((record) => record.id));
       await this.config.repository.upsert(offlineDto);
@@ -62,7 +62,7 @@ export class OfflineCrudService<TSaveDto extends { id: number }, TDetailDto, TLi
   }
 
   async update(id: number, dto: TSaveDto): Promise<TSaveDto> {
-    if (OperationModeService.isOffline()) {
+    if (OperationModeService.getMode() === OperationMode.Offline) {
       blockIfNotLocalWhenOffline(id);
       const updated = { ...dto, id };
       await this.config.repository.upsert(updated);
@@ -72,7 +72,7 @@ export class OfflineCrudService<TSaveDto extends { id: number }, TDetailDto, TLi
   }
 
   async delete(id: number): Promise<void> {
-    if (OperationModeService.isOffline()) {
+    if (OperationModeService.getMode() === OperationMode.Offline) {
       blockIfNotLocalWhenOffline(id);
       await this.config.repository.remove(id);
       return;

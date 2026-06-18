@@ -7,6 +7,7 @@ import { CrudOperationType, CrudOperationTypeUtility } from '../../../../Infrast
 import { DateField } from '../../../Components/DateField';
 import { CrudListScreen } from '../../CrudListScreen';
 import { listScreenStyles, tableStyles } from '../../../Styles';
+import { OperationMode } from '../../../../Application/Services/Offline/OperationModeService';
 
 interface CommercialDocumentListState<TListing extends IDocumentListing> {
   page: number;
@@ -37,6 +38,7 @@ interface CommercialDocumentListScreenProps<TListing extends IDocumentListing> e
   extraActions?: (item: TListing) => ReactNode;
   allowedCrudOperationTypes?: CrudOperationType[];
   canMutateItem?: (item: TListing) => boolean;
+  operationMode: OperationMode;
 }
 
 export function CommercialDocumentListScreen<TListing extends IDocumentListing>({
@@ -58,6 +60,7 @@ export function CommercialDocumentListScreen<TListing extends IDocumentListing>(
   canMutateItem,
   onGoBack,
   onNavigateToForm,
+  operationMode,
 }: CommercialDocumentListScreenProps<TListing>) {
   const columns: IColumn<TListing>[] = [
     { key: 'id', label: 'Código', flex: 0.4 },
@@ -134,7 +137,7 @@ export function CommercialDocumentListScreen<TListing extends IDocumentListing>(
       extraActions={extraActions}
       allowedCrudOperationTypes={allowedCrudOperationTypes}
       canMutateItem={canMutateItem}
-      emptyGridMessage={isOffline ? 'Somente registros gerados no modo offline serão exibidos.' : null}
+      emptyGridMessage={operationMode === OperationMode.Offline ? 'Somente registros gerados no modo offline serão exibidos.' : undefined}
     />
   );
 }

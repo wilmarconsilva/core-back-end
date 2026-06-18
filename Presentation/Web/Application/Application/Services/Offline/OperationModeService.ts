@@ -8,7 +8,7 @@ export enum OperationMode {
  * Per the offline requirements the mode must NOT change during usage and can
  * only be re-evaluated after reloading the application, so it is write-once.
  */
-class OperationModeServiceImpl {
+class OperationModeServiceImplementation {
   private mode: OperationMode | null = null;
 
   resolve(mode: OperationMode): void {
@@ -21,13 +21,6 @@ class OperationModeServiceImpl {
     return this.mode ?? OperationMode.Online;
   }
 
-  isOffline(): boolean {
-    return this.getMode() === OperationMode.Offline;
-  }
-
-  isResolved(): boolean {
-    return this.mode !== null;
-  }
 }
 
-export const OperationModeService = new OperationModeServiceImpl();
+export const OperationModeService = new OperationModeServiceImplementation();

@@ -5,6 +5,7 @@ import { UseDataSynchronization } from '../../Application/Hooks/UseDataSynchroni
 import { UseOperationMode } from '../../Application/Hooks/UseOperationMode';
 import { SynchronizationStatus } from '../../Application/Interfaces/Services/IDataSynchronizationService';
 import { colors } from '../Styles';
+import { OperationMode } from '../../Application/Services/Offline/OperationModeService';
 
 type IndicatorAppearance = {
   icon: keyof typeof Ionicons.glyphMap;
@@ -13,8 +14,8 @@ type IndicatorAppearance = {
   spinning: boolean;
 };
 
-function resolveAppearance(status: SynchronizationStatus, isOffline: boolean): IndicatorAppearance | null {
-  if (isOffline) {
+function resolveAppearance(status: SynchronizationStatus, operationMode: OperationMode): IndicatorAppearance | null {
+  if (operationMode === OperationMode.Offline) {
     return { icon: 'cloud-offline-outline', color: colors.textSecondary, label: 'Offline', spinning: false };
   }
 
@@ -36,10 +37,10 @@ function resolveAppearance(status: SynchronizationStatus, isOffline: boolean): I
  */
 export function DataSynchronizationIndicator() {
   const { status } = UseDataSynchronization();
-  const { isOffline } = UseOperationMode();
+  const operationMode = UseOperationMode();
   const spin = useRef(new Animated.Value(0)).current;
 
-  const appearance = resolveAppearance(status, isOffline);
+  const appearance = resolveAppearance(status, operationMode);
   const isSpinning = appearance?.spinning ?? false;
 
   useEffect(() => {

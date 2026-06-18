@@ -9,12 +9,12 @@ import { ICustomerListingFilter } from '../../../Application/Interfaces/DataTran
 import { ICrudListScreenProps } from '../../Interfaces/Screens/ICrudListScreenProps';
 import { listScreenStyles } from '../../Styles';
 import { CrudListScreen } from '../CrudListScreen';
-import { CrudOperationType, CrudOperationTypeUtility } from '../../../Infrastructure/Persistence/Enums/CrudOperationType';
 import { isLocalRecord } from '../../../Application/Services/Utilities/OfflineUtilities';
+import { OperationMode } from '../../../Application/Services/Offline/OperationModeService';
 
 export function CustomersListScreen({ onGoBack, onNavigateToForm }: ICrudListScreenProps) {
   const { listings, isLoadingList, isDeleting, loadAll, remove } = UseCustomers();
-  const { isOffline } = UseOperationMode();
+  const operationMode = UseOperationMode();
   const [name, setName] = useState('');
 
   const buildFilter = useCallback((p: number, pageSize: number): ICustomerListingFilter => ({
@@ -64,7 +64,7 @@ export function CustomersListScreen({ onGoBack, onNavigateToForm }: ICrudListScr
       getDeleteMessage={(item) => `Deseja excluir o cliente "${item?.name}"?`}
       onConfirmDelete={listState.confirmDelete}
       onCancelDelete={listState.closeDeleteConfirm}
-      canMutateItem={isOffline ? (item) => isLocalRecord(item.id) : undefined}
+      canMutateItem={operationMode === OperationMode.Offline ? (item) => isLocalRecord(item.id) : undefined}
     />
   );
 }

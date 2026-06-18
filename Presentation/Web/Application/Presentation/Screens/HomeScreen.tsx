@@ -22,8 +22,9 @@ import { OrdersListScreen } from './Commercial/Documents/Orders/OrdersListScreen
 import { OrderFormScreen } from './Commercial/Documents/Orders/OrderFormScreen';
 import { BudgetReportScreen } from './Commercial/Documents/Budgets/BudgetReportScreen';
 import { OrderReportScreen } from './Commercial/Documents/Orders/OrderReportScreen';
+import { OperationMode } from '../../Application/Services/Offline/OperationModeService';
 
-function HomeMenuScreen({ userName, navigate, isOffline }: IHomeMenuProps) {
+function HomeMenuScreen({ userName, navigate, operationMode }: IHomeMenuProps) {
   const budgetTarget: Screen = { name: 'budgets' };
   const orderTarget: Screen = { name: 'orders' };
 
@@ -38,7 +39,7 @@ function HomeMenuScreen({ userName, navigate, isOffline }: IHomeMenuProps) {
           <MenuItem icon="cube-outline" label="Produtos" onPress={() => navigate({ name: 'products' })} />
           <MenuItem icon="cash-outline" label="Orçamentos" onPress={() => navigate(budgetTarget)} />
           <MenuItem icon="clipboard-outline" label="Pedidos" onPress={() => navigate(orderTarget)} />
-          {!isOffline && (
+          {operationMode === OperationMode.Online && (
             <>
               <MenuItem icon="location-outline" label="Localidades" onPress={() => navigate({ name: 'localities' })} />
               <MenuItem icon="bar-chart-outline" label="Relatórios" onPress={() => navigate({ name: 'reports' })} />
@@ -56,7 +57,7 @@ function screenKey(screen: Screen): string {
 
 export function HomeScreen({ userName }: IHomeScreenProps) {
   const { currentScreen, navigate, goBack } = UseNavigation();
-  const { isOffline } = UseOperationMode();
+  const operationMode = UseOperationMode();
 
   function renderScreen() {
     switch (currentScreen.name) {
@@ -99,7 +100,7 @@ export function HomeScreen({ userName }: IHomeScreenProps) {
         return <OrderReportScreen onGoBack={goBack} />;
 
       default:
-        return <HomeMenuScreen userName={userName} navigate={navigate} isOffline={isOffline} />;
+        return <HomeMenuScreen userName={userName} navigate={navigate} operationMode={operationMode} />;
     }
   }
 

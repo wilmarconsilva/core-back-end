@@ -7,13 +7,13 @@ import { isLocalRecord } from '../../../../../Application/Services/Utilities/Off
 import { IOrderListing } from '../../../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderListing';
 import { IOrderListingFilter } from '../../../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderListingFilter';
 import { ICrudListScreenProps } from '../../../../Interfaces/Screens/ICrudListScreenProps';
-import { CrudOperationType, CrudOperationTypeUtility } from '../../../../../Infrastructure/Persistence/Enums/CrudOperationType';
 import { tableStyles } from '../../../../Styles';
 import { CommercialDocumentListScreen } from '../CommercialDocumentListScreen';
+import { OperationMode } from '../../../../../Application/Services/Offline/OperationModeService';
 
 export function OrdersListScreen({ onGoBack, onNavigateToForm }: ICrudListScreenProps) {
   const { listings, isLoadingList, isDeleting, loadAll, remove } = UseOrders();
-  const { isOffline } = UseOperationMode();
+  const operationMode = UseOperationMode();
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
@@ -57,7 +57,8 @@ export function OrdersListScreen({ onGoBack, onNavigateToForm }: ICrudListScreen
       ]}
       onGoBack={onGoBack}
       onNavigateToForm={onNavigateToForm}
-      canMutateItem={isOffline ? (item) => isLocalRecord(item.id) : undefined}
+      canMutateItem={operationMode === OperationMode.Offline ? (item) => isLocalRecord(item.id) : undefined}
+      operationMode={operationMode}
     />
   );
 }

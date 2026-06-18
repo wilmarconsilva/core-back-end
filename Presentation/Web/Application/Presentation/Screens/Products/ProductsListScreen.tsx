@@ -9,13 +9,12 @@ import { IProductListingFilter } from '../../../Application/Interfaces/DataTrans
 import { ICrudListScreenProps } from '../../Interfaces/Screens/ICrudListScreenProps';
 import { listScreenStyles } from '../../Styles';
 import { CrudListScreen } from '../CrudListScreen';
-import { CrudOperationType } from '../../../Infrastructure/Persistence/Enums/CrudOperationType';
-import { CrudOperationTypeUtility } from '../../../Infrastructure/Persistence/Enums/CrudOperationType';
 import { isLocalRecord } from '../../../Application/Services/Utilities/OfflineUtilities';
+import { OperationMode } from '../../../Application/Services/Offline/OperationModeService';
 
 export function ProductsListScreen({ onGoBack, onNavigateToForm }: ICrudListScreenProps) {
   const { listings, isLoadingList, isDeleting, loadAll, remove } = UseProducts();
-  const { isOffline } = UseOperationMode();
+  const operationMode = UseOperationMode();
   const [description, setDescription] = useState('');
 
   const buildFilter = useCallback((p: number, pageSize: number): IProductListingFilter => ({
@@ -64,7 +63,7 @@ export function ProductsListScreen({ onGoBack, onNavigateToForm }: ICrudListScre
       getDeleteMessage={(item) => `Deseja excluir o produto "${item?.description}"?`}
       onConfirmDelete={listState.confirmDelete}
       onCancelDelete={listState.closeDeleteConfirm}
-      canMutateItem={isOffline ? (item) => isLocalRecord(item.id) : undefined}
+      canMutateItem={operationMode === OperationMode.Offline ? (item) => isLocalRecord(item.id) : undefined}
     />
   );
 }
