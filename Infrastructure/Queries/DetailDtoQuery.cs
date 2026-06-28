@@ -38,7 +38,7 @@ namespace Infrastructure.Queries
 
             return ordered
                 .Skip(filter.RegistersStart)
-                .Take(filter.RegistersEnd - filter.RegistersStart);
+                .Take(filter.RegistersQuantity);
         }
     }
 }

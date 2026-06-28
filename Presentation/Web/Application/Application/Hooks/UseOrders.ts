@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { OfflineCompositionRoot } from '../../Configuration/Offline/OfflineCompositionRoot';
+import { OfflineCompositionRoot } from '../../Infrastructure/Persistence/OfflineCompositionRoot';
 import { IOrderSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderSaveDto';
 import { IOrderDetailDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderDetailDto';
 import { IOrderListing } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderListing';

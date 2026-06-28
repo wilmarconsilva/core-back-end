@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { OfflineCompositionRoot } from '../../Configuration/Offline/OfflineCompositionRoot';
+import { OfflineCompositionRoot } from '../../Infrastructure/Persistence/OfflineCompositionRoot';
 import { SynchronizationStatus } from '../Interfaces/Services/IDataSynchronizationService';
 
 /**

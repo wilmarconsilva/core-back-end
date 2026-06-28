@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { OfflineCompositionRoot } from '../../Configuration/Offline/OfflineCompositionRoot';
+import { OfflineCompositionRoot } from '../../Infrastructure/Persistence/OfflineCompositionRoot';
 import { BudgetService } from '../Services/Commercial/Documents/Budgets/BudgetService';
 import { IBudgetSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetSaveDto';
 import { IBudgetDetailDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetDetailDto';

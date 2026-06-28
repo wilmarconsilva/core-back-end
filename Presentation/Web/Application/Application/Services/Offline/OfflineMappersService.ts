@@ -18,7 +18,11 @@ import { IProductListing } from '../../Interfaces/DataTransferObjects/Products/I
 import { IProductSaveDto } from '../../Interfaces/DataTransferObjects/Products/IProductSaveDto';
 import { IProductListingFilter } from '../../Interfaces/DataTransferObjects/Products/IProductListingFilter';
 import { ICustomerListingFilter } from '../../Interfaces/DataTransferObjects/Persons/Customers/ICustomerListingFilter';
-import { IOfflineRepository } from '../../Interfaces/Persistence/IOfflineRepository';
+import { ILocalityDetailDto } from '../../Interfaces/DataTransferObjects/Localities/ILocalityDetailDto';
+import { ILocalityListing } from '../../Interfaces/DataTransferObjects/Localities/ILocalityListing';
+import { ILocalityListingFilter } from '../../Interfaces/DataTransferObjects/Localities/ILocalityListingFilter';
+import { ILocalitySaveDto } from '../../Interfaces/DataTransferObjects/Localities/ILocalitySaveDto';
+import { IOfflineRepository } from '../../../Infrastructure/Persistence/Interfaces/IOfflineRepository';
 import { CommercialDocumentFormService } from '../Commercial/Documents/CommercialDocumentFormService';
 
 function containsIgnoreCase(value: string, term?: string): boolean {
@@ -46,6 +50,30 @@ export function matchesDocumentListingFilter(
   if (filter.creationDateTimeStart && listing.creationDateTime < filter.creationDateTimeStart) return false;
   if (filter.creationDateTimeEnd && listing.creationDateTime > filter.creationDateTimeEnd) return false;
   return true;
+}
+
+export function matchesLocalityFilter(listing: ILocalityListing, filter: ILocalityListingFilter): boolean {
+  return (
+    matchesEntityId(listing.id, filter.id) &&
+    containsIgnoreCase(listing.description, filter.description) &&
+    (filter.stateId === undefined || listing.stateId === filter.stateId)
+  );
+}
+
+export function localitySaveToDetail(dto: ILocalitySaveDto): ILocalityDetailDto {
+  return {
+    id: dto.id,
+    description: dto.description,
+    state: dto.stateId !== undefined ? { id: dto.stateId, description: '' } : undefined,
+  };
+}
+
+export function listingToLocalitySaveDto(listing: ILocalityListing): ILocalitySaveDto {
+  return {
+    id: listing.id,
+    description: listing.description,
+    stateId: listing.stateId,
+  };
 }
 
 function toIsoDateTime(value: Date | string): string {

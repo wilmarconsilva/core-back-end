@@ -44,6 +44,10 @@ export class IndexedDbContext implements IIndexedDbContext {
           if (!database.objectStoreNames.contains(OfflineStoreNames.budgets)) {
             database.createObjectStore(OfflineStoreNames.budgets, { keyPath: 'id' });
           }
+
+          if (!database.objectStoreNames.contains(OfflineStoreNames.localities)) {
+            database.createObjectStore(OfflineStoreNames.localities, { keyPath: 'id' });
+          }
         },
       });
     }

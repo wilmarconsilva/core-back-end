@@ -14,8 +14,6 @@ import { CustomersListScreen } from './Customers/CustomersListScreen';
 import { CustomerFormScreen } from './Customers/CustomerFormScreen';
 import { ProductsListScreen } from './Products/ProductsListScreen';
 import { ProductFormScreen } from './Products/ProductFormScreen';
-import { LocalitiesListScreen } from './Localities/LocalitiesListScreen';
-import { LocalityFormScreen } from './Localities/LocalityFormScreen';
 import { BudgetsListScreen } from './Commercial/Documents/Budgets/BudgetsListScreen';
 import { BudgetFormScreen } from './Commercial/Documents/Budgets/BudgetFormScreen';
 import { OrdersListScreen } from './Commercial/Documents/Orders/OrdersListScreen';
@@ -25,8 +23,6 @@ import { OrderReportScreen } from './Commercial/Documents/Orders/OrderReportScre
 import { OperationMode } from '../../Application/Services/Offline/OperationModeService';
 
 function HomeMenuScreen({ userName, navigate, operationMode }: IHomeMenuProps) {
-  const budgetTarget: Screen = { name: 'budgets' };
-  const orderTarget: Screen = { name: 'orders' };
 
   return (
     <View style={layoutStyles.screenWrapper}>
@@ -35,20 +31,20 @@ function HomeMenuScreen({ userName, navigate, operationMode }: IHomeMenuProps) {
         <Text style={typographyStyles.title}>Olá, {userName}!</Text>
         <Text style={typographyStyles.subtitle}>O que deseja acessar?</Text>
         <View style={gridStyles.grid}>
-          <MenuItem icon="people-outline" label="Clientes" onPress={() => navigate({ name: 'customers' })} />
-          <MenuItem icon="cube-outline" label="Produtos" onPress={() => navigate({ name: 'products' })} />
-          <MenuItem icon="cash-outline" label="Orçamentos" onPress={() => navigate(budgetTarget)} />
-          <MenuItem icon="clipboard-outline" label="Pedidos" onPress={() => navigate(orderTarget)} />
+          <MenuItem icon="people-outline" label="Clientes" menuItemSize="medium" onPress={() => navigate({ name: 'customers' })} />
+          <MenuItem icon="cube-outline" label="Produtos" menuItemSize="medium" onPress={() => navigate({ name: 'products' })} />
+          <MenuItem icon="cash-outline" label="Orçamentos" menuItemSize="medium" onPress={() => navigate({ name: 'budgets' })} />
+          <MenuItem icon="clipboard-outline" label="Pedidos" menuItemSize="medium" onPress={() => navigate({ name: 'orders' })} />
           {operationMode === OperationMode.Online && (
             <>
-              <MenuItem icon="location-outline" label="Localidades" onPress={() => navigate({ name: 'localities' })} />
-              <MenuItem icon="bar-chart-outline" label="Relatórios" onPress={() => navigate({ name: 'reports' })} />
+              <MenuItem icon="bar-chart-outline" label="Relatórios" menuItemSize="large" onPress={() => navigate({ name: 'reports' })} />
             </>
           )}
         </View>
       </ScrollView>
     </View>
   );
+
 }
 
 function screenKey(screen: Screen): string {
@@ -80,11 +76,6 @@ export function HomeScreen({ userName }: IHomeScreenProps) {
         return <OrdersListScreen onGoBack={goBack} onNavigateToForm={(id) => navigate({ name: 'orderForm', id })} />;
       case 'orderForm':
         return <OrderFormScreen id={currentScreen.id} onGoBack={goBack} />;
-
-      case 'localities':
-        return <LocalitiesListScreen onGoBack={goBack} onNavigateToForm={(id) => navigate({ name: 'localityForm', id })} />;
-      case 'localityForm':
-        return <LocalityFormScreen id={currentScreen.id} onGoBack={goBack} />;
 
       case 'reports':
         return (

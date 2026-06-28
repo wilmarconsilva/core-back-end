@@ -1,7 +1,7 @@
 import { IListingFilter } from '../../Interfaces/DataTransferObjects/IListingFilter';
 import { IDocumentSaveDto } from '../../Interfaces/DataTransferObjects/Commercial/Documents/IDocumentSaveDto';
 import { IDocumentProductSaveDto } from '../../Interfaces/DataTransferObjects/Commercial/Documents/IDocumentProductSaveDto';
-import { IOfflineRepository } from '../../Interfaces/Persistence/IOfflineRepository';
+import { IOfflineRepository } from '../../../Infrastructure/Persistence/Interfaces/IOfflineRepository';
 import {
   IDataSynchronizationService,
   SynchronizationListener,
@@ -15,6 +15,9 @@ import { ICustomerListingFilter } from '../../Interfaces/DataTransferObjects/Per
 import { ICustomerSaveDto } from '../../Interfaces/DataTransferObjects/Persons/Customers/ICustomerSaveDto';
 import { IOrderSaveDto } from '../../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderSaveDto';
 import { IBudgetSaveDto } from '../../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetSaveDto';
+import { ILocalityListing } from '../../Interfaces/DataTransferObjects/Localities/ILocalityListing';
+import { ILocalityListingFilter } from '../../Interfaces/DataTransferObjects/Localities/ILocalityListingFilter';
+import { ILocalitySaveDto } from '../../Interfaces/DataTransferObjects/Localities/ILocalitySaveDto';
 import { toApiCreatePayload } from '../Utilities/OfflineUtilities';
 import { remapDocumentReferences } from './OfflineMappersService';
 
@@ -33,10 +36,12 @@ interface DataSynchronizationDependencies {
   customerApi: IListingFetchService<ICustomerListing, ICustomerListingFilter> & ICreatePushService<ICustomerSaveDto>;
   orderApi: ICreatePushService<IOrderSaveDto>;
   budgetApi: ICreatePushService<IBudgetSaveDto>;
+  localityApi: IListingFetchService<ILocalityListing, ILocalityListingFilter>;
   productRepository: IOfflineRepository<IProductSaveDto, IProductListing, IProductListingFilter>;
   customerRepository: IOfflineRepository<ICustomerSaveDto, ICustomerListing, ICustomerListingFilter>;
   orderRepository: IOfflineRepository<IOrderSaveDto, unknown, unknown>;
   budgetRepository: IOfflineRepository<IBudgetSaveDto, unknown, unknown>;
+  localityRepository: IOfflineRepository<ILocalitySaveDto, ILocalityListing, ILocalityListingFilter>;
 }
 
 /**
@@ -44,7 +49,7 @@ interface DataSynchronizationDependencies {
  *   1. push local Products    2. push local Customers
  *   3. remap FKs              4. push local Orders
  *   5. push local Budgets     6. refresh Products
- *   7. refresh Customers
+ *   7. refresh Customers      8. refresh Localities
  */
 export class DataSynchronizationService implements IDataSynchronizationService {
   private status: SynchronizationStatus = 'idle';
@@ -110,6 +115,7 @@ export class DataSynchronizationService implements IDataSynchronizationService {
     ));
     await runStep(() => this.refreshProducts());
     await runStep(() => this.refreshCustomers());
+    await runStep(() => this.refreshLocalities());
 
     this.setStatus(hadError ? 'error' : 'success');
   }
@@ -155,23 +161,26 @@ export class DataSynchronizationService implements IDataSynchronizationService {
     await this.dependencies.customerRepository.replaceSynced(customers);
   }
 
+  private async refreshLocalities(): Promise<void> {
+    const localities = await this.fetchAll(this.dependencies.localityApi);
+    await this.dependencies.localityRepository.replaceSynced(localities);
+  }
+
   private async fetchAll<TListing, TFilter extends IListingFilter>(
     service: IListingFetchService<TListing, TFilter>,
   ): Promise<TListing[]> {
     const all: TListing[] = [];
     let start = 0;
+    let page: TListing[] | null = null;
 
-    for (;;) {
-      const page = await service.getAll({
+    while(page === null || page.length === FETCH_PAGE_SIZE) {
+      page = await service.getAll({
         registersStart: start,
         registersEnd: start + FETCH_PAGE_SIZE,
       } as TFilter);
 
       all.push(...page);
 
-      if (page.length < FETCH_PAGE_SIZE) {
-        break;
-      }
       start += FETCH_PAGE_SIZE;
     }
 

@@ -1,5 +1,5 @@
 import { ICrudService } from '../../Interfaces/Services/ICrudService';
-import { IOfflineRepository } from '../../Interfaces/Persistence/IOfflineRepository';
+import { IOfflineRepository } from '../../../Infrastructure/Persistence/Interfaces/IOfflineRepository';
 import { OperationMode, OperationModeService } from './OperationModeService';
 import {
   assignLocalId,

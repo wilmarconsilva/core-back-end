@@ -1,5 +1,5 @@
 import { IListingFilter } from '../../../Application/Interfaces/DataTransferObjects/IListingFilter';
-import { IOfflineRepository } from '../../../Application/Interfaces/Persistence/IOfflineRepository';
+import { IOfflineRepository } from '../Interfaces/IOfflineRepository';
 import { isLocalRecord } from '../../../Application/Services/Utilities/OfflineUtilities';
 import { IIndexedDbContext } from './IIndexedDbContext';
 import { OfflineStoreName } from './IndexedDbSchema';

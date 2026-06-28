@@ -1,5 +1,5 @@
 import { ICrudService } from '../../Application/Interfaces/Services/ICrudService';
-import { IOfflineRepository } from '../../Application/Interfaces/Persistence/IOfflineRepository';
+import { IOfflineRepository } from './Interfaces/IOfflineRepository';
 import { OfflineCrudService } from '../../Application/Services/Offline/OfflineCrudService';
 import { DataSynchronizationService } from '../../Application/Services/Offline/DataSynchronizationService';
 import { IDataSynchronizationService } from '../../Application/Interfaces/Services/IDataSynchronizationService';
@@ -10,14 +10,18 @@ import {
   buildOrderListing,
   customerSaveToDetail,
   listingToCustomerSaveDto,
+  listingToLocalitySaveDto,
   listingToProductSaveDto,
+  localitySaveToDetail,
   matchesCustomerFilter,
   matchesDocumentListingFilter,
+  matchesLocalityFilter,
   matchesProductFilter,
   productSaveToDetail,
 } from '../../Application/Services/Offline/OfflineMappersService';
 import { ProductService } from '../../Application/Services/Products/ProductService';
 import { CustomerService } from '../../Application/Services/Customers/CustomerService';
+import { LocalityService } from '../../Application/Services/Localities/LocalityService';
 import { OrderService } from '../../Application/Services/Commercial/Documents/Orders/OrderService';
 import { BudgetService } from '../../Application/Services/Commercial/Documents/Budgets/BudgetService';
 import { IProductListing } from '../../Application/Interfaces/DataTransferObjects/Products/IProductListing';
@@ -36,9 +40,13 @@ import { IBudgetSaveDto } from '../../Application/Interfaces/DataTransferObjects
 import { IBudgetDetailDto } from '../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetDetailDto';
 import { IBudgetListing } from '../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListing';
 import { IBudgetListingFilter } from '../../Application/Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetListingFilter';
-import { IndexedDbContext } from '../../Infrastructure/Persistence/IndexedDb/IndexedDbContext';
-import { IndexedDbOfflineRepository } from '../../Infrastructure/Persistence/IndexedDb/IndexedDbOfflineRepository';
-import { OfflineStoreNames } from '../../Infrastructure/Persistence/IndexedDb/IndexedDbSchema';
+import { ILocalityDetailDto } from '../../Application/Interfaces/DataTransferObjects/Localities/ILocalityDetailDto';
+import { ILocalityListing } from '../../Application/Interfaces/DataTransferObjects/Localities/ILocalityListing';
+import { ILocalityListingFilter } from '../../Application/Interfaces/DataTransferObjects/Localities/ILocalityListingFilter';
+import { ILocalitySaveDto } from '../../Application/Interfaces/DataTransferObjects/Localities/ILocalitySaveDto';
+import { IndexedDbContext } from './IndexedDb/IndexedDbContext';
+import { IndexedDbOfflineRepository } from './IndexedDb/IndexedDbOfflineRepository';
+import { OfflineStoreNames } from './IndexedDb/IndexedDbSchema';
 
 /**
  * Composition root that wires the IndexedDB persistence into the offline-aware
@@ -88,16 +96,27 @@ class OfflineCompositionRootImpl {
       },
     );
 
+  readonly localityRepository: IOfflineRepository<ILocalitySaveDto, ILocalityListing, ILocalityListingFilter> =
+    new IndexedDbOfflineRepository(
+      this.context,
+      OfflineStoreNames.localities,
+      (dto) => ({ id: dto.id, description: dto.description, stateId: dto.stateId }),
+      matchesLocalityFilter,
+      listingToLocalitySaveDto,
+    );
+
   readonly dataSynchronizationService: IDataSynchronizationService =
     new DataSynchronizationService({
       productApi: new ProductService(),
       customerApi: new CustomerService(),
       orderApi: new OrderService(),
       budgetApi: new BudgetService(),
+      localityApi: new LocalityService(),
       productRepository: this.productRepository,
       customerRepository: this.customerRepository,
       orderRepository: this.orderRepository,
       budgetRepository: this.budgetRepository,
+      localityRepository: this.localityRepository,
     });
 
   createProductService(): ICrudService<IProductSaveDto, IProductDetailDto, IProductListing, IProductListingFilter> {
@@ -133,6 +152,15 @@ class OfflineCompositionRootImpl {
       toListing: (dto) => buildBudgetListing(dto, this.customerRepository),
       toDetail: (dto) => buildBudgetDetail(dto, this.customerRepository, this.productRepository),
       listingScope: 'localOnly',
+    });
+  }
+
+  createLocalityService(): ICrudService<ILocalitySaveDto, ILocalityDetailDto, ILocalityListing, ILocalityListingFilter> {
+    return new OfflineCrudService(new LocalityService(), {
+      repository: this.localityRepository,
+      toListing: (dto) => ({ id: dto.id, description: dto.description, stateId: dto.stateId }),
+      toDetail: async (dto) => localitySaveToDetail(dto),
+      listingScope: 'snapshot',
     });
   }
 }

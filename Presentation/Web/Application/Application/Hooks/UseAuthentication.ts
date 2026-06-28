@@ -4,7 +4,7 @@ import { TokenStorageService } from '../Services/TokenStorageService';
 import { setTokenRefreshFunction } from '../Services/HttpClientService';
 import { ConnectivityProbe } from '../Services/Offline/ConnectivityProbe';
 import { OperationMode, OperationModeService } from '../Services/Offline/OperationModeService';
-import { OfflineCompositionRoot } from '../../Configuration/Offline/OfflineCompositionRoot';
+import { OfflineCompositionRoot } from '../../Infrastructure/Persistence/OfflineCompositionRoot';
 import { IAccessToken } from '../Interfaces/DataTransferObjects/Authentication/IAccessToken';
 import { ILoginRequest } from '../Interfaces/DataTransferObjects/Authentication/ILoginRequest';
 

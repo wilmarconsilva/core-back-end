@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { OfflineCompositionRoot } from '../../Configuration/Offline/OfflineCompositionRoot';
+import { OfflineCompositionRoot } from '../../Infrastructure/Persistence/OfflineCompositionRoot';
 import { ICustomerSaveDto } from '../Interfaces/DataTransferObjects/Persons/Customers/ICustomerSaveDto';
 import { ICustomerDetailDto } from '../Interfaces/DataTransferObjects/Persons/Customers/ICustomerDetailDto';
 import { ICustomerListing } from '../Interfaces/DataTransferObjects/Persons/Customers/ICustomerListing';
