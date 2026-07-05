@@ -14,7 +14,8 @@ export type Screen =
   | { name: 'localityForm'; id?: number }
   | { name: 'reports' }
   | { name: 'budgetReport' }
-  | { name: 'orderReport' };
+  | { name: 'orderReport' }
+  | { name: 'synchronizationPendencies' };
 
 export interface IUseNavigationResult {
   currentScreen: Screen;

@@ -18,6 +18,7 @@ import {
   matchesLocalityFilter,
   matchesProductFilter,
   productSaveToDetail,
+  remapDocumentReferences,
 } from '../../Application/Services/Offline/OfflineMappersService';
 import { ProductService } from '../../Application/Services/Products/ProductService';
 import { CustomerService } from '../../Application/Services/Customers/CustomerService';
@@ -44,9 +45,18 @@ import { ILocalityDetailDto } from '../../Application/Interfaces/DataTransferObj
 import { ILocalityListing } from '../../Application/Interfaces/DataTransferObjects/Localities/ILocalityListing';
 import { ILocalityListingFilter } from '../../Application/Interfaces/DataTransferObjects/Localities/ILocalityListingFilter';
 import { ILocalitySaveDto } from '../../Application/Interfaces/DataTransferObjects/Localities/ILocalitySaveDto';
+import { IDocumentProductSaveDto } from '../../Application/Interfaces/DataTransferObjects/Commercial/Documents/IDocumentProductSaveDto';
+import { IDocumentSaveDto } from '../../Application/Interfaces/DataTransferObjects/Commercial/Documents/IDocumentSaveDto';
+import { SynchronizationEntityType } from '../../Application/Interfaces/DataTransferObjects/Offline/SynchronizationEntityType';
+import { ISynchronizationPendencyService } from '../../Application/Interfaces/Services/ISynchronizationPendencyService';
+import { SynchronizationPendencyService } from '../../Application/Services/Offline/SynchronizationPendencyService';
 import { IndexedDbContext } from './IndexedDb/IndexedDbContext';
-import { IndexedDbOfflineRepository } from './IndexedDb/IndexedDbOfflineRepository';
+import { IndexedDbOfflineRepository } from './Repositories/IndexedDbOfflineRepository';
 import { OfflineStoreNames } from './IndexedDb/IndexedDbSchema';
+import { ILocalityOfflineRepository } from './Repositories/Localities/Interfaces/ILocalityOfflineRepository';
+import { LocalityOfflineRepository } from './Repositories/Localities/LocalityOfflineRepository';
+import { ISynchronizationPendencyRepository } from './Repositories/SynchronizationPendencies/Interfaces/ISynchronizationPendencyRepository';
+import { SynchronizationPendencyRepository } from './Repositories/SynchronizationPendencies/SynchronizationPendencyRepository';
 
 /**
  * Composition root that wires the IndexedDB persistence into the offline-aware
@@ -96,14 +106,20 @@ class OfflineCompositionRootImpl {
       },
     );
 
-  readonly localityRepository: IOfflineRepository<ILocalitySaveDto, ILocalityListing, ILocalityListingFilter> =
-    new IndexedDbOfflineRepository(
+  readonly localityRepository: ILocalityOfflineRepository =
+    new LocalityOfflineRepository(
       this.context,
       OfflineStoreNames.localities,
       (dto) => ({ id: dto.id, description: dto.description, stateId: dto.stateId }),
       matchesLocalityFilter,
       listingToLocalitySaveDto,
     );
+
+  private readonly synchronizationPendencyRepository: ISynchronizationPendencyRepository =
+    new SynchronizationPendencyRepository(this.context);
+
+  readonly synchronizationPendencyService: ISynchronizationPendencyService =
+    new SynchronizationPendencyService(this.synchronizationPendencyRepository);
 
   readonly dataSynchronizationService: IDataSynchronizationService =
     new DataSynchronizationService({
@@ -117,6 +133,7 @@ class OfflineCompositionRootImpl {
       orderRepository: this.orderRepository,
       budgetRepository: this.budgetRepository,
       localityRepository: this.localityRepository,
+      synchronizationPendencyService: this.synchronizationPendencyService,
     });
 
   createProductService(): ICrudService<IProductSaveDto, IProductDetailDto, IProductListing, IProductListingFilter> {
@@ -125,6 +142,10 @@ class OfflineCompositionRootImpl {
       toListing: (dto) => ({ id: dto.id, description: dto.description }),
       toDetail: async (dto) => productSaveToDetail(dto),
       listingScope: 'snapshot',
+      onLocalRecordSynchronized: async (localId, serverId) => {
+        await this.synchronizationPendencyService.resolve(SynchronizationEntityType.Product, localId);
+        await this.remapStoredDocumentReferences(new Map(), new Map([[localId, serverId]]));
+      },
     });
   }
 
@@ -134,6 +155,10 @@ class OfflineCompositionRootImpl {
       toListing: (dto) => ({ id: dto.id, name: dto.name }),
       toDetail: async (dto) => customerSaveToDetail(dto),
       listingScope: 'snapshot',
+      onLocalRecordSynchronized: async (localId, serverId) => {
+        await this.synchronizationPendencyService.resolve(SynchronizationEntityType.Customer, localId);
+        await this.remapStoredDocumentReferences(new Map([[localId, serverId]]), new Map());
+      },
     });
   }
 
@@ -143,6 +168,8 @@ class OfflineCompositionRootImpl {
       toListing: (dto) => buildOrderListing(dto, this.customerRepository),
       toDetail: (dto) => buildOrderDetail(dto, this.customerRepository, this.productRepository),
       listingScope: 'localOnly',
+      onLocalRecordSynchronized: (localId) =>
+        this.synchronizationPendencyService.resolve(SynchronizationEntityType.Order, localId),
     });
   }
 
@@ -152,6 +179,8 @@ class OfflineCompositionRootImpl {
       toListing: (dto) => buildBudgetListing(dto, this.customerRepository),
       toDetail: (dto) => buildBudgetDetail(dto, this.customerRepository, this.productRepository),
       listingScope: 'localOnly',
+      onLocalRecordSynchronized: (localId) =>
+        this.synchronizationPendencyService.resolve(SynchronizationEntityType.Budget, localId),
     });
   }
 
@@ -162,6 +191,30 @@ class OfflineCompositionRootImpl {
       toDetail: async (dto) => localitySaveToDetail(dto),
       listingScope: 'snapshot',
     });
+  }
+
+  /**
+   * After a local Customer/Product is resubmitted online, the local documents
+   * that still reference its local (negative) id must point to the server id.
+   */
+  private async remapStoredDocumentReferences(
+    customerIdMap: Map<number, number>,
+    productIdMap: Map<number, number>,
+  ): Promise<void> {
+    await this.remapStoredDocuments(this.orderRepository, customerIdMap, productIdMap);
+    await this.remapStoredDocuments(this.budgetRepository, customerIdMap, productIdMap);
+  }
+
+  private async remapStoredDocuments<T extends IDocumentSaveDto<IDocumentProductSaveDto>>(
+    repository: IOfflineRepository<T, unknown, unknown>,
+    customerIdMap: Map<number, number>,
+    productIdMap: Map<number, number>,
+  ): Promise<void> {
+    const records = await repository.getLocalRecords();
+
+    for (const record of records) {
+      await repository.upsert(remapDocumentReferences(record, customerIdMap, productIdMap));
+    }
   }
 }
 

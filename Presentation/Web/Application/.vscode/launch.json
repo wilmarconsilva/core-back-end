@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "Core - Web Application",
-      "type": "msedge",
+      "type": "chrome",
       "request": "launch",
       "url": "http://localhost:8081",
       "webRoot": "${workspaceFolder}",

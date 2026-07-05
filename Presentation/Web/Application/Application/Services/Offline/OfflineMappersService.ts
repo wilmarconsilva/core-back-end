@@ -132,6 +132,21 @@ export function listingToCustomerSaveDto(listing: ICustomerListing): ICustomerSa
   };
 }
 
+/**
+ * Human-readable identification of a document for the synchronization
+ * pendencies grid (customer name + creation date).
+ */
+export async function describeDocument(
+  dto: IDocumentSaveDto<IDocumentProductSaveDto>,
+  customerRepository: IOfflineRepository<ICustomerSaveDto, ICustomerListing, unknown>,
+): Promise<string> {
+  const customer = await customerRepository.getById(dto.customerId);
+  const creationDate = new Date(toIsoDateTime(dto.creationDateTime)).toLocaleDateString('pt-BR');
+  const customerName = customer?.name ?? 'Cliente não identificado';
+
+  return `${customerName} - ${creationDate}`;
+}
+
 export async function buildDocumentListing(
   dto: IDocumentSaveDto<IDocumentProductSaveDto>,
   customerRepository: IOfflineRepository<ICustomerSaveDto, ICustomerListing, unknown>,

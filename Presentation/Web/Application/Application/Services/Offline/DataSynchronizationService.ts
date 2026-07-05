@@ -15,11 +15,14 @@ import { ICustomerListingFilter } from '../../Interfaces/DataTransferObjects/Per
 import { ICustomerSaveDto } from '../../Interfaces/DataTransferObjects/Persons/Customers/ICustomerSaveDto';
 import { IOrderSaveDto } from '../../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderSaveDto';
 import { IBudgetSaveDto } from '../../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetSaveDto';
-import { ILocalityListing } from '../../Interfaces/DataTransferObjects/Localities/ILocalityListing';
-import { ILocalityListingFilter } from '../../Interfaces/DataTransferObjects/Localities/ILocalityListingFilter';
-import { ILocalitySaveDto } from '../../Interfaces/DataTransferObjects/Localities/ILocalitySaveDto';
+import { ILocalityOfflineRepository } from '../../../Infrastructure/Persistence/Repositories/Localities/Interfaces/ILocalityOfflineRepository';
+import { ILocalityService } from '../../Interfaces/Services/ILocalityService';
+import { ISynchronizationPendencyService } from '../../Interfaces/Services/ISynchronizationPendencyService';
+import { SynchronizationEntityType } from '../../Interfaces/DataTransferObjects/Offline/SynchronizationEntityType';
+import { IApiError } from '../../Interfaces/DataTransferObjects/APIConsumer/IApiError';
 import { toApiCreatePayload } from '../Utilities/OfflineUtilities';
-import { remapDocumentReferences } from './OfflineMappersService';
+import { describeDocument, remapDocumentReferences } from './OfflineMappersService';
+import { APIConsumerUtility } from '../Utilities/APIConsumerUtility';
 
 const FETCH_PAGE_SIZE = 50;
 
@@ -27,8 +30,8 @@ interface ICreatePushService<TSaveDto> {
   create(dto: TSaveDto): Promise<TSaveDto>;
 }
 
-interface IListingFetchService<TListing, TFilter extends IListingFilter> {
-  getAll(filter: TFilter): Promise<TListing[]>;
+interface IListingFetchService<TListing, IListingFilter> {
+  getAll(filter: IListingFilter): Promise<TListing[]>;
 }
 
 interface DataSynchronizationDependencies {
@@ -36,12 +39,13 @@ interface DataSynchronizationDependencies {
   customerApi: IListingFetchService<ICustomerListing, ICustomerListingFilter> & ICreatePushService<ICustomerSaveDto>;
   orderApi: ICreatePushService<IOrderSaveDto>;
   budgetApi: ICreatePushService<IBudgetSaveDto>;
-  localityApi: IListingFetchService<ILocalityListing, ILocalityListingFilter>;
+  localityApi: ILocalityService;
   productRepository: IOfflineRepository<IProductSaveDto, IProductListing, IProductListingFilter>;
   customerRepository: IOfflineRepository<ICustomerSaveDto, ICustomerListing, ICustomerListingFilter>;
   orderRepository: IOfflineRepository<IOrderSaveDto, unknown, unknown>;
   budgetRepository: IOfflineRepository<IBudgetSaveDto, unknown, unknown>;
-  localityRepository: IOfflineRepository<ILocalitySaveDto, ILocalityListing, ILocalityListingFilter>;
+  localityRepository: ILocalityOfflineRepository;
+  synchronizationPendencyService: ISynchronizationPendencyService;
 }
 
 /**
@@ -55,6 +59,7 @@ export class DataSynchronizationService implements IDataSynchronizationService {
   private status: SynchronizationStatus = 'idle';
   private readonly listeners = new Set<SynchronizationListener>();
   private hasRun = false;
+  private hadFailure = false;
 
   constructor(private readonly dependencies: DataSynchronizationDependencies) {}
 
@@ -75,14 +80,14 @@ export class DataSynchronizationService implements IDataSynchronizationService {
       return;
     }
     this.hasRun = true;
+    this.hadFailure = false;
     this.setStatus('syncing');
 
-    let hadError = false;
     const runStep = async (step: () => Promise<void>): Promise<void> => {
       try {
         await step();
       } catch {
-        hadError = true;
+        this.hadFailure = true;
       }
     };
 
@@ -93,44 +98,58 @@ export class DataSynchronizationService implements IDataSynchronizationService {
       productIdMap = await this.pushLocalRecords(
         this.dependencies.productRepository,
         this.dependencies.productApi,
+        SynchronizationEntityType.Product,
+        (record) => record.description,
       );
     });
     await runStep(async () => {
       customerIdMap = await this.pushLocalRecords(
         this.dependencies.customerRepository,
         this.dependencies.customerApi,
+        SynchronizationEntityType.Customer,
+        (record) => record.name,
       );
     });
     await runStep(() => this.pushLocalDocuments(
       this.dependencies.orderRepository,
       this.dependencies.orderApi,
+      SynchronizationEntityType.Order,
       customerIdMap,
       productIdMap,
     ));
     await runStep(() => this.pushLocalDocuments(
       this.dependencies.budgetRepository,
       this.dependencies.budgetApi,
+      SynchronizationEntityType.Budget,
       customerIdMap,
       productIdMap,
     ));
     await runStep(() => this.refreshProducts());
     await runStep(() => this.refreshCustomers());
-    await runStep(() => this.refreshLocalities());
+    await runStep(() => this.refreshLocalitiesIfQuantityIsNotEqual());
 
-    this.setStatus(hadError ? 'error' : 'success');
+    this.setStatus(this.hadFailure ? 'error' : 'success');
   }
 
   private async pushLocalRecords<T extends { id: number }>(
     repository: IOfflineRepository<T, unknown, unknown>,
     api: ICreatePushService<T>,
+    entityType: SynchronizationEntityType,
+    describe: (record: T) => string,
   ): Promise<Map<number, number>> {
     const idMap = new Map<number, number>();
     const pending = await repository.getLocalRecords();
 
     for (const record of pending) {
-      const created = await api.create(toApiCreatePayload(record));
-      idMap.set(record.id, created.id);
-      await repository.remove(record.id);
+      try {
+        const created = await api.create(toApiCreatePayload(record));
+        idMap.set(record.id, created.id);
+        await repository.remove(record.id);
+        await this.dependencies.synchronizationPendencyService.resolve(entityType, record.id);
+      } catch (error) {
+        this.hadFailure = true;
+        await this.registerPendencyIfRejected(entityType, record.id, describe(record), error);
+      }
     }
 
     return idMap;
@@ -139,6 +158,7 @@ export class DataSynchronizationService implements IDataSynchronizationService {
   private async pushLocalDocuments<T extends IDocumentSaveDto<IDocumentProductSaveDto>>(
     repository: IOfflineRepository<T, unknown, unknown>,
     api: ICreatePushService<T>,
+    entityType: SynchronizationEntityType,
     customerIdMap: Map<number, number>,
     productIdMap: Map<number, number>,
   ): Promise<void> {
@@ -146,9 +166,38 @@ export class DataSynchronizationService implements IDataSynchronizationService {
 
     for (const record of pending) {
       const remapped = remapDocumentReferences(record, customerIdMap, productIdMap);
-      await api.create(toApiCreatePayload(remapped));
-      await repository.remove(record.id);
+      try {
+        await api.create(toApiCreatePayload(remapped));
+        await repository.remove(record.id);
+        await this.dependencies.synchronizationPendencyService.resolve(entityType, record.id);
+      } catch (error) {
+        this.hadFailure = true;
+        // Keep the remapped references so the record stays editable online.
+        await repository.upsert(remapped);
+        const description = await describeDocument(remapped, this.dependencies.customerRepository);
+        await this.registerPendencyIfRejected(entityType, record.id, description, error);
+      }
     }
+  }
+
+  /**
+   * Only back-end rejections (4xx) become pendencies; network/server outages
+   * leave the record untouched to be retried on the next synchronization.
+   */
+  private async registerPendencyIfRejected(
+    entityType: SynchronizationEntityType,
+    recordId: number,
+    description: string,
+    error: unknown,
+  ): Promise<void> {
+    const apiError = error as IApiError;
+
+    await this.dependencies.synchronizationPendencyService.register({
+      entityType,
+      recordId,
+      description,
+      failureMessage: APIConsumerUtility.GetErrorMessage(apiError),
+    });
   }
 
   private async refreshProducts(): Promise<void> {
@@ -161,9 +210,15 @@ export class DataSynchronizationService implements IDataSynchronizationService {
     await this.dependencies.customerRepository.replaceSynced(customers);
   }
 
-  private async refreshLocalities(): Promise<void> {
-    const localities = await this.fetchAll(this.dependencies.localityApi);
-    await this.dependencies.localityRepository.replaceSynced(localities);
+  private async refreshLocalitiesIfQuantityIsNotEqual(): Promise<void> {
+    const localitiesOfflineQuantity = await this.dependencies.localityRepository.getQuantity();
+    const localitiesApiQuantity = await this.dependencies.localityApi.getQuantity();
+
+    if (localitiesOfflineQuantity !== localitiesApiQuantity) 
+    {
+      const localities = await this.fetchAll(this.dependencies.localityApi);
+      await this.dependencies.localityRepository.replaceSynced(localities);
+    }
   }
 
   private async fetchAll<TListing, TFilter extends IListingFilter>(

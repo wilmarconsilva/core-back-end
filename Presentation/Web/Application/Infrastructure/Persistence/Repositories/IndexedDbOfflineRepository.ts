@@ -1,8 +1,8 @@
 import { IListingFilter } from '../../../Application/Interfaces/DataTransferObjects/IListingFilter';
 import { IOfflineRepository } from '../Interfaces/IOfflineRepository';
 import { isLocalRecord } from '../../../Application/Services/Utilities/OfflineUtilities';
-import { IIndexedDbContext } from './IIndexedDbContext';
-import { OfflineStoreName } from './IndexedDbSchema';
+import { IIndexedDbContext } from '../IndexedDb/IIndexedDbContext';
+import { OfflineStoreName } from '../IndexedDb/IndexedDbSchema';
 
 export type OfflineListingMapper<TSaveDto, TListing> = (
   dto: TSaveDto,
@@ -18,10 +18,13 @@ export class IndexedDbOfflineRepository<
   TSaveDto extends { id: number },
   TListing extends { id: number },
   TFilter extends IListingFilter,
-> implements IOfflineRepository<TSaveDto, TListing, TFilter> {
+> implements IOfflineRepository<TSaveDto, TListing, TFilter> 
+{
+  
   constructor(
-    private readonly context: IIndexedDbContext,
-    private readonly storeName: OfflineStoreName,
+    protected readonly context: IIndexedDbContext,
+    protected readonly storeName: OfflineStoreName,
+
     private readonly toListing: OfflineListingMapper<TSaveDto, TListing>,
     private readonly matches: OfflineFilterPredicate<TListing, TFilter>,
     private readonly listingToSaveDto: (listing: TListing) => TSaveDto,

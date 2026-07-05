@@ -5,6 +5,7 @@ import {
   INDEXED_DB_NAME,
   INDEXED_DB_VERSION,
   OfflineStoreNames,
+  SYNCHRONIZATION_PENDENCIES_STORE_NAME,
 } from './IndexedDbSchema';
 
 /**
@@ -47,6 +48,10 @@ export class IndexedDbContext implements IIndexedDbContext {
 
           if (!database.objectStoreNames.contains(OfflineStoreNames.localities)) {
             database.createObjectStore(OfflineStoreNames.localities, { keyPath: 'id' });
+          }
+
+          if (!database.objectStoreNames.contains(SYNCHRONIZATION_PENDENCIES_STORE_NAME)) {
+            database.createObjectStore(SYNCHRONIZATION_PENDENCIES_STORE_NAME, { keyPath: 'key' });
           }
         },
       });

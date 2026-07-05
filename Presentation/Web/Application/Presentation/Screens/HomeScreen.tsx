@@ -20,7 +20,10 @@ import { OrdersListScreen } from './Commercial/Documents/Orders/OrdersListScreen
 import { OrderFormScreen } from './Commercial/Documents/Orders/OrderFormScreen';
 import { BudgetReportScreen } from './Commercial/Documents/Budgets/BudgetReportScreen';
 import { OrderReportScreen } from './Commercial/Documents/Orders/OrderReportScreen';
+import { SynchronizationPendenciesScreen } from './Offline/SynchronizationPendenciesScreen';
 import { OperationMode } from '../../Application/Services/Offline/OperationModeService';
+import { ISynchronizationPendency } from '../../Application/Interfaces/DataTransferObjects/Offline/ISynchronizationPendency';
+import { SynchronizationEntityType } from '../../Application/Interfaces/DataTransferObjects/Offline/SynchronizationEntityType';
 
 function HomeMenuScreen({ userName, navigate, operationMode }: IHomeMenuProps) {
 
@@ -37,7 +40,8 @@ function HomeMenuScreen({ userName, navigate, operationMode }: IHomeMenuProps) {
           <MenuItem icon="clipboard-outline" label="Pedidos" menuItemSize="medium" onPress={() => navigate({ name: 'orders' })} />
           {operationMode === OperationMode.Online && (
             <>
-              <MenuItem icon="bar-chart-outline" label="Relatórios" menuItemSize="large" onPress={() => navigate({ name: 'reports' })} />
+              <MenuItem icon="bar-chart-outline" label="Relatórios" menuItemSize="medium" onPress={() => navigate({ name: 'reports' })} />
+              <MenuItem icon="cloud-upload-outline" label="Pendências de Sincronização" menuItemSize="medium" onPress={() => navigate({ name: 'synchronizationPendencies' })} />
             </>
           )}
         </View>
@@ -49,6 +53,20 @@ function HomeMenuScreen({ userName, navigate, operationMode }: IHomeMenuProps) {
 
 function screenKey(screen: Screen): string {
   return 'id' in screen ? `${screen.name}-${screen.id ?? 'new'}` : screen.name;
+}
+
+/** Resolves the form screen that edits the local record of a synchronization pendency. */
+function pendencyFormScreen(pendency: ISynchronizationPendency): Screen {
+  switch (pendency.entityType) {
+    case SynchronizationEntityType.Product:
+      return { name: 'productForm', id: pendency.recordId };
+    case SynchronizationEntityType.Customer:
+      return { name: 'customerForm', id: pendency.recordId };
+    case SynchronizationEntityType.Order:
+      return { name: 'orderForm', id: pendency.recordId };
+    case SynchronizationEntityType.Budget:
+      return { name: 'budgetForm', id: pendency.recordId };
+  }
 }
 
 export function HomeScreen({ userName }: IHomeScreenProps) {
@@ -89,6 +107,14 @@ export function HomeScreen({ userName }: IHomeScreenProps) {
         return <BudgetReportScreen onGoBack={goBack} />;
       case 'orderReport':
         return <OrderReportScreen onGoBack={goBack} />;
+
+      case 'synchronizationPendencies':
+        return (
+          <SynchronizationPendenciesScreen
+            onGoBack={goBack}
+            onEditPendency={(pendency) => navigate(pendencyFormScreen(pendency))}
+          />
+        );
 
       default:
         return <HomeMenuScreen userName={userName} navigate={navigate} operationMode={operationMode} />;

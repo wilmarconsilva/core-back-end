@@ -1,8 +1,9 @@
 import Toast from 'react-native-toast-message';
-import { IApiError } from '../Interfaces/DataTransferObjects/Authentication/IApiError';
+import { IApiError } from '../Interfaces/DataTransferObjects/APIConsumer/IApiError';
 import { API_BASE_URL, fetchWithAuth, SessionExpiredError } from './HttpClientService';
 import { TokenStorageService } from './TokenStorageService';
 import { IRequestOptions } from '../Interfaces/DataTransferObjects/APIConsumer/IRequestOptions';
+import { APIConsumerUtility } from './Utilities/APIConsumerUtility';
 
 type FetchFn = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 
@@ -51,12 +52,9 @@ export class APIConsumerService {
 
       if (!TokenStorageService.isLoggingOut()) 
       {        
-        const isBadRequest: boolean = apiError.status !== undefined &&
-          apiError.status !== null &&
-          apiError.status >= 400 &&
-          apiError.status < 500;
+        const isBadRequest: boolean = APIConsumerUtility.ErrorIsBadRequest(apiError);
 
-        const genericErrorMessage = `Status: ${apiError.status ?? "não definido."} - ${new Date().toLocaleString('pt-BR')} - Ocorreu um erro inesperado. Por favor, contate o suporte.`;
+        const genericErrorMessage = APIConsumerUtility.GetErrorMessage(apiError);
 
         const message = isBadRequest ? apiError.detail ?? genericErrorMessage : genericErrorMessage;
           
