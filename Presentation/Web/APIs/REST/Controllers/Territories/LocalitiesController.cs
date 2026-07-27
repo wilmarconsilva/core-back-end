@@ -26,5 +26,15 @@ namespace REST.Controllers.Territories
                 return Ok(listings);
             }, cancellationToken);
         }
+
+        [HttpGet("quantity")]
+        public async Task<ActionResult<long>> GetQuantity(CancellationToken cancellationToken)
+        {
+            return await ProcessRequestAsync<long>(async () =>
+            {
+                long quantity = await _service.GetQuantityAsync(cancellationToken);
+                return Ok(quantity);
+            }, cancellationToken);
+        }
     }
 }

@@ -4,10 +4,10 @@ import { Text, TouchableOpacity } from 'react-native';
 import { IMenuItemProps } from '../Interfaces/MenuItem/IMenuItemProps';
 import { colors, gridStyles } from '../Styles';
 
-export function MenuItem({ icon, label, onPress }: IMenuItemProps) {
+export function MenuItem({ icon, label, menuItemSize, onPress }: IMenuItemProps) {
   return (
     <TouchableOpacity
-      style={gridStyles.menuItem}
+      style={menuItemSize === 'large' ? gridStyles.menuItemLarge : gridStyles.menuItemMedium}
       onPress={onPress}
       activeOpacity={0.7}
     >

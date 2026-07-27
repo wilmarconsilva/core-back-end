@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
+import { OfflineCompositionRoot } from '../../Infrastructure/Persistence/OfflineCompositionRoot';
 import { BudgetService } from '../Services/Commercial/Documents/Budgets/BudgetService';
 import { IBudgetSaveDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetSaveDto';
 import { IBudgetDetailDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Budgets/IBudgetDetailDto';
@@ -7,6 +8,8 @@ import { IBudgetListingFilter } from '../Interfaces/DataTransferObjects/Commerci
 import { IOrderDetailDto } from '../Interfaces/DataTransferObjects/Commercial/Documents/Orders/IOrderDetailDto';
 import { UseCrud, UseCrudResult } from './UseCrud';
 
+const budgetCrudService = OfflineCompositionRoot.createBudgetService();
+// Kept raw: online-only operation (creates an order from an existing budget, id > 0).
 const budgetService = new BudgetService();
 
 export type UseBudgetsResult = UseCrudResult<IBudgetSaveDto, IBudgetDetailDto, IBudgetListing, IBudgetListingFilter> & {
@@ -16,7 +19,7 @@ export type UseBudgetsResult = UseCrudResult<IBudgetSaveDto, IBudgetDetailDto, I
 };
 
 export function UseBudgets(): UseBudgetsResult {
-  const service = useMemo(() => budgetService, []);
+  const service = useMemo(() => budgetCrudService, []);
   const crud = UseCrud(service);
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [createdOrder, setCreatedOrder] = useState<IOrderDetailDto | null>(null);
