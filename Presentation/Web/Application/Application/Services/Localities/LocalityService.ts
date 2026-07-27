@@ -12,4 +12,11 @@ export class LocalityService
   constructor() {
     super('/localities');
   }
+
+  async getQuantity(): Promise<number> {
+      return this.request<number>(`/localities/quantity`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      }, { toastsConfiguration: { doNotShowSuccess: true } });
+    }
 }

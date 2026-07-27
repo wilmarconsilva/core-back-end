@@ -1,15 +1,8 @@
 import { StyleSheet } from 'react-native';
 import { colors } from './colors';
+import { ViewStyle } from 'react-native';
 
-export const gridStyles = StyleSheet.create({
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginTop: 8,
-  },
-  menuItem: {
-    width: '48%',
+const menuItem: ViewStyle = {
     backgroundColor: colors.surface,
     borderRadius: 16,
     paddingVertical: 28,
@@ -22,6 +15,22 @@ export const gridStyles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 3,
+};
+
+export const gridStyles = StyleSheet.create({
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginTop: 8,
+  },
+  menuItemMedium: {
+    ...menuItem,
+    width: '48%',
+  },
+  menuItemLarge: {
+    ...menuItem,
+    width: '100%',
   },
   menuItemIcon: {
     marginBottom: 12,

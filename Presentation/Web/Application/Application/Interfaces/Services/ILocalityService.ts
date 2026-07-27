@@ -4,4 +4,7 @@ import { ILocalityDetailDto } from '../DataTransferObjects/Localities/ILocalityD
 import { ILocalityListing } from '../DataTransferObjects/Localities/ILocalityListing';
 import { ILocalityListingFilter } from '../DataTransferObjects/Localities/ILocalityListingFilter';
 
-export interface ILocalityService extends ICrudService<ILocalitySaveDto, ILocalityDetailDto, ILocalityListing, ILocalityListingFilter> {}
+export interface ILocalityService extends ICrudService<ILocalitySaveDto, ILocalityDetailDto, ILocalityListing, ILocalityListingFilter> 
+{
+    getQuantity(): Promise<number>;
+}

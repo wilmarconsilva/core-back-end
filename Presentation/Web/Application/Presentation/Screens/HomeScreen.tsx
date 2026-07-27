@@ -3,8 +3,10 @@ import { ScrollView, Text, View } from 'react-native';
 import { Breadcrumb } from '../Components/Breadcrumb';
 import { MenuItem } from '../Components/MenuItem';
 import { ScreenTransition } from '../Components/ScreenTransition';
+import { DataSynchronizationIndicator } from '../Components/DataSynchronizationIndicator';
 import { gridStyles, layoutStyles, typographyStyles } from '../Styles';
 import { UseNavigation, Screen } from '../../Application/Hooks/UseNavigation';
+import { UseOperationMode } from '../../Application/Hooks/UseOperationMode';
 import { IHomeMenuProps } from '../Interfaces/Home/IHomeMenuProps';
 import { IHomeScreenProps } from '../Interfaces/Home/IHomeScreenProps';
 import { ReportsScreen } from './ReportsScreen';
@@ -12,16 +14,19 @@ import { CustomersListScreen } from './Customers/CustomersListScreen';
 import { CustomerFormScreen } from './Customers/CustomerFormScreen';
 import { ProductsListScreen } from './Products/ProductsListScreen';
 import { ProductFormScreen } from './Products/ProductFormScreen';
-import { LocalitiesListScreen } from './Localities/LocalitiesListScreen';
-import { LocalityFormScreen } from './Localities/LocalityFormScreen';
 import { BudgetsListScreen } from './Commercial/Documents/Budgets/BudgetsListScreen';
 import { BudgetFormScreen } from './Commercial/Documents/Budgets/BudgetFormScreen';
 import { OrdersListScreen } from './Commercial/Documents/Orders/OrdersListScreen';
 import { OrderFormScreen } from './Commercial/Documents/Orders/OrderFormScreen';
 import { BudgetReportScreen } from './Commercial/Documents/Budgets/BudgetReportScreen';
 import { OrderReportScreen } from './Commercial/Documents/Orders/OrderReportScreen';
+import { SynchronizationPendenciesScreen } from './Offline/SynchronizationPendenciesScreen';
+import { OperationMode } from '../../Application/Services/Offline/OperationModeService';
+import { ISynchronizationPendency } from '../../Application/Interfaces/DataTransferObjects/Offline/ISynchronizationPendency';
+import { SynchronizationEntityType } from '../../Application/Interfaces/DataTransferObjects/Offline/SynchronizationEntityType';
 
-function HomeMenuScreen({ userName, navigate }: IHomeMenuProps) {
+function HomeMenuScreen({ userName, navigate, operationMode }: IHomeMenuProps) {
+
   return (
     <View style={layoutStyles.screenWrapper}>
       <ScrollView contentContainerStyle={layoutStyles.scrollContainer}>
@@ -29,24 +34,44 @@ function HomeMenuScreen({ userName, navigate }: IHomeMenuProps) {
         <Text style={typographyStyles.title}>Olá, {userName}!</Text>
         <Text style={typographyStyles.subtitle}>O que deseja acessar?</Text>
         <View style={gridStyles.grid}>
-          <MenuItem icon="people-outline" label="Clientes" onPress={() => navigate({ name: 'customers' })} />
-          <MenuItem icon="cube-outline" label="Produtos" onPress={() => navigate({ name: 'products' })} />
-          <MenuItem icon="cash-outline" label="Orçamentos" onPress={() => navigate({ name: 'budgets' })} />
-          <MenuItem icon="clipboard-outline" label="Pedidos" onPress={() => navigate({ name: 'orders' })} />
-          <MenuItem icon="location-outline" label="Localidades" onPress={() => navigate({ name: 'localities' })} />
-          <MenuItem icon="bar-chart-outline" label="Relatórios" onPress={() => navigate({ name: 'reports' })} />
+          <MenuItem icon="people-outline" label="Clientes" menuItemSize="medium" onPress={() => navigate({ name: 'customers' })} />
+          <MenuItem icon="cube-outline" label="Produtos" menuItemSize="medium" onPress={() => navigate({ name: 'products' })} />
+          <MenuItem icon="cash-outline" label="Orçamentos" menuItemSize="medium" onPress={() => navigate({ name: 'budgets' })} />
+          <MenuItem icon="clipboard-outline" label="Pedidos" menuItemSize="medium" onPress={() => navigate({ name: 'orders' })} />
+          {operationMode === OperationMode.Online && (
+            <>
+              <MenuItem icon="bar-chart-outline" label="Relatórios" menuItemSize="medium" onPress={() => navigate({ name: 'reports' })} />
+              <MenuItem icon="cloud-upload-outline" label="Pendências de Sincronização" menuItemSize="medium" onPress={() => navigate({ name: 'synchronizationPendencies' })} />
+            </>
+          )}
         </View>
       </ScrollView>
     </View>
   );
+
 }
 
 function screenKey(screen: Screen): string {
   return 'id' in screen ? `${screen.name}-${screen.id ?? 'new'}` : screen.name;
 }
 
+/** Resolves the form screen that edits the local record of a synchronization pendency. */
+function pendencyFormScreen(pendency: ISynchronizationPendency): Screen {
+  switch (pendency.entityType) {
+    case SynchronizationEntityType.Product:
+      return { name: 'productForm', id: pendency.recordId };
+    case SynchronizationEntityType.Customer:
+      return { name: 'customerForm', id: pendency.recordId };
+    case SynchronizationEntityType.Order:
+      return { name: 'orderForm', id: pendency.recordId };
+    case SynchronizationEntityType.Budget:
+      return { name: 'budgetForm', id: pendency.recordId };
+  }
+}
+
 export function HomeScreen({ userName }: IHomeScreenProps) {
   const { currentScreen, navigate, goBack } = UseNavigation();
+  const operationMode = UseOperationMode();
 
   function renderScreen() {
     switch (currentScreen.name) {
@@ -70,11 +95,6 @@ export function HomeScreen({ userName }: IHomeScreenProps) {
       case 'orderForm':
         return <OrderFormScreen id={currentScreen.id} onGoBack={goBack} />;
 
-      case 'localities':
-        return <LocalitiesListScreen onGoBack={goBack} onNavigateToForm={(id) => navigate({ name: 'localityForm', id })} />;
-      case 'localityForm':
-        return <LocalityFormScreen id={currentScreen.id} onGoBack={goBack} />;
-
       case 'reports':
         return (
           <ReportsScreen
@@ -88,15 +108,26 @@ export function HomeScreen({ userName }: IHomeScreenProps) {
       case 'orderReport':
         return <OrderReportScreen onGoBack={goBack} />;
 
+      case 'synchronizationPendencies':
+        return (
+          <SynchronizationPendenciesScreen
+            onGoBack={goBack}
+            onEditPendency={(pendency) => navigate(pendencyFormScreen(pendency))}
+          />
+        );
+
       default:
-        return <HomeMenuScreen userName={userName} navigate={navigate} />;
+        return <HomeMenuScreen userName={userName} navigate={navigate} operationMode={operationMode} />;
     }
   }
 
   return (
-    <ScreenTransition screenKey={screenKey(currentScreen)}>
-      {renderScreen()}
-    </ScreenTransition>
+    <View style={{ flex: 1 }}>
+      <ScreenTransition screenKey={screenKey(currentScreen)}>
+        {renderScreen()}
+      </ScreenTransition>
+      <DataSynchronizationIndicator />
+    </View>
   );
 }
 

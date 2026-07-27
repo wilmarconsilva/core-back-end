@@ -3,14 +3,18 @@ import { View } from 'react-native';
 import { FormField } from '../../Components/FormField';
 import { UseCustomers } from '../../../Application/Hooks/UseCustomers';
 import { UsePagedCrudList } from '../../../Application/Hooks/UsePagedCrudList';
+import { UseOperationMode } from '../../../Application/Hooks/UseOperationMode';
 import { ICustomerListing } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerListing';
 import { ICustomerListingFilter } from '../../../Application/Interfaces/DataTransferObjects/Persons/Customers/ICustomerListingFilter';
 import { ICrudListScreenProps } from '../../Interfaces/Screens/ICrudListScreenProps';
 import { listScreenStyles } from '../../Styles';
 import { CrudListScreen } from '../CrudListScreen';
+import { isLocalRecord } from '../../../Application/Services/Utilities/OfflineUtilities';
+import { OperationMode } from '../../../Application/Services/Offline/OperationModeService';
 
 export function CustomersListScreen({ onGoBack, onNavigateToForm }: ICrudListScreenProps) {
   const { listings, isLoadingList, isDeleting, loadAll, remove } = UseCustomers();
+  const operationMode = UseOperationMode();
   const [name, setName] = useState('');
 
   const buildFilter = useCallback((p: number, pageSize: number): ICustomerListingFilter => ({
@@ -60,6 +64,7 @@ export function CustomersListScreen({ onGoBack, onNavigateToForm }: ICrudListScr
       getDeleteMessage={(item) => `Deseja excluir o cliente "${item?.name}"?`}
       onConfirmDelete={listState.confirmDelete}
       onCancelDelete={listState.closeDeleteConfirm}
+      canMutateItem={operationMode === OperationMode.Offline ? (item) => isLocalRecord(item.id) : undefined}
     />
   );
 }

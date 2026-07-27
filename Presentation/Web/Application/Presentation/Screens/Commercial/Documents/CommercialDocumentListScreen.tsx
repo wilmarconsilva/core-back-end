@@ -3,9 +3,11 @@ import { Text, View } from 'react-native';
 import { IDocumentListing } from '../../../../Application/Interfaces/DataTransferObjects/Commercial/Documents/IDocumentListing';
 import { IColumn } from '../../../Interfaces/DataGrid/IColumn';
 import { ICrudListScreenProps } from '../../../Interfaces/Screens/ICrudListScreenProps';
+import { CrudOperationType, CrudOperationTypeUtility } from '../../../../Infrastructure/Persistence/Enums/CrudOperationType';
 import { DateField } from '../../../Components/DateField';
 import { CrudListScreen } from '../../CrudListScreen';
 import { listScreenStyles, tableStyles } from '../../../Styles';
+import { OperationMode } from '../../../../Application/Services/Offline/OperationModeService';
 
 interface CommercialDocumentListState<TListing extends IDocumentListing> {
   page: number;
@@ -34,6 +36,9 @@ interface CommercialDocumentListScreenProps<TListing extends IDocumentListing> e
   showCreationDate?: boolean;
   extraColumns?: IColumn<TListing>[];
   extraActions?: (item: TListing) => ReactNode;
+  allowedCrudOperationTypes?: CrudOperationType[];
+  canMutateItem?: (item: TListing) => boolean;
+  operationMode: OperationMode;
 }
 
 export function CommercialDocumentListScreen<TListing extends IDocumentListing>({
@@ -51,8 +56,11 @@ export function CommercialDocumentListScreen<TListing extends IDocumentListing>(
   showCreationDate = false,
   extraColumns = [],
   extraActions,
+  allowedCrudOperationTypes = CrudOperationTypeUtility.getAll(),
+  canMutateItem,
   onGoBack,
   onNavigateToForm,
+  operationMode,
 }: CommercialDocumentListScreenProps<TListing>) {
   const columns: IColumn<TListing>[] = [
     { key: 'id', label: 'Código', flex: 0.4 },
@@ -127,6 +135,9 @@ export function CommercialDocumentListScreen<TListing extends IDocumentListing>(
       onConfirmDelete={listState.confirmDelete}
       onCancelDelete={listState.closeDeleteConfirm}
       extraActions={extraActions}
+      allowedCrudOperationTypes={allowedCrudOperationTypes}
+      canMutateItem={canMutateItem}
+      emptyGridMessage={operationMode === OperationMode.Offline ? 'Somente registros gerados no modo offline serão exibidos.' : undefined}
     />
   );
 }

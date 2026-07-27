@@ -45,3 +45,5 @@ yarn-error.*
 /ios
 /android
 
+# serena
+.serena

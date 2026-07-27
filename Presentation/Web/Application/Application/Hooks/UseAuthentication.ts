@@ -2,10 +2,19 @@ import { useCallback, useEffect, useState } from 'react';
 import { AuthenticationService } from '../Services/AuthenticationService';
 import { TokenStorageService } from '../Services/TokenStorageService';
 import { setTokenRefreshFunction } from '../Services/HttpClientService';
+import { ConnectivityProbe } from '../Services/Offline/ConnectivityProbe';
+import { OperationMode, OperationModeService } from '../Services/Offline/OperationModeService';
+import { OfflineCompositionRoot } from '../../Infrastructure/Persistence/OfflineCompositionRoot';
 import { IAccessToken } from '../Interfaces/DataTransferObjects/Authentication/IAccessToken';
 import { ILoginRequest } from '../Interfaces/DataTransferObjects/Authentication/ILoginRequest';
 
 const authenticationService = new AuthenticationService();
+const connectivityProbe = new ConnectivityProbe();
+
+/** Fire-and-forget so the UI never freezes waiting for synchronization. */
+function startSynchronization(): void {
+  void OfflineCompositionRoot.dataSynchronizationService.synchronize();
+}
 
 interface AuthenticationState {
   accessToken: IAccessToken | null;
@@ -42,10 +51,35 @@ export function UseAuthentication(): UseAuthenticationResult {
   }, []);
 
   useEffect(() => {
-    authenticationService.refresh()
-      .then(storeToken)
-      .catch(() => {})
-      .finally(() => setIsInitializing(false));
+    // The operation mode is resolved ONCE, at startup, and never re-evaluated
+    // during the session (per the offline requirements).
+    const bootstrap = async (): Promise<void> => {
+      const operationMode = process.env.EXPO_PUBLIC_OPERATION_MODE;
+      if (operationMode) {
+        OperationModeService.resolve(operationMode as OperationMode);
+      } else {
+        const online = await connectivityProbe.isOnline();
+        OperationModeService.resolve(online ? OperationMode.Online : OperationMode.Offline);
+      }
+
+      if (OperationModeService.getMode() === OperationMode.Online) {
+        try {
+          const token = await authenticationService.refresh();
+          storeToken(token);
+          startSynchronization();
+        } catch {
+          // Not authenticated: fall back to the login screen.
+        }
+      } else {
+        // Offline: reuse the last known token so the app can open without a server.
+        const storedToken = TokenStorageService.getFullToken();
+        if (storedToken) {
+          setAccessToken(storedToken);
+        }
+      }
+    };
+
+    bootstrap().finally(() => setIsInitializing(false));
   }, [storeToken]);
 
   const login = useCallback(async (request: ILoginRequest) => {
@@ -55,6 +89,7 @@ export function UseAuthentication(): UseAuthenticationResult {
     {
       const token = await authenticationService.login(request);
       storeToken(token);
+      startSynchronization();
     }
     catch
     {
