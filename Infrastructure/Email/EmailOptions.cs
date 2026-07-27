@@ -10,11 +10,11 @@ namespace Infrastructure.Email
 
         public string SenderEmail { get; private set; } = "noreply@localhost";
 
-        public string SenderName { get; private set; } = "Core Dev";
+        public string SenderName { get; private set; } = "Core - Desenvolvimento";
 
-        public string? Username { get; private set; }
+        public string? Username { get; private set; } = null;
 
-        public string? Password { get; private set; }
+        public string? Password { get; private set; } = null;
 
         public bool EnableSsl { get; private set; } = false;
     }

@@ -36,7 +36,7 @@ public static class InfrastructureServiceExtensions
     private static void AddPersistence(IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("Default")));
+            options.UseNpgsql(configuration.GetConnectionString("Postgres")));
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
