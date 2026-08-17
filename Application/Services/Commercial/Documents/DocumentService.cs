@@ -15,6 +15,7 @@ using Domain.Interfaces.Repositories;
 using Domain.ValueObjects.Commercial.Documents.Payments;
 using Domain.ValueObjects.Commercial.Documents.Payments.Installments;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services.Commercial.Documents
 {
@@ -31,6 +32,7 @@ namespace Application.Services.Commercial.Documents
         private readonly ICustomerRepository _customerRepository;
         private readonly DocumentTypeInfo _documentTypeInfo;
         private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly ILogger _logger;
 
         protected DocumentService(IRepositoryCrud<TEntity> repository,
             IEntityCrudQuery<TDocumentDetailDto, TListing, TFilter> query,
@@ -38,13 +40,15 @@ namespace Application.Services.Commercial.Documents
             ICustomerRepository customerRepository,
             IServiceScopeFactory serviceScopeFactory,
             DocumentTypeInfo documentTypeInfo,
-            IHttpContextCurrentUser httpContextCurrentUser)
+            IHttpContextCurrentUser httpContextCurrentUser,
+            ILogger logger)
             : base(repository, query, unitOfWork)
         {
             _customerRepository = customerRepository;
             _documentTypeInfo = documentTypeInfo;
             _currentUser = httpContextCurrentUser;
             _serviceScopeFactory = serviceScopeFactory;
+            _logger = logger;
         }
 
         protected record DocumentTypeInfo(string Title, string FileName);
@@ -98,14 +102,26 @@ namespace Application.Services.Commercial.Documents
 
                 _ = Task.Run(async () =>
                 {
-                    await SentDocumentEmailToCustomerAsync(entitiesIdsToBeUpdated, entity, customer);
-                }, CancellationToken.None);
+                    try
+                    {
+                        await SendPdfByEmailToCustomerAsync(
+                            entitiesIdsToBeUpdated,
+                            entity,
+                            customer);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(
+                            ex,
+                            $"Eror while sending PDF by e-mail to customer of {nameof(Customer.Id)}: {{CustomerId}}",
+                            customer.Id);
+                    }
+                });
             }
         }
 
-        private async Task SentDocumentEmailToCustomerAsync(long[] entitiesIdsToBeUpdated, TEntity entity, Customer customer)
+        private async Task SendPdfByEmailToCustomerAsync(long[] entitiesIdsToBeUpdated, TEntity entity, Customer customer)
         {
-            //remover pdf e template para deixar só no front.
             await using AsyncServiceScope scope = _serviceScopeFactory.CreateAsyncScope();
             IEmailService emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
 

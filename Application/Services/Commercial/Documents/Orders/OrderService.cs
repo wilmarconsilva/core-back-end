@@ -11,6 +11,7 @@ using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
 using Domain.ValueObjects.Commercial.Documents.Payments;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services.Commercial.Documents.Orders
 {
@@ -18,8 +19,24 @@ namespace Application.Services.Commercial.Documents.Orders
     {
         private readonly IMapper _mapper;
 
-        public OrderService(IOrderRepository repository, IOrderQuery query, IUnitOfWork unitOfWork, IMapper mapper, ICustomerRepository customerRepository, IServiceScopeFactory serviceScopeFactory, IHttpContextCurrentUser currentUser)
-            : base(repository, query, unitOfWork, customerRepository, serviceScopeFactory, new("Pedido", "pedido"), currentUser)
+        public OrderService(
+            IOrderRepository repository,
+            IOrderQuery query,
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            ICustomerRepository customerRepository,
+            IServiceScopeFactory serviceScopeFactory,
+            IHttpContextCurrentUser currentUser,
+            ILogger<OrderService> logger)
+            : base(
+                  repository,
+                  query,
+                  unitOfWork,
+                  customerRepository,
+                  serviceScopeFactory,
+                  new("Pedido", "pedido"),
+                  currentUser,
+                  logger)
         {
             _mapper = mapper;
         }

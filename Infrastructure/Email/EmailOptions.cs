@@ -4,18 +4,29 @@ namespace Infrastructure.Email
     {
         public const string SectionName = "Email";
 
-        public string Host { get; private set; } = "localhost";
+        public bool Enabled { get; init; }
 
-        public int Port { get; private set; } = 1025;
+        /// <summary>
+        /// Required when Enabled is true.
+        /// </summary>
+        public string? Host { get; init; }
 
-        public string SenderEmail { get; private set; } = "noreply@localhost";
+        /// <summary>
+        /// Required when Enabled is true.
+        /// </summary>
+        public int? Port { get; init; }
 
-        public string SenderName { get; private set; } = "Core Dev";
+        /// <summary>
+        /// Required when Enabled is true.
+        /// </summary>
+        public string? SenderEmail { get; init; }
 
-        public string? Username { get; private set; }
+        public string? SenderName { get; init; }
 
-        public string? Password { get; private set; }
+        public string? Username { get; init; }
 
-        public bool EnableSsl { get; private set; } = false;
+        public string? Password { get; init; }
+
+        public bool EnableSsl { get; init; }
     }
 }

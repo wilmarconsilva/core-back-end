@@ -14,6 +14,7 @@ using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
 using Domain.ValueObjects.Commercial.Documents.Payments;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services.Commercial.Documents.Budgets
 {
@@ -22,8 +23,23 @@ namespace Application.Services.Commercial.Documents.Budgets
         private readonly IMapper _mapper;
         private readonly IOrderService _orderService;
 
-        public BudgetService(IBudgetRepository repository, IBudgetQuery query, IUnitOfWork unitOfWork, IMapper mapper, IOrderService orderService, ICustomerRepository customerRepository, IServiceScopeFactory serviceScopeFactory, IHttpContextCurrentUser currentUser)
-            : base(repository, query, unitOfWork, customerRepository, serviceScopeFactory, new("Orçamento", "orcamento"), currentUser)
+        public BudgetService(IBudgetRepository repository,
+            IBudgetQuery query,
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            IOrderService orderService,
+            ICustomerRepository customerRepository,
+            IServiceScopeFactory serviceScopeFactory,
+            IHttpContextCurrentUser currentUser,
+            ILogger<BudgetService> logger)
+            : base(repository,
+                  query,
+                  unitOfWork,
+                  customerRepository,
+                  serviceScopeFactory,
+                  new("Orçamento", "orcamento"),
+                  currentUser,
+                  logger)
         {
             _mapper = mapper;
             _orderService = orderService;

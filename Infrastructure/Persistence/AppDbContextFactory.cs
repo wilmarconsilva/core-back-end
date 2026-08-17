@@ -1,3 +1,5 @@
+using DotNetEnv;
+using DotNetEnv.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
@@ -12,12 +14,15 @@ namespace Infrastructure.Persistece
 
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .SetBasePath(basePath)
-                .AddJsonFile("appsettings.json", optional: false)
-                .AddJsonFile("appsettings.Development.json", optional: true)
+                .AddDotNetEnv(options: LoadOptions.TraversePath().NoClobber())
                 .Build();
 
-            string keyConnectionString = "Default";
-            string connectionString = configuration.GetConnectionString(keyConnectionString) ?? throw new KeyNotFoundException($"Connection string: '{keyConnectionString}' not found.");
+            string keyConnectionString = "Postgres";
+            string? connectionString = configuration.GetConnectionString(keyConnectionString);
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new KeyNotFoundException(
+                    $"Connection string: '{keyConnectionString}' is not defined as an environment variable or in the .env file.");
 
             DbContextOptionsBuilder<AppDbContext> optionsBuilder = new();
 

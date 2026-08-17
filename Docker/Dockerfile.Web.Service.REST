@@ -1,0 +1,52 @@
+# syntax=docker/dockerfile:1
+
+# ============================================
+# Etapa 1: Build
+# ============================================
+
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+
+WORKDIR /src
+
+# Copia os arquivos de projeto primeiro para aproveitar o cache
+COPY Domain/Domain.csproj Domain/
+COPY Application/Application.csproj Application/
+COPY Infrastructure/Infrastructure.csproj Infrastructure/
+COPY Presentation/Web/Services/REST/REST.csproj Presentation/Web/Services/REST/
+
+# Restaura as dependências
+RUN dotnet restore Presentation/Web/Services/REST/REST.csproj
+
+# Copia o código-fonte
+COPY Domain/ Domain/
+COPY Application/ Application/
+COPY Infrastructure/ Infrastructure/
+COPY Presentation/ Presentation/
+
+# Compila e publica
+RUN dotnet publish Presentation/Web/Services/REST/REST.csproj \
+    --configuration Release \
+    --output /app/publish \
+    --no-restore
+
+
+# ============================================
+# Etapa 2: Runtime
+# ============================================
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+
+WORKDIR /app
+
+# Configurações do ASP.NET Core
+ENV ASPNETCORE_ENVIRONMENT=Production \
+    DOTNET_RUNNING_IN_CONTAINER=true
+
+# Usuário não-root
+USER app
+
+# Copia os arquivos publicados
+COPY --from=build /app/publish .
+
+# Render fornece a variável PORT em runtime
+ENTRYPOINT ["sh", "-c", "dotnet REST.dll --urls http://0.0.0.0:${PORT}"]

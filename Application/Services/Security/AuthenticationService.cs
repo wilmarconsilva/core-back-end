@@ -18,14 +18,14 @@ namespace Application.Services.Security
 
         private readonly IUserRepository _userRepository;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
-        private readonly IJwtTokenGenerator _jwtTokenGenerator;
+        private readonly IJwtGeneratorService _jwtTokenGenerator;
         private readonly IPasswordHasherService _passwordHasherService;
         private readonly IUnitOfWork _unitOfWork;
 
         public AuthenticationService(
             IUserRepository userRepository,
             IRefreshTokenRepository refreshTokenRepository,
-            IJwtTokenGenerator jwtTokenGenerator,
+            IJwtGeneratorService jwtTokenGenerator,
             IPasswordHasherService passwordHasherService,
             IUnitOfWork unitOfWork)
         {
