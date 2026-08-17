@@ -37,7 +37,7 @@ A solução (`Core.sln`) é dividida em quatro projetos, seguindo a **Regra da D
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Presentation  (Presentation/Web/APIs/REST)                  │
+│  Presentation  (Presentation/Web/Services/REST)                  │
 │  Controllers, DI, Middleware, Validações de entrada          │
 │      │ depende de ▼                                           │
 ├─────────────────────────────────────────────────────────────┤

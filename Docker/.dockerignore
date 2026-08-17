@@ -1,0 +1,13 @@
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+.git/
+.github/
+.serena/
+.claude/
+.env
+.env.*
+!.env.example
+*.md
+README.md
