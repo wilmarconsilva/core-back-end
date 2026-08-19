@@ -38,6 +38,6 @@ namespace Application.DataTransferObjects.Commercial.Documents.Reports
 
         public string CustomerName { get; set; } = null!;
 
-        public string CustomerCityState { get; set; } = null!;
+        public string CustomerLocalityState { get; set; } = null!;
     }
 }
