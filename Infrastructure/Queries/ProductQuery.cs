@@ -4,7 +4,7 @@ using Application.Interfaces.Queries;
 using AutoMapper;
 using Domain.Entities;
 using Infrastructure.Persistece;
-using Infrastructure.Queries;
+using Infrastructure.Extensions.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Queries
@@ -20,7 +20,7 @@ namespace Infrastructure.Queries
             IQueryable<Product> query = _query;
 
             if (filter.Description != null)
-                query = query.Where(p => p.Description.Contains(filter.Description));
+                query = query.WhereContains(p => p.Description, filter.Description);
 
             return await ApplyPaging(query, filter)
                 .Select(product => new ProductListing
