@@ -78,7 +78,7 @@ namespace Infrastructure.Queries.Commercial.Documents
                     d.observations AS "{nameof(DocumentReport.Observations)}",
                     u.name AS "{nameof(DocumentReport.UserName)}",
                     c.name AS "{nameof(DocumentReport.CustomerName)}",
-                    COALESCE(addr.locality_description, '') || ' - ' || COALESCE(addr.state_acronym, '') AS "{nameof(DocumentReport.CustomerCityState)}"
+                    COALESCE(addr.locality_description, '') || ' - ' || COALESCE(addr.state_acronym, '') AS "{nameof(DocumentReport.CustomerLocalityState)}"
                 FROM {GetTableName()} d
                 INNER JOIN users u ON u.id = d.user_id
                 INNER JOIN customers c ON c.id = d.customer_id
