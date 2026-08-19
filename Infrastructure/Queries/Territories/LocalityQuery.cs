@@ -4,6 +4,7 @@ using Application.Interfaces.Queries.Territories;
 using AutoMapper;
 using Domain.Entities.Territories;
 using Infrastructure.Persistece;
+using Infrastructure.Extensions.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Queries.Territories
@@ -27,7 +28,7 @@ namespace Infrastructure.Queries.Territories
                 query = query.Where(l => l.Id == filter.Id.Value);
 
             if (filter.Description != null)
-                query = query.Where(l => EF.Functions.ILike(l.Description, filter.Description));
+                query = query.WhereContains(l => l.Description, filter.Description);
 
             if (filter.StateId.HasValue)
                 query = query.Where(l => l.StateId == filter.StateId.Value);
