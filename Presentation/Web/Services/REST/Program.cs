@@ -33,8 +33,13 @@ await app.ApplyMigrationsAsync();
 
 // Configure Middleware
 
-// Deploy roda atrás de um proxy que termina o TLS (ex.: Render) e repassa HTTP puro ao Kestrel
-// sem isso, Request.IsHttps fica sempre false e o cookie do refresh token nunca recebe Secure=true.
+// Deploy roda atrás de um proxy que termina o TLS (ex.: Render, ou Nginx/Caddy numa VPS) e repassa HTTP
+// puro ao Kestrel; sem isso, Request.IsHttps fica sempre false e o cookie do refresh token nunca recebe
+// Secure=true. KnownIPNetworks/KnownProxies são limpos de propósito para confiar no cabeçalho vindo de
+// qualquer origem — isso só é seguro porque o Kestrel não deve ser alcançável por ninguém além desse
+// proxy confiável (garantido pela rede, não por este código): container da API sem porta publicada pro
+// host (mesma rede interna do proxy) ou, fora de Docker, Kestrel vinculado a 127.0.0.1. Se a porta do
+// Kestrel for exposta diretamente à internet, qualquer requisição pode forjar X-Forwarded-Proto/-For.
 if (app.Environment.IsProduction())
 {
     ForwardedHeadersOptions forwardedHeadersOptions = new()
@@ -51,5 +56,8 @@ app.UseCorsConfiguration();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+// Health check.
+app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
 
 await app.RunAsync();

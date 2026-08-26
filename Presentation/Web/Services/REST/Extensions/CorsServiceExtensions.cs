@@ -17,13 +17,12 @@ public static class CorsServiceExtensions
 
         string[] origins = GetValues(configuration, OriginsSectionName);
         string[] originSuffixes = GetValues(configuration, OriginSuffixesSectionName);
-        bool allowAnyLocalhost = environment.IsDevelopment();
 
         services.AddCors(options =>
         {
             options.AddPolicy(FrontendPolicyName, policy =>
             {
-                policy.SetIsOriginAllowed(origin => IsOriginAllowed(origin, origins, originSuffixes, allowAnyLocalhost))
+                policy.SetIsOriginAllowed(origin => IsOriginAllowed(origin, origins, originSuffixes, environment))
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
@@ -42,12 +41,12 @@ public static class CorsServiceExtensions
         return app;
     }
 
-    private static bool IsOriginAllowed(string origin, string[] origins, string[] originSuffixes, bool allowAnyLocalhost)
+    private static bool IsOriginAllowed(string origin, string[] origins, string[] originSuffixes, IHostEnvironment environment)
     {
         if (!Uri.TryCreate(origin, UriKind.Absolute, out Uri? originUri))
             return false;
 
-        if (allowAnyLocalhost && originUri.Host is "localhost" or "127.0.0.1" or "::1")
+        if (environment.IsDevelopment() && originUri.Host is "localhost" or "127.0.0.1" or "::1")
             return true;
 
         if (origins.Contains(origin, StringComparer.OrdinalIgnoreCase))

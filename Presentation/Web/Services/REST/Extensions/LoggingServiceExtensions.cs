@@ -1,5 +1,4 @@
 using Serilog;
-using Serilog.Events;
 
 namespace REST.Extensions;
 
@@ -23,10 +22,12 @@ public static class LoggingServiceExtensions
         {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Error()
+                // Em container o arquivo é efêmero (perdido a cada recriação) e invisível para
+                // "docker logs". O console é o canal padrão coletado pelo runtime.
+                .WriteTo.Console()
                 .WriteTo.File(
                 "Logs/.txt",
                 rollingInterval: RollingInterval.Day,
-                restrictedToMinimumLevel: LogEventLevel.Error,
                 retainedFileCountLimit: 7, // 7 days
                 fileSizeLimitBytes: 100_000_000, // 100 MB
                 rollOnFileSizeLimit: true)
