@@ -52,4 +52,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+// Health check.
+app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
+
 await app.RunAsync();
