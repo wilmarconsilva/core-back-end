@@ -23,6 +23,9 @@ public static class LoggingServiceExtensions
         {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Error()
+                // Em container o arquivo é efêmero (perdido a cada recriação) e invisível para
+                // "docker logs"; o console é o canal padrão coletado pelo runtime.
+                .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Error)
                 .WriteTo.File(
                 "Logs/.txt",
                 rollingInterval: RollingInterval.Day,

@@ -42,6 +42,14 @@ WORKDIR /app
 ENV ASPNETCORE_ENVIRONMENT=Production \
     DOTNET_RUNNING_IN_CONTAINER=true
 
+# curl para o HEALTHCHECK do compose: a imagem aspnet não traz curl nem wget, e sem ele o
+# healthcheck falha com "executable file not found in $PATH", deixando o container unhealthy
+# para sempre. Como o proxy declara depends_on: service_healthy, isso derruba o "up" inteiro.
+# Precisa vir ANTES do USER app, porque o apt-get exige root.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
 # Usuário não-root
 USER app
 
