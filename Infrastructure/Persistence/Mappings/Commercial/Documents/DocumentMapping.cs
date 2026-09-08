@@ -35,7 +35,7 @@ namespace Infrastructure.Persistence.Mappings.Commercial.Documents
                     .IsRequired();
 
                 payment.Property(p => p.HasInstallment)
-                    .HasColumnName("payment_installment_has_installment")
+                    .HasColumnName("payment_has_installment")
                     .IsRequired();
 
                 // NÍVEL 2: Installment dentro de Payment
