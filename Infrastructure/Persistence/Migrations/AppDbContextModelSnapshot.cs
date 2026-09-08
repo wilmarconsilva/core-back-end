@@ -17,7 +17,7 @@ namespace Infrastructure.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -512,7 +512,7 @@ namespace Infrastructure.Persistence.Migrations
 
                             b1.Property<bool>("HasInstallment")
                                 .HasColumnType("boolean")
-                                .HasColumnName("payment_installment_has_installment");
+                                .HasColumnName("payment_has_installment");
 
                             b1.Property<int>("Method")
                                 .HasColumnType("integer")
@@ -639,7 +639,7 @@ namespace Infrastructure.Persistence.Migrations
 
                             b1.Property<bool>("HasInstallment")
                                 .HasColumnType("boolean")
-                                .HasColumnName("payment_installment_has_installment");
+                                .HasColumnName("payment_has_installment");
 
                             b1.Property<int>("Method")
                                 .HasColumnType("integer")
