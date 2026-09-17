@@ -10,7 +10,11 @@ namespace REST.Extensions;
 public static class SwaggerServiceExtensions
 {
     private const string ApiTitle = "Core - Web Service - REST";
-    private const string ApiVersion = "v1.0.0";
+    private readonly static string _apiVersion = $"v{Assembly
+        .GetEntryAssembly()?
+        .GetName()
+        .Version?
+        .ToString(3) ?? "desconhecida"}";
 
     public static IServiceCollection AddSwaggerConfiguration(this IServiceCollection services)
     {
@@ -18,15 +22,14 @@ public static class SwaggerServiceExtensions
 
         services.AddSwaggerGen(setup =>
         {
-            string appVersion = Assembly.GetExecutingAssembly()
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
-                ?? "desconhecida";
-
-            setup.SwaggerDoc(ApiVersion, new OpenApiInfo
+            setup.SwaggerDoc(_apiVersion, new OpenApiInfo
             {
                 Title = ApiTitle,
-                Version = ApiVersion,
-                Description = $"Versão da aplicação: {appVersion}",
+                Version = _apiVersion,
+                Description = $"Versão detalhada: {Assembly
+                .GetExecutingAssembly()?
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+                .InformationalVersion ?? "desconhecida"}"
             });
 
             string xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -59,7 +62,7 @@ public static class SwaggerServiceExtensions
         app.UseSwagger();
         app.UseSwaggerUI(c =>
         {
-            c.SwaggerEndpoint($"/swagger/{ApiVersion}/swagger.json", ApiTitle);
+            c.SwaggerEndpoint($"/swagger/{_apiVersion}/swagger.json", ApiTitle);
             c.RoutePrefix = string.Empty;
         });
 
