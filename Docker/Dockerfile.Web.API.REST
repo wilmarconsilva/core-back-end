@@ -12,10 +12,10 @@ WORKDIR /src
 COPY Domain/Domain.csproj Domain/
 COPY Application/Application.csproj Application/
 COPY Infrastructure/Infrastructure.csproj Infrastructure/
-COPY Presentation/Web/Services/REST/REST.csproj Presentation/Web/Services/REST/
+COPY Presentation/Web/APIs/REST/REST.csproj Presentation/Web/APIs/REST/
 
 # Restaura as dependências
-RUN dotnet restore Presentation/Web/Services/REST/REST.csproj
+RUN dotnet restore Presentation/Web/APIs/REST/REST.csproj
 
 # Copia o código-fonte
 COPY Domain/ Domain/
@@ -24,7 +24,7 @@ COPY Infrastructure/ Infrastructure/
 COPY Presentation/ Presentation/
 
 # Compila e publica
-RUN dotnet publish Presentation/Web/Services/REST/REST.csproj \
+RUN dotnet publish Presentation/Web/APIs/REST/REST.csproj \
     --configuration Release \
     --output /app/publish \
     --no-restore
