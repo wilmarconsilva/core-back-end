@@ -18,7 +18,7 @@ public static class AuthenticationServiceExtensions
             .Bind(configuration.GetSection(JwtOptions.SectionName))
             .Validate(
                 options => !string.IsNullOrWhiteSpace(options.SigningKey),
-                "All required JWT settings must be provided by environment variables or .env file.")
+                $"{JwtOptions.SectionName}__{nameof(JwtOptions.SigningKey)} must be provided by environment variables or .env file.")
             .ValidateOnStart();
 
         services
