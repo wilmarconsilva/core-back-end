@@ -29,15 +29,5 @@ namespace REST.Controllers.Commercial.Documents
                 return Ok(listings);
             }, cancellationToken);
         }
-
-        [HttpPost("{id}/orders")]
-        public async Task<ActionResult<OrderDetailDto>> CreateOrderByBudget([FromRoute] long id, [FromBody] OrderByBudgetDto orderByBudgetDto, CancellationToken cancellationToken)
-        {
-            return await ProcessRequestAsync<OrderDetailDto>(async () =>
-            {
-                OrderDetailDto orderDetail = await _service.CreateOrderByBudget(id, orderByBudgetDto, cancellationToken);
-                return CreatedAtAction(nameof(OrdersController.GetById), nameof(OrdersController).Replace("Controller", string.Empty), new { id = orderDetail.Id }, orderDetail);
-            }, cancellationToken);
-        }
     }
 }

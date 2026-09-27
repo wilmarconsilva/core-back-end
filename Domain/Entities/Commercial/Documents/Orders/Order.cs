@@ -16,14 +16,6 @@ namespace Domain.Entities.Commercial.Documents.Orders
             BudgetId = budgetId;
         }
 
-        public Order(Budget budget, DateTime creationDateTime)
-            : base(budget.UserId, creationDateTime, budget.CustomerId, budget.Payment, budget.Observations, budget.CustomerSignatureImage, budget.PDF,
-                   budget.Products.Select(p => new OrderProduct(p.ProductId, p.Quantity, p.ValueUnit, p.ValueTotal)).ToList())
-        {
-            BudgetId = budget.Id;
-            Budget = budget;
-        }
-
         public long? BudgetId { get; set; }
 
         public Budget? Budget { get; private set; }
