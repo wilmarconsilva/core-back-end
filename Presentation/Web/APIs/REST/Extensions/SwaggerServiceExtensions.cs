@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi;
+using REST.Middlewares;
+using REST.Options;
 using System.Reflection;
 
 namespace REST.Extensions;
@@ -16,9 +18,18 @@ public static class SwaggerServiceExtensions
         .Version?
         .ToString(3) ?? "desconhecida"}";
 
-    public static IServiceCollection AddSwaggerConfiguration(this IServiceCollection services)
+    public static IServiceCollection AddSwaggerConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        services
+            .AddOptions<SwaggerAuthenticationOptions>()
+            .Bind(configuration.GetSection(SwaggerAuthenticationOptions.SectionName))
+            .Validate(
+                options => !string.IsNullOrWhiteSpace(options.Password),
+                $"{SwaggerAuthenticationOptions.SectionName}__{nameof(SwaggerAuthenticationOptions.Password)} must be provided by environment variables or .env file.")
+            .ValidateOnStart();
 
         services.AddSwaggerGen(setup =>
         {
@@ -59,6 +70,7 @@ public static class SwaggerServiceExtensions
     {
         ArgumentNullException.ThrowIfNull(app);
 
+        app.UseWhen(IsSwaggerRequest, branch => branch.UseMiddleware<SwaggerAuthenticationMiddleware>());
         app.UseSwagger();
         app.UseSwaggerUI(c =>
         {
@@ -67,5 +79,16 @@ public static class SwaggerServiceExtensions
         });
 
         return app;
+    }
+
+    // O Swagger UI é servido na raiz (RoutePrefix vazio), junto dos controllers; por isso protege-se apenas a página
+    // e o documento OpenAPI. Os assets estáticos (js/css) da biblioteca são públicos e permanecem liberados.
+    private static bool IsSwaggerRequest(HttpContext context)
+    {
+        PathString path = context.Request.Path;
+
+        return path == "/"
+            || path.Equals("/index.html", StringComparison.OrdinalIgnoreCase)
+            || path.StartsWithSegments("/swagger", StringComparison.OrdinalIgnoreCase);
     }
 }
