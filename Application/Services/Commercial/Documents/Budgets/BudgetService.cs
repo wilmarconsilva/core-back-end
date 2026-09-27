@@ -21,13 +21,11 @@ namespace Application.Services.Commercial.Documents.Budgets
     public class BudgetService : DocumentService<Budget, BudgetSaveDto, DocumentDetailDto, BudgetProductSaveDto, BudgetListing, BudgetListingFilter>, IBudgetService
     {
         private readonly IMapper _mapper;
-        private readonly IOrderService _orderService;
 
         public BudgetService(IBudgetRepository repository,
             IBudgetQuery query,
             IUnitOfWork unitOfWork,
             IMapper mapper,
-            IOrderService orderService,
             ICustomerRepository customerRepository,
             IServiceScopeFactory serviceScopeFactory,
             IHttpContextCurrentUser currentUser,
@@ -42,7 +40,6 @@ namespace Application.Services.Commercial.Documents.Budgets
                   logger)
         {
             _mapper = mapper;
-            _orderService = orderService;
         }
 
         protected override IEnumerable<DocumentProduct> GetProducts(Budget entity) => entity.Products;
@@ -62,16 +59,6 @@ namespace Application.Services.Commercial.Documents.Budgets
             Payment payment = CreatePayment(dto);
 
             entity.Fill(_currentUser.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, dto.PDF, products);
-        }
-
-        public async Task<OrderDetailDto> CreateOrderByBudget(long id, OrderByBudgetDto orderByBudgetDto, CancellationToken cancellationToken)
-        {
-            Budget? budget = (await _repositoryCrud.GetByIdsAsync([id], cancellationToken)).FirstOrDefault();
-
-            if (budget == null)
-                throw new BusinessRuleException(GetNotFoundMessage([id]));
-
-            return await _orderService.CreateByBudgetAsync(budget, orderByBudgetDto, cancellationToken);
         }
 
         protected override Task<bool> EntitiesCanBeDeleted(IEnumerable<long> ids)

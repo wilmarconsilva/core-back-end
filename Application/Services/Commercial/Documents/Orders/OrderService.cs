@@ -5,7 +5,6 @@ using Application.Interfaces.Security;
 using Application.Interfaces.Services.Commercial.Documents.Orders;
 using AutoMapper;
 using Domain.Entities.Commercial.Documents;
-using Domain.Entities.Commercial.Documents.Budgets;
 using Domain.Entities.Commercial.Documents.Orders;
 using Domain.Interfaces.Data;
 using Domain.Interfaces.Repositories;
@@ -42,19 +41,6 @@ namespace Application.Services.Commercial.Documents.Orders
         }
 
         protected override IEnumerable<DocumentProduct> GetProducts(Order entity) => entity.Products;
-
-        public async Task<OrderDetailDto> CreateByBudgetAsync(Budget budget, OrderByBudgetDto orderByBudgetDto, CancellationToken cancellationToken)
-        {
-            Order order = new Order(budget, orderByBudgetDto.CreationDateTime);
-
-            await SaveAsync([order], cancellationToken);
-
-            OrderDetailDto? detail = await _query.GetDetailAsync(order.Id, cancellationToken);
-            if (detail == null)
-                throw new InvalidOperationException($"Pedido {order.Id} não encontrado após criação.");
-
-            return detail;
-        }
 
         protected override Order CreateEntity(OrderSaveDto dto)
         {
