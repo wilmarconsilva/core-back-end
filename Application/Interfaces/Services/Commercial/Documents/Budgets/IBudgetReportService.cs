@@ -1,5 +1,5 @@
-using Application.DataTransferObjects.Commercial.Documents.Budgets;
-using Application.DataTransferObjects.Commercial.Documents.Budgets.Reports;
+using Application.Documents.Budgets.DataTransferObjects;
+using Application.Documents.Budgets.DataTransferObjects.Reports;
 
 namespace Application.Interfaces.Services.Commercial.Documents.Budgets
 {

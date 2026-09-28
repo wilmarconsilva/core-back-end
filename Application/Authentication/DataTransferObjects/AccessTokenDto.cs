@@ -1,0 +1,11 @@
+﻿namespace Application.Authentication.DataTransferObjects
+{
+    public class AccessTokenDto
+    {
+        public required string AccessToken { get; init; }
+
+        public required DateTime AccessTokenExpirationDateTime { get; init; }
+
+        public required string UserName { get; init; }
+    }
+}

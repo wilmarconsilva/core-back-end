@@ -1,6 +1,6 @@
-using Application.DataTransferObjects.Products;
+using Application.Products.DataTransferObjects;
 using AutoMapper;
-using Domain.Entities;
+using Domain.Products.Entities;
 
 namespace Application.Mappings.Products
 {

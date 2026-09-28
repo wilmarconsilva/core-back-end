@@ -1,4 +1,4 @@
-using Infrastructure.Persistece;
+using Infrastructure.Shared.Persistance;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 

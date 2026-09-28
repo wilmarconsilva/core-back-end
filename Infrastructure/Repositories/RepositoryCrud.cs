@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
-using Domain.Entities;
-using Domain.Interfaces.Repositories;
-using Infrastructure.Persistence;
+using Domain.Shared.Entities;
+using Domain.Shared.Repositories.Interfaces;
+using Infrastructure.Shared.Persistance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -12,7 +12,7 @@ namespace Infrastructure.Repositories
     {
         protected readonly DbSet<TEntity> _entityDbSet;
 
-        protected RepositoryCrud(Persistece.AppDbContext context) : base(context)
+        protected RepositoryCrud(AppDbContext context) : base(context)
         {
             _entityDbSet = _context.Set<TEntity>();
         }

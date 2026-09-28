@@ -1,5 +1,5 @@
-using Application.DataTransferObjects.Commercial.Documents.DocumentsProducts;
-using Domain.Entities.Commercial.Documents.Orders;
+using Application.Documents.DataTransferObjects.DocumentsProducts;
+using Domain.Documents.Orders.Entities;
 
 namespace Application.Mappings.Commercial.Documents.Orders.Details
 {

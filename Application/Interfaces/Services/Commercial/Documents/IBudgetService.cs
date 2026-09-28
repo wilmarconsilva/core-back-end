@@ -1,6 +1,6 @@
-using Application.DataTransferObjects.Commercial.Documents;
-using Application.DataTransferObjects.Commercial.Documents.Budgets;
-using Application.DataTransferObjects.Commercial.Documents.Budgets.Listings;
+using Application.Documents.Budgets.DataTransferObjects;
+using Application.Documents.Budgets.DataTransferObjects.Listings;
+using Application.Documents.DataTransferObjects;
 
 namespace Application.Interfaces.Services.Commercial.Documents
 {

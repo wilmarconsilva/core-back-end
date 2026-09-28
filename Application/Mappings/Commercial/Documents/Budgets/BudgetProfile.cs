@@ -1,6 +1,6 @@
-using Application.DataTransferObjects.Commercial.Documents.Budgets;
+using Application.Documents.Budgets.DataTransferObjects;
 using AutoMapper;
-using Domain.Entities.Commercial.Documents.Budgets;
+using Domain.Documents.Budgets.Entities;
 
 namespace Application.Mappings.Commercial.Documents.Budgets
 {

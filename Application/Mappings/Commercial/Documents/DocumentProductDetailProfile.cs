@@ -1,7 +1,7 @@
-﻿using Application.DataTransferObjects.Commercial.Documents.DocumentsProducts;
-using Application.DataTransferObjects.Entities;
+﻿using Application.DataTransferObjects.Entities;
+using Application.Documents.DataTransferObjects.DocumentsProducts;
 using AutoMapper;
-using Domain.Entities.Commercial.Documents;
+using Domain.Documents.Entities;
 
 namespace Application.Mappings.Commercial.Documents
 {

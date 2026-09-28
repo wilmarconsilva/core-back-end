@@ -1,5 +1,5 @@
-﻿using Domain.Entities.Commercial.Documents;
-using Infrastructure.Persistece;
+﻿using Domain.Documents.Entities;
+using Infrastructure.Shared.Persistance;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.Commercial.Documents

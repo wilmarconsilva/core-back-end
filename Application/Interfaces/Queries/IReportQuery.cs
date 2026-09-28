@@ -1,4 +1,4 @@
-using Application.DataTransferObjects.Listings;
+using Application.Shared.DataTransferObjects.Listings;
 
 namespace Application.Interfaces.Queries
 {

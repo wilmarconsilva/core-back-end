@@ -1,6 +1,6 @@
-using Domain.Entities.Persons.Customers;
-using Domain.Interfaces.Repositories;
-using Infrastructure.Persistece;
+using Domain.Persons.Customers.Entities;
+using Domain.Persons.Customers.Repositories.Interfaces;
+using Infrastructure.Shared.Persistance;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.Persons.Customers

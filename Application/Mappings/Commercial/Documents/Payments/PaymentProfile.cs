@@ -1,5 +1,5 @@
-using Application.DataTransferObjects.Commercial.Documents.Payments;
-using Domain.ValueObjects.Commercial.Documents.Payments;
+using Application.Documents.DataTransferObjects.Payments;
+using Domain.Documents.ValueObjects.Payments;
 
 namespace Application.Mappings.Commercial.Documents.Budgets
 {

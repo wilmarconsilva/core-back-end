@@ -1,5 +1,5 @@
-using Application.DataTransferObjects.Persons.Customers.CustomerAddresses;
-using Domain.Entities.Persons.Customers;
+using Application.Persons.Customers.DataTransferObjects.CustomerAddresses;
+using Domain.Persons.Customers.Entities;
 
 namespace Application.Mappings.Persons.Customers
 {

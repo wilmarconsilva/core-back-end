@@ -1,6 +1,6 @@
-using Domain.Entities.Territories;
-using Domain.Interfaces.Repositories;
-using Infrastructure.Persistece;
+using Domain.Territories.Localities.Entities;
+using Domain.Territories.Localities.Repositories.Interfaces;
+using Infrastructure.Shared.Persistance;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.Territories

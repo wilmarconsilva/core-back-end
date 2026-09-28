@@ -1,6 +1,6 @@
-using Application.DataTransferObjects.Territories;
 using Application.Mappings;
-using Domain.Entities.Territories;
+using Application.Territories.Localities.DataTransferObjects;
+using Domain.Territories.Localities.Entities;
 
 namespace Application.Mappings.Territories
 {

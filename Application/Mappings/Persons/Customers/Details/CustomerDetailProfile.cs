@@ -1,6 +1,6 @@
-using Application.DataTransferObjects.Persons.Customers;
+using Application.Persons.Customers.DataTransferObjects;
 using AutoMapper;
-using Domain.Entities.Persons.Customers;
+using Domain.Persons.Customers.Entities;
 
 namespace Application.Mappings.Persons.Customers.Details
 {

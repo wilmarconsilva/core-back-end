@@ -1,4 +1,4 @@
-using Application.DataTransferObjects.Email;
+using Application.Email.DataTransferObjects;
 
 namespace Application.Interfaces.Services
 {

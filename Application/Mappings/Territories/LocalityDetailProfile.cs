@@ -1,7 +1,7 @@
 using Application.DataTransferObjects.Entities;
-using Application.DataTransferObjects.Territories;
+using Application.Territories.Localities.DataTransferObjects;
 using AutoMapper;
-using Domain.Entities.Territories;
+using Domain.Territories.Localities.Entities;
 
 namespace Application.Mappings.Territories
 {

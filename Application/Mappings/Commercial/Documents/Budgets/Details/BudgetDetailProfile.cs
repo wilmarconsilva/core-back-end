@@ -1,5 +1,5 @@
-using Application.DataTransferObjects.Commercial.Documents;
-using Domain.Entities.Commercial.Documents.Budgets;
+using Application.Documents.DataTransferObjects;
+using Domain.Documents.Budgets.Entities;
 
 namespace Application.Mappings.Commercial.Documents.Budgets.Details
 {

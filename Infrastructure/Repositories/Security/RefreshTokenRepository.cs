@@ -1,6 +1,6 @@
-using Domain.Entities.Security;
-using Domain.Interfaces.Repositories;
-using Infrastructure.Persistece;
+using Domain.Authtentication.Entities;
+using Domain.Authtentication.Repositories.Interfaces;
+using Infrastructure.Shared.Persistance;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.Security

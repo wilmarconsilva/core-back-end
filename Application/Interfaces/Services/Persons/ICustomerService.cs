@@ -1,5 +1,5 @@
-using Application.DataTransferObjects.Persons.Customers;
-using Application.DataTransferObjects.Persons.Customers.Listings;
+using Application.Persons.Customers.DataTransferObjects;
+using Application.Persons.Customers.DataTransferObjects.Listings;
 
 namespace Application.Interfaces.Services.Persons
 {

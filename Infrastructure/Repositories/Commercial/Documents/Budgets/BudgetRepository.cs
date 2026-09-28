@@ -1,6 +1,6 @@
-using Domain.Entities.Commercial.Documents.Budgets;
-using Domain.Interfaces.Repositories;
-using Infrastructure.Persistece;
+using Domain.Documents.Budgets.Entities;
+using Domain.Documents.Budgets.Repositories.Interfaces;
+using Infrastructure.Shared.Persistance;
 
 namespace Infrastructure.Repositories.Commercial.Documents.Budgets
 {

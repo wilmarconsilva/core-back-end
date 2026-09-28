@@ -1,6 +1,6 @@
-using Application.DataTransferObjects.Entities;
-using Application.DataTransferObjects.Listings;
-using Domain.Entities;
+using Application.Shared.DataTransferObjects.Entities;
+using Application.Shared.DataTransferObjects.Listings;
+using Domain.Shared.Entities;
 
 namespace Application.Interfaces.Services
 {

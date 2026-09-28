@@ -1,5 +1,5 @@
-using Application.DataTransferObjects.Territories;
-using Application.DataTransferObjects.Territories.Listings;
+using Application.Territories.Localities.DataTransferObjects;
+using Application.Territories.Localities.DataTransferObjects.Listings;
 
 namespace Application.Interfaces.Queries.Territories
 {

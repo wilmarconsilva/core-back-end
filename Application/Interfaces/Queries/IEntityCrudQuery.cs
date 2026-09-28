@@ -1,5 +1,5 @@
-using Application.DataTransferObjects.Entities;
-using Application.DataTransferObjects.Listings;
+using Application.Shared.DataTransferObjects.Entities;
+using Application.Shared.DataTransferObjects.Listings;
 
 namespace Application.Interfaces.Queries
 {

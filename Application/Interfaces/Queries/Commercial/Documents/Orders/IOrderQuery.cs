@@ -1,5 +1,5 @@
-using Application.DataTransferObjects.Commercial.Documents.Orders;
-using Application.DataTransferObjects.Commercial.Documents.Orders.Listings;
+using Application.Documents.Orders.DataTransferObjects;
+using Application.Documents.Orders.DataTransferObjects.Listings;
 
 namespace Application.Interfaces.Queries.Commercial.Documents.Orders
 {

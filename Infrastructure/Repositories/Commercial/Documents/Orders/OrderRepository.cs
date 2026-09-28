@@ -1,6 +1,6 @@
-using Domain.Entities.Commercial.Documents.Orders;
-using Domain.Interfaces.Repositories;
-using Infrastructure.Persistece;
+using Domain.Documents.Orders.Entities;
+using Domain.Documents.Orders.Repositories.Interfaces;
+using Infrastructure.Shared.Persistance;
 
 namespace Infrastructure.Repositories.Commercial.Documents.Orders
 {

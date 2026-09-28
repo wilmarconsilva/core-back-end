@@ -1,4 +1,4 @@
-using Application.DataTransferObjects.Commercial.Documents.Orders.Reports;
+using Application.Documents.Orders.DataTransferObjects.Reports;
 
 namespace Application.Interfaces.Queries.Commercial.Documents.Orders
 {

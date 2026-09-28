@@ -146,7 +146,7 @@ public class Payment
 
 ### 2.4 Validação de domínio
 
-`Domain/Utilities/Entities/Validator.cs` é um utilitário `internal static` com guard clauses genéricas (`ValidateValue`, `ValidateEnum`, `ValidateEmail`, `ValidateCpfCnpj`, ...). Ele reforça invariantes **dentro** do domínio e lança `BusinessRuleException` com mensagem em português. Não confundir com a validação de *entrada* (FluentValidation na apresentação — §8): esta protege as regras de negócio; aquela protege o formato da requisição.
+`Domain/Utilities/Entities/Validator.cs` é um utilitário `internal static` com guard clauses genéricas (`ValidateValue`, `ValidateEnum`, `ValidateEmail`, `ValidateCpfCnpj`, ...). Ele reforça invariantes **dentro** do domínio e lança `BusinessRuleException` com mensagem em português. É o único ponto de validação da solução — não há validação de entrada na apresentação (ver §8.3).
 
 ### 2.5 Exceções de domínio
 
@@ -347,11 +347,11 @@ public async Task<ActionResult<TSaveDto>> Create([FromBody] TSaveDto dto, Cancel
 
 Também desembrulha `InnerException` (ex.: exceções do EF que embrulham a de negócio). Isso mantém os métodos de ação limpos — nada de `try/catch` espalhado.
 
-### 8.3 Validação de entrada (FluentValidation)
+### 8.3 Validação de entrada
 
-`Presentation/.../Validations/FluentValidationAction.cs` é um `IAsyncActionFilter` que, antes de cada ação, procura um `IValidator<T>` registrado para cada argumento e valida automaticamente. Falhas viram `ModelState` → `400` padronizado. Assim, validar um DTO exige apenas criar um `AbstractValidator<TDto>`; nada muda no controller.
+Não há camada de validação de entrada na apresentação (nem FluentValidation, nem *action filter* de validação). Toda validação acontece no domínio — `Validator` e métodos de negócio das entidades (§2.4) — e chega ao cliente como `BusinessRuleException` → `400` via `ProcessRequestAsync` (§8.2).
 
-> **Divisão de responsabilidades de validação:** FluentValidation valida o *formato/contrato* da requisição (obrigatoriedade, tamanho, ranges); o `Validator` de domínio e os métodos das entidades garantem as *regras de negócio*.
+> Só introduza validação de *formato/contrato* na apresentação se surgir necessidade concreta (ex.: devolver todos os erros de uma requisição de uma vez, em vez de parar na primeira `BusinessRuleException`).
 
 ---
 
@@ -395,7 +395,7 @@ Ao criar um novo recurso CRUD (ex.: `Foo`), siga o mesmo caminho das features ex
 1. **Domain** — `Foo : Entity` (ou o agregado apropriado), com invariantes validadas; se necessário, `IFooRepository : IRepositoryCrud<Foo>`.
 2. **Application** — DTOs (`FooSaveDto`, `FooDetailDto`, `FooListing`, `FooListingFilter`); `IFooService : ICrudService<...>` + `FooService : CrudService<...>`; `IFooQuery` + Profile de AutoMapper.
 3. **Infrastructure** — `FooMapping : EntityMapping<Foo>`; `FooQuery : DetailDtoQuery<Foo, FooDetailDto>`; `FooRepository : RepositoryCrud<Foo>` (se houver contrato específico); *migration*.
-4. **Presentation** — `FoosController : CrudController<...>` (implementa `GetAll`); `FooSaveDtoValidator : AbstractValidator<FooSaveDto>` se precisar validar entrada; registrar Service/Query/Repository na extension de DI.
+4. **Presentation** — `FoosController : CrudController<...>` (implementa `GetAll`); registrar Service/Query/Repository na extension de DI.
 
 Convenções gerais:
 
@@ -421,8 +421,8 @@ Padrões clássicos do catálogo GoF efetivamente presentes no código:
 | **Prototype (cópia de estado)** | Criacional | `ICopyable<T>.Copy(source)` — reconcilia entidades filhas copiando estado sobre a instância já rastreada em `EntityCollection.Sync` (em vez de recriar) |
 | **Adapter**                   | Estrutural   | `HttpContextCurrentUser` adapta `IHttpContextAccessor`/`ClaimsPrincipal` (ASP.NET) para o contrato de domínio `IHttpContextCurrentUser`; AutoMapper `Profile`s adaptam Entidade ↔ DTO |
 | **Facade**                    | Estrutural   | *Extension methods* de DI (`AddApplicationServices`, `AddInfrastructureServices`) fecham um subsistema de registros atrás de uma chamada simples; os *Services* de aplicação são fachadas sobre Domain + Repository + Query + UoW |
-| **Strategy**                  | Comportamental | Implementações intercambiáveis atrás de interfaces resolvidas por DI (`IEmailService`→`SmtpEmailService`, `IPasswordHasherService`, `IJwtTokenGenerator`); `FluentValidationAction` seleciona em runtime o `IValidator<T>` conforme o tipo do argumento |
-| **Chain of Responsibility**   | Comportamental | Pipeline de *middleware*/*action filters* do ASP.NET (`FluentValidationAction` com `Order`); tratamento de exceção em `Controller` que encadeia tipos e cai no `InnerException` como próximo elo |
+| **Strategy**                  | Comportamental | Implementações intercambiáveis atrás de interfaces resolvidas por DI (`IEmailService`→`SmtpEmailService`, `IPasswordHasherService`, `IJwtTokenGenerator`) |
+| **Chain of Responsibility**   | Comportamental | Pipeline de *middleware* do ASP.NET (`Program.cs`); tratamento de exceção em `Controller` que encadeia tipos e cai no `InnerException` como próximo elo |
 
 ### 12.2 Padrões arquiteturais e de aplicação (Enterprise / PoEAA)
 
