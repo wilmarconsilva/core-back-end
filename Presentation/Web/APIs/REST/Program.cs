@@ -1,7 +1,9 @@
 using DotNetEnv;
 using DotNetEnv.Configuration;
 using Microsoft.AspNetCore.HttpOverrides;
+using REST.Authentication;
 using REST.Extensions;
+using REST.Swagger;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

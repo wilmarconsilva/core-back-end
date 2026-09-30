@@ -1,17 +1,24 @@
-using Application.Interfaces.Security;
 using Infrastructure.Security;
-using Application.Interfaces.Services;
-using Domain.Interfaces.Data;
-using Domain.Interfaces.Repositories;
 using Infrastructure.Email;
-using Infrastructure.Persistece;
-using Infrastructure.Repositories.Commercial.Documents.Budgets;
-using Infrastructure.Repositories.Commercial.Documents.Orders;
-using Infrastructure.Repositories.Persons;
-using Infrastructure.Repositories.Persons.Customers;
-using Infrastructure.Repositories.Security;
 using Infrastructure.Security.JsonWebTokens;
 using Microsoft.EntityFrameworkCore;
+using Domain.Shared.Persistance.Interfaces;
+using Domain.Documents.Budgets.Repositories.Interfaces;
+using Domain.Documents.Orders.Repositories.Interfaces;
+using Domain.Products.Repositories.Interfaces;
+using Domain.Persons.Customers.Repositories.Interfaces;
+using Domain.Authtentication.Repositories.Interfaces;
+using Domain.Persons.Users.Repositories.Interfaces;
+using Application.Authentication.Interfaces;
+using Application.Authentication.Services.Interfaces;
+using Infrastructure.Shared.Persistance;
+using Application.Email.Services.Interfaces;
+using Infrastructure.Documents.Budgets.Repositories;
+using Infrastructure.Documents.Orders;
+using Infrastructure.Persons.Customers;
+using Infrastructure.Persons.Users;
+using Infrastructure.Authentication;
+using Infrastructure.Products;
 
 namespace REST.Extensions;
 
