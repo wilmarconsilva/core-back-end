@@ -1,9 +1,9 @@
-using Application.Interfaces.Queries.Territories;
-using Application.Interfaces.Services.Territories;
 using Application.Shared.Services;
 using Application.Territories.Localities.DataTransferObjects;
 using Application.Territories.Localities.DataTransferObjects.Listings;
-using Domain.Exceptions;
+using Application.Territories.Localities.Queries.Interfaces;
+using Application.Territories.Localities.Services.Interfaces;
+using Domain.Shared.Exceptions;
 using Domain.Shared.Persistance.Interfaces;
 using Domain.Territories.Localities.Entities;
 using Domain.Territories.Localities.Repositories.Interfaces;
@@ -22,13 +22,11 @@ namespace Application.Territories.Localities.Services
         protected override Locality CreateEntity(LocalitySaveDto dto)
         {
             throw new BusinessRuleException("Operação não permitida. Localidades não podem ser criadas.");
-            //return new Locality(dto.Description, dto.StateId);
         }
 
         protected override void UpdateEntity(LocalitySaveDto dto, Locality entity)
         {
             throw new BusinessRuleException("Operação não permitida. Localidades não podem ser alteradas.");
-            //entity.Fill(dto.Description, dto.StateId);
         }
 
         protected override Task<bool> EntitiesCanBeDeleted(IEnumerable<long> ids)

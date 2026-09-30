@@ -1,16 +1,16 @@
-using Application.DataTransferObjects.Commercial.Documents.Budgets;
+using Application.Documents.Budgets.DataTransferObjects;
 using Application.Documents.Budgets.DataTransferObjects.Listings;
-using Application.Documents.DataTransferObjects;
-using Application.Interfaces.Queries.Commercial.Documents.Budgets;
+using Application.Documents.Budgets.Queries.Interfaces;
 using AutoMapper;
 using Domain.Documents.Budgets.Entities;
+using Domain.Documents.Budgets.ValueObjects;
 using Infrastructure.Documents.Queries;
-using Infrastructure.Shared.Persistance;
 using Microsoft.EntityFrameworkCore;
+using Infrastructure.Shared.Persistance;
 
 namespace Infrastructure.Documents.Budgets.Queries
 {
-    public class BudgetQuery : DocumentQuery<Budget, DocumentDetailDto, BudgetProduct, BudgetListing, BudgetListingFilter>, IBudgetQuery
+    public class BudgetQuery : DocumentQuery<Budget, BudgetDetailDto, BudgetProduct, BudgetPayment, BudgetListing, BudgetListingFilter>, IBudgetQuery
     {
         public BudgetQuery(AppDbContext context, IMapper mapper) : base(context, mapper)
         {

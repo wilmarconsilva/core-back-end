@@ -1,11 +1,12 @@
 using Domain.Documents.Orders.Entities;
+using Domain.Documents.Orders.ValueObjects;
 using Infrastructure.Documents.Persistance.Mappings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Documents.Orders.Persistance.Mappings
 {
-    public class OrderMapping : DocumentMapping<Order, OrderProduct>
+    public class OrderMapping : DocumentMapping<Order, OrderProduct, OrderPayment>
     {
         public override void Configure(EntityTypeBuilder<Order> builder)
         {
@@ -17,7 +18,14 @@ namespace Infrastructure.Documents.Orders.Persistance.Mappings
             builder.HasOne(o => o.Budget)
                 .WithMany()
                 .HasForeignKey(o => o.BudgetId)
-                .OnDelete(Microsoft.EntityFrameworkCore.DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.OwnsOne(d => d.Payment, payment =>
+            {
+                payment.Property(p => p.Method)
+                    .HasColumnName("payment_method")
+                    .IsRequired();
+            });
         }
 
         protected override string GetTableName()

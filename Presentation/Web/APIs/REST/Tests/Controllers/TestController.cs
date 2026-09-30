@@ -1,12 +1,11 @@
 using Domain.Shared.Persistance.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using REST.Shared.Controllers;
 
 namespace REST.Tests.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class TestController : Controller
+    public class TestController : Shared.Controllers.Controller
     {
         public TestController(ILogger logger, IUnitOfWork unitOfWork) : base(logger, unitOfWork)
         {

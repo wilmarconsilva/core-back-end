@@ -15,6 +15,11 @@
     {
         public static string GetDescription(this PaymentMethod paymentMethod)
         {
+            return ((PaymentMethod?)paymentMethod).GetDescription();
+        }
+
+        public static string GetDescription(this PaymentMethod? paymentMethod)
+        {
             return paymentMethod switch
             {
                 PaymentMethod.DebitCard => "Cartão de Débito",

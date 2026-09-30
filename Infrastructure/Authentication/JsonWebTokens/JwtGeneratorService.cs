@@ -22,7 +22,7 @@ namespace Infrastructure.Security.JsonWebTokens
         {
             DateTime expirationDateTime = DateTime.UtcNow.AddMinutes(_jwtOptions.AccessTokenExpirationMinutes);
             SigningCredentials signingCredentials = new(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SigningKey)),
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SigningKey!)),
                 SecurityAlgorithms.HmacSha256);
 
             List<Claim> claims =

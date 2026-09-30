@@ -1,4 +1,4 @@
-﻿using Domain.Exceptions;
+﻿using Domain.Shared.Exceptions;
 using Domain.Persons.Enums;
 using Domain.Shared.Extensions;
 using System.Numerics;
@@ -52,16 +52,8 @@ namespace Domain.Shared.Utilities
 
             string numeric = value.OnlyNumbers();
 
-            if (personType == PersonType.Natural)
-            {
-                if (!IsValidCpf(numeric))
-                    throw new BusinessRuleException(GetInvalidationMessage(propertyName, "contém um CPF inválido."));
-            }
-            else if (personType == PersonType.Legal)
-            {
-                if (!IsValidCnpj(numeric))
-                    throw new BusinessRuleException(GetInvalidationMessage(propertyName, "contém um CNPJ inválido."));
-            }
+            if (personType == PersonType.Natural && !IsValidCpf(numeric))
+                throw new BusinessRuleException(GetInvalidationMessage(propertyName, "contém um CPF inválido."));
         }
 
         private static string GetInvalidationMessage(string propertyName, string message)
@@ -96,12 +88,6 @@ namespace Domain.Shared.Utilities
             int digit2 = remainder < 2 ? 0 : 11 - remainder;
 
             return numbers[9] == digit1 && numbers[10] == digit2;
-        }
-
-        private static bool IsValidCnpj(string cnpj)
-        {
-            //Contemplar a regra do alfanumérico.
-            return true;
         }
     }
 }

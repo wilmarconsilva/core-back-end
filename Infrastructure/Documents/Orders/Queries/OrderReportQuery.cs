@@ -1,5 +1,5 @@
 using Application.Documents.Orders.DataTransferObjects.Reports;
-using Application.Interfaces.Queries.Commercial.Documents.Orders;
+using Application.Documents.Orders.Queries;
 using Infrastructure.Documents.Queries;
 using Infrastructure.Shared.Persistance;
 

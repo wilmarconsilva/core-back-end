@@ -1,6 +1,6 @@
-using Application.Interfaces.Services.Persons;
 using Application.Persons.Customers.DataTransferObjects;
 using Application.Persons.Customers.DataTransferObjects.Listings;
+using Application.Persons.Customers.Services.Interfaces;
 using Domain.Shared.Persistance.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using REST.Shared.Controllers;

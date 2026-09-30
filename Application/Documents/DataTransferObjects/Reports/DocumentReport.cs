@@ -14,7 +14,7 @@ namespace Application.Documents.DataTransferObjects.Reports
 
         public decimal ValueTotal { get; set; }
 
-        public PaymentMethod PaymentMethod { get; set; }
+        public PaymentMethod? PaymentMethod { get; set; }
 
         public string PaymentMethodDescription => PaymentMethod.GetDescription();
 
@@ -30,7 +30,7 @@ namespace Application.Documents.DataTransferObjects.Reports
 
         public PaymentMethod? PaymentInstallmentDownPaymentMethod { get; set; }
 
-        public string? PaymentInstallmentDownPaymentMethodDescription => PaymentInstallmentDownPaymentMethod?.GetDescription();
+        public string PaymentInstallmentDownPaymentMethodDescription => PaymentInstallmentDownPaymentMethod.GetDescription();
 
         public string? Observations { get; set; }
 

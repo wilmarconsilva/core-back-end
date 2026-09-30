@@ -1,7 +1,7 @@
-using Application.Interfaces.Queries.Persons.Customers;
-using Application.Interfaces.Services.Persons;
 using Application.Persons.Customers.DataTransferObjects;
 using Application.Persons.Customers.DataTransferObjects.Listings;
+using Application.Persons.Customers.Queries;
+using Application.Persons.Customers.Services.Interfaces;
 using Application.Shared.Services;
 using AutoMapper;
 using Domain.Persons.Customers.Entities;

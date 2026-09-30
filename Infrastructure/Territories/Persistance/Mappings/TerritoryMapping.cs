@@ -1,4 +1,3 @@
-using Domain.Entities;
 using Domain.Territories.Entities;
 using Infrastructure.Shared.Persistance.Mappings;
 using Microsoft.EntityFrameworkCore;

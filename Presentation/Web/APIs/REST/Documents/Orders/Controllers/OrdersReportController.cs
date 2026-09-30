@@ -1,15 +1,14 @@
 using Application.Documents.Orders.DataTransferObjects;
 using Application.Documents.Orders.DataTransferObjects.Reports;
-using Application.Interfaces.Services.Commercial.Documents.Orders;
+using Application.Documents.Orders.Services.Interfaces;
 using Domain.Shared.Persistance.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using REST.Shared.Controllers;
 
 namespace REST.Documents.Orders.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class OrdersReportController : Controller
+    public class OrdersReportController : Shared.Controllers.Controller
     {
         private readonly IOrderReportService _service;
 

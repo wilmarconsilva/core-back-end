@@ -1,10 +1,10 @@
 using Domain.Documents.Interfaces;
 using Domain.Documents.ValueObjects.Payments;
-using Domain.Exceptions;
 using Domain.Persons.Customers.Entities;
 using Domain.Persons.Users.Entities;
 using Domain.Shared.Entities;
 using Domain.Shared.Utilities;
+using Domain.Shared.Exceptions;
 
 namespace Domain.Documents.Entities
 {
@@ -29,7 +29,7 @@ namespace Domain.Documents.Entities
 
         public decimal ValueTotal { get; private set; }
 
-        public Payment Payment => _payment;
+        public TPayment Payment => _payment;
 
         public string? Observations { get; set; }
 
@@ -58,11 +58,11 @@ namespace Domain.Documents.Entities
 
         public void Fill(
             long userId,
-            long customerId, 
-            TPayment payment, 
-            string? observations, 
-            byte[]? customerSignatureImage, 
-            byte[]? pdf, 
+            long customerId,
+            TPayment payment,
+            string? observations,
+            byte[]? customerSignatureImage,
+            byte[]? pdf,
             IReadOnlyCollection<TProduct> products)
         {
             LastUpdateDateTime = DateTime.UtcNow;
@@ -105,9 +105,10 @@ namespace Domain.Documents.Entities
 
             SetValueTotal();
 
-            _payment.Installment?.SetValue(ValueTotal);
-
-            ValidateInstallment();
+            if (Payment.Installment != null && Payment.HasInstallment)
+            {
+                Payment.Installment.SetValue(ValueTotal);
+            }
         }
 
         private void SetValueTotal()
@@ -122,21 +123,6 @@ namespace Domain.Documents.Entities
             decimal valueSubtotal = Products.Sum(p => p.ValueTotal);
             ValueValidatorUtility.ValidateValue(valueSubtotal, nameof(ValueSubtotal));
             ValueSubtotal = valueSubtotal;
-        }
-
-        private void ValidateInstallment()
-        {
-            if (Payment.Installment == null || !Payment.HasInstallment)
-                return;
-
-            if (!Payment.Installment.ValidateDownPaymentPercentage(ValueTotal))
-                throw new BusinessRuleException("O valor da entrada não corresponde a porcentagem da entrada em relação ao valor total do documento.");
-
-            if (!Payment.Installment.ValidateDownPaymentValue(ValueTotal))
-                throw new BusinessRuleException("O valor da entrada não pode ser igual ou maior que o valor total do documento.");
-
-            if (!Payment.Installment.ValidateInstallmentValueQuantity(ValueTotal))
-                throw new BusinessRuleException("O valor total da(s) parcela(s) não corresponde ao valor total do documento descontando o valor da entrada.");
         }
     }
 }

@@ -1,5 +1,5 @@
-using Application.Interfaces.Queries;
 using Application.Shared.DataTransferObjects.Listings;
+using Application.Shared.Queries.Interfaces;
 using Infrastructure.Shared.Persistance;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;

@@ -1,12 +1,12 @@
-﻿using Application.Interfaces.Queries;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Domain.Products.Entities;
 using Application.Products.DataTransferObjects;
 using Application.Products.DataTransferObjects.Listings;
 using Infrastructure.Shared.Persistance;
-using Infrastructure.Shared.Persistance.Extensions.PostgreSql;
+using Infrastructure.Shared;
 using Infrastructure.Shared.Queries;
+using Application.Shared.Queries.Interfaces;
 
 namespace Infrastructure.Products.Queries
 {

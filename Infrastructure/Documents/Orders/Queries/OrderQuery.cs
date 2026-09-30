@@ -1,16 +1,16 @@
-using Application.DataTransferObjects.Commercial.Documents.Listings;
-using Application.Interfaces.Queries.Commercial.Documents.Orders;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Domain.Documents.Orders.Entities;
+using Domain.Documents.Orders.ValueObjects;
 using Application.Documents.Orders.DataTransferObjects;
 using Application.Documents.Orders.DataTransferObjects.Listings;
 using Infrastructure.Shared.Persistance;
 using Infrastructure.Documents.Queries;
+using Application.Documents.Orders.Queries;
 
 namespace Infrastructure.Documents.Orders.Queries
 {
-    public class OrderQuery : DocumentQuery<Order, OrderDetailDto, OrderProduct, OrderListing, OrderListingFilter>, IOrderQuery
+    public class OrderQuery : DocumentQuery<Order, OrderDetailDto, OrderProduct, OrderPayment, OrderListing, OrderListingFilter>, IOrderQuery
     {
         public OrderQuery(AppDbContext context, IMapper mapper) : base(context, mapper)
         {

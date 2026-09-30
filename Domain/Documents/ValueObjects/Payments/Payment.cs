@@ -1,5 +1,4 @@
 using Domain.Documents.ValueObjects.Payments.Installments;
-using Domain.Entities.Commercial.Documents.ValueObjects.Payments.Enums;
 
 namespace Domain.Documents.ValueObjects.Payments
 {

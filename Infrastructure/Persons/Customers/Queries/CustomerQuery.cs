@@ -1,12 +1,12 @@
-﻿using Application.Interfaces.Queries.Persons.Customers;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Domain.Persons.Customers.Entities;
 using Application.Persons.Customers.DataTransferObjects;
 using Application.Persons.Customers.DataTransferObjects.Listings;
 using Infrastructure.Shared.Persistance;
-using Infrastructure.Shared.Persistance.Extensions.PostgreSql;
+using Infrastructure.Shared;
 using Infrastructure.Shared.Queries;
+using Application.Persons.Customers.Queries;
 
 namespace Infrastructure.Persons.Customers.Queries
 {

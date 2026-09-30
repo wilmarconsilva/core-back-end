@@ -1,12 +1,12 @@
-using Application.Interfaces.Queries.Territories;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Domain.Territories.Localities.Entities;
 using Application.Territories.Localities.DataTransferObjects;
 using Application.Territories.Localities.DataTransferObjects.Listings;
 using Infrastructure.Shared.Persistance;
-using Infrastructure.Shared.Persistance.Extensions.PostgreSql;
+using Infrastructure.Shared;
 using Infrastructure.Shared.Queries;
+using Application.Territories.Localities.Queries.Interfaces;
 
 namespace Infrastructure.Territories.Localities.Queries
 {

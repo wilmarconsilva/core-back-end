@@ -1,10 +1,9 @@
 using Application.Authentication.Interfaces;
 using Application.Documents.Budgets.DataTransferObjects;
 using Application.Documents.Budgets.DataTransferObjects.Listings;
-using Application.Documents.DataTransferObjects;
+using Application.Documents.Budgets.Queries.Interfaces;
+using Application.Documents.Budgets.Services.Interfaces;
 using Application.Documents.Services;
-using Application.Interfaces.Queries.Commercial.Documents.Budgets;
-using Application.Interfaces.Services.Commercial.Documents;
 using AutoMapper;
 using Domain.Documents.Budgets.Entities;
 using Domain.Documents.Budgets.Repositories.Interfaces;
@@ -17,7 +16,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Documents.Budgets.Services
 {
-    public class BudgetService : DocumentService<Budget, BudgetSaveDto, DocumentDetailDto, BudgetProductSaveDto, BudgetListing, BudgetListingFilter>, IBudgetService
+    public class BudgetService : DocumentService<Budget, BudgetSaveDto, BudgetDetailDto, BudgetProductSaveDto, BudgetListing, BudgetListingFilter>, IBudgetService
     {
         private readonly IMapper _mapper;
 

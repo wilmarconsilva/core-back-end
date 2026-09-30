@@ -1,15 +1,14 @@
 using Application.Documents.Budgets.DataTransferObjects;
 using Application.Documents.Budgets.DataTransferObjects.Reports;
-using Application.Interfaces.Services.Commercial.Documents.Budgets;
+using Application.Documents.Budgets.Services.Interfaces;
 using Domain.Shared.Persistance.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using REST.Shared.Controllers;
 
 namespace REST.Documents.Budgets.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class BudgetsReportController : Controller
+    public class BudgetsReportController : Shared.Controllers.Controller
     {
         private readonly IBudgetReportService _service;
 

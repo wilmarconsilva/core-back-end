@@ -1,7 +1,7 @@
-using Application.Interfaces.Queries;
-using Application.Interfaces.Services;
 using Application.Products.DataTransferObjects;
 using Application.Products.DataTransferObjects.Listings;
+using Application.Products.Services.Interfaces;
+using Application.Shared.Queries.Interfaces;
 using Application.Shared.Services;
 using Domain.Products.Entities;
 using Domain.Products.Repositories.Interfaces;

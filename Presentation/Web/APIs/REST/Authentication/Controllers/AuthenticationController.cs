@@ -1,16 +1,14 @@
 using Application.Authentication.DataTransferObjects;
 using Application.Authentication.Services.Interfaces;
-using Application.DataTransferObjects.Security;
 using Domain.Shared.Persistance.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using REST.Shared.Controllers;
 
 namespace REST.Authentication.Controllers
 {
     [ApiController]
     [Route("authentication")]
-    public class AuthenticationController : Controller
+    public class AuthenticationController : Shared.Controllers.Controller
     {
         private const string RefreshTokenCookieName = "refreshToken";
         private const string RefreshTokenCookiePath = "/authentication";

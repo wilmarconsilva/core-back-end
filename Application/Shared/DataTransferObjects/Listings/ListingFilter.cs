@@ -1,4 +1,4 @@
-﻿using Domain.Exceptions;
+﻿using Domain.Shared.Exceptions;
 namespace Application.Shared.DataTransferObjects.Listings
 {
     public abstract class ListingFilter

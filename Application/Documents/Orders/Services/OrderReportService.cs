@@ -1,10 +1,7 @@
-﻿using Application.DataTransferObjects.Commercial.Documents.Reports;
-using Application.Interfaces.Queries.Commercial.Documents.Orders;
-using Application.Interfaces.Services.Commercial.Documents.Orders;
-using Application.Documents.DataTransferObjects.Orders.Reports;
-using Application.Documents.Orders.Reports;
-using Application.Documents.Orders.DataTransferObjects;
+﻿using Application.Documents.Orders.DataTransferObjects;
 using Application.Documents.Orders.DataTransferObjects.Reports;
+using Application.Documents.Orders.Queries;
+using Application.Documents.Orders.Services.Interfaces;
 
 namespace Application.Documents.Orders.Services
 {

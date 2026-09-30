@@ -1,9 +1,7 @@
-using Application.DataTransferObjects.Commercial.Documents.Reports;
 using Application.Documents.Budgets.DataTransferObjects;
 using Application.Documents.Budgets.DataTransferObjects.Reports;
-using Application.Documents.DataTransferObjects.Budgets.Reports;
-using Application.Interfaces.Queries.Commercial.Documents.Budgets;
-using Application.Interfaces.Services.Commercial.Documents.Budgets;
+using Application.Documents.Budgets.Queries.Interfaces;
+using Application.Documents.Budgets.Services.Interfaces;
 
 namespace Application.Documents.Budgets.Services
 {

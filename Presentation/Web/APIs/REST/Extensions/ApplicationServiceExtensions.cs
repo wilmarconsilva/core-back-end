@@ -1,16 +1,3 @@
-using Application.Interfaces.Queries;
-using Application.Interfaces.Queries.Commercial.Documents.Budgets;
-using Application.Interfaces.Queries.Commercial.Documents.Orders;
-using Application.Interfaces.Queries.Persons.Customers;
-using Application.Interfaces.Queries.Territories;
-using Application.Interfaces.Services;
-using Application.Interfaces.Services.Commercial.Documents;
-using Application.Interfaces.Services.Persons;
-using Application.Interfaces.Services.Territories;
-using Application.Mappings.Persons.Customers;
-using Infrastructure.Repositories.Territories;
-using Application.Interfaces.Services.Commercial.Documents.Orders;
-using Application.Interfaces.Services.Commercial.Documents.Budgets;
 using Domain.Territories.Localities.Repositories.Interfaces;
 using Application.Authentication.Services.Interfaces;
 using Application.Authentication.Services;
@@ -24,6 +11,18 @@ using Infrastructure.Documents.Orders.Queries;
 using Infrastructure.Persons.Customers.Queries;
 using Infrastructure.Territories.Localities.Queries;
 using Infrastructure.Products.Queries;
+using Application.Persons.Customers.Queries;
+using Application.Documents.Orders.Queries;
+using Application.Documents.Budgets.Queries.Interfaces;
+using Application.Territories.Localities.Queries.Interfaces;
+using Application.Shared.Queries.Interfaces;
+using Application.Documents.Budgets.Services.Interfaces;
+using Application.Documents.Orders.Services.Interfaces;
+using Application.Persons.Customers.Services.Interfaces;
+using Application.Territories.Localities.Services.Interfaces;
+using Application.Products.Services.Interfaces;
+using Application.Persons.Customers.Mappings;
+using Infrastructure.Territories.Localities;
 
 namespace REST.Extensions;
 

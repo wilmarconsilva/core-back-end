@@ -1,4 +1,4 @@
-﻿using Domain.Exceptions;
+﻿using Domain.Shared.Exceptions;
 using Domain.Shared.Interfaces;
 using Domain.Shared.Utilities;
 using Domain.Shared.Entities;

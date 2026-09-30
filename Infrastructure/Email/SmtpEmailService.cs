@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Mail;
 using Application.Email.DataTransferObjects;
-using Application.Interfaces.Services;
+using Application.Email.Services.Interfaces;
 using Microsoft.Extensions.Options;
 
 namespace Infrastructure.Email

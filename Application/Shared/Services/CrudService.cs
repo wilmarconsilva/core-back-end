@@ -1,8 +1,8 @@
-using Application.Interfaces.Queries;
-using Application.Interfaces.Services;
 using Application.Shared.DataTransferObjects.Entities;
 using Application.Shared.DataTransferObjects.Listings;
-using Domain.Exceptions;
+using Application.Shared.Queries.Interfaces;
+using Application.Shared.Services.Interfaces;
+using Domain.Shared.Exceptions;
 using Domain.Shared.Entities;
 using Domain.Shared.Persistance.Interfaces;
 using Domain.Shared.Repositories.Interfaces;

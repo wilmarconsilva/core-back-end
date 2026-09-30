@@ -1,7 +1,6 @@
 using Application.Documents.Budgets.DataTransferObjects;
 using Application.Documents.Budgets.DataTransferObjects.Listings;
-using Application.Documents.DataTransferObjects;
-using Application.Interfaces.Services.Commercial.Documents;
+using Application.Documents.Budgets.Services.Interfaces;
 using Domain.Shared.Persistance.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using REST.Shared.Controllers;
@@ -10,7 +9,7 @@ namespace REST.Documents.Budgets.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class BudgetsController : CrudController<BudgetSaveDto, DocumentDetailDto, BudgetListing, BudgetListingFilter>
+    public class BudgetsController : CrudController<BudgetSaveDto, BudgetDetailDto, BudgetListing, BudgetListingFilter>
     {
         private readonly IBudgetService _service;
 

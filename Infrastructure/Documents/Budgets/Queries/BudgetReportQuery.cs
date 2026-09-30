@@ -1,5 +1,5 @@
 using Application.Documents.Budgets.DataTransferObjects.Reports;
-using Application.Interfaces.Queries.Commercial.Documents.Budgets;
+using Application.Documents.Budgets.Queries.Interfaces;
 using Infrastructure.Documents.Queries;
 using Infrastructure.Shared.Persistance;
 

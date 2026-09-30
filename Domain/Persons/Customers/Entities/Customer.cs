@@ -1,4 +1,4 @@
-using Domain.Exceptions;
+using Domain.Shared.Exceptions;
 using Domain.Persons.Entities;
 using Domain.Persons.Enums;
 using Domain.Shared.Utilities;

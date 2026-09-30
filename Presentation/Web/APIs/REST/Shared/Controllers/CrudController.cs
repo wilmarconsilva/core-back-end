@@ -1,6 +1,6 @@
-using Application.Interfaces.Services;
 using Application.Shared.DataTransferObjects.Entities;
 using Application.Shared.DataTransferObjects.Listings;
+using Application.Shared.Services.Interfaces;
 using Domain.Shared.Entities;
 using Domain.Shared.Persistance.Interfaces;
 using Microsoft.AspNetCore.Mvc;
