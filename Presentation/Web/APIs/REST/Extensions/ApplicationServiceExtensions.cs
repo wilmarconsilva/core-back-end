@@ -23,6 +23,10 @@ using Application.Territories.Localities.Services.Interfaces;
 using Application.Products.Services.Interfaces;
 using Application.Persons.Customers.Mappings;
 using Infrastructure.Territories.Localities;
+using Application.Persons.Users.Queries.Interfaces;
+using Application.Persons.Users.Services;
+using Application.Persons.Users.Services.Interfaces;
+using Infrastructure.Persons.Users.Queries;
 
 namespace REST.Extensions;
 
@@ -37,6 +41,7 @@ public static class ApplicationServiceExtensions
 
         AddAutoMapper(services);
         AddCustomerServices(services);
+        AddUserServices(services);
         AddProductServices(services);
         AddBudgetServices(services);
         AddOrderServices(services);
@@ -55,6 +60,12 @@ public static class ApplicationServiceExtensions
     {
         services.AddScoped<ICustomerService, CustomerService>();
         services.AddScoped<ICustomerQuery, CustomerQuery>();
+    }
+
+    private static void AddUserServices(IServiceCollection services)
+    {
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IUserQuery, UserQuery>();
     }
 
     private static void AddProductServices(IServiceCollection services)
