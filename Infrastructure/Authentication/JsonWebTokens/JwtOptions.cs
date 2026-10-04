@@ -1,4 +1,4 @@
-namespace Infrastructure.Security.JsonWebTokens
+namespace Infrastructure.Authentication.JsonWebTokens
 {
     public class JwtOptions
     {

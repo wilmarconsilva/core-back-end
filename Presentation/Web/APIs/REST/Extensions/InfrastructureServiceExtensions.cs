@@ -1,6 +1,6 @@
 using Infrastructure.Security;
 using Infrastructure.Email;
-using Infrastructure.Security.JsonWebTokens;
+using Infrastructure.Authentication.JsonWebTokens;
 using Microsoft.EntityFrameworkCore;
 using Domain.Shared.Persistance.Interfaces;
 using Domain.Documents.Budgets.Repositories.Interfaces;
