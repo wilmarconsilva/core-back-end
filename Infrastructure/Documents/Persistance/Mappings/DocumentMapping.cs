@@ -94,17 +94,17 @@ namespace Infrastructure.Documents.Persistance.Mappings
             builder.Ignore(d => d.PDF);
 
             // Relacionamentos
-            builder.Property(dp => dp.UserId)
-                .HasColumnName("user_id")
+            builder.Property(dp => dp.SellerId)
+                .HasColumnName("seller_id")
                 .IsRequired();
 
             builder.Property(dp => dp.CustomerId)
                 .HasColumnName("customer_id")
                 .IsRequired();
 
-            builder.HasOne(d => d.User)
+            builder.HasOne(d => d.Seller)
                 .WithMany()
-                .HasForeignKey(d => d.UserId)
+                .HasForeignKey(d => d.SellerId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 

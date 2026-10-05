@@ -34,7 +34,7 @@ namespace Application.Documents.DataTransferObjects.Reports
 
         public string? Observations { get; set; }
 
-        public string UserName { get; set; } = null!;
+        public string SellerName { get; set; } = null!;
 
         public string CustomerName { get; set; } = null!;
 

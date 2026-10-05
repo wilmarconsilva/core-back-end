@@ -1,5 +1,5 @@
-using Application.Shared.DataTransferObjects.Entities;
 using Application.Territories.Localities.DataTransferObjects;
+using Application.Territories.States.DataTransferObjects;
 using AutoMapper;
 using Domain.Territories.Localities.Entities;
 
@@ -9,13 +9,15 @@ namespace Application.Territories.Localities.Mappings
     {
         public LocalityDetailProfile()
         {
+            // Every locality has a state (state_id is NOT NULL in the database).
             CreateMap<Locality, LocalityDetailDto>()
                 .ForMember(d => d.State, opt => opt.MapFrom(s =>
-                    s.StateId != null ? new EntityReferenceDto
+                    new StateReferenceDto
                     {
-                        Id = s.StateId.Value,
+                        Id = s.StateId!.Value,
                         Description = s.State!.Description,
-                    } : null));
+                        Acronym = s.State.Acronym,
+                    }));
         }
     }
 }

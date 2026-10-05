@@ -1,6 +1,7 @@
 using Application.Shared.Services;
 using Application.Territories.Localities.DataTransferObjects;
 using Application.Territories.Localities.DataTransferObjects.Listings;
+using Application.Territories.Localities.DataTransferObjects.Synchronizations;
 using Application.Territories.Localities.Queries.Interfaces;
 using Application.Territories.Localities.Services.Interfaces;
 using Domain.Shared.Exceptions;
@@ -13,10 +14,17 @@ namespace Application.Territories.Localities.Services
     public class LocalityService : CrudService<Locality, LocalitySaveDto, LocalityDetailDto, LocalityListing, LocalityListingFilter>, ILocalityService
     {
         private readonly ILocalityRepository _repository;
+        private readonly ILocalityQuery _localityQuery;
 
         public LocalityService(ILocalityRepository repository, ILocalityQuery query, IUnitOfWork unitOfWork) : base(repository, query, unitOfWork)
         {
             _repository = repository;
+            _localityQuery = query;
+        }
+
+        public Task<List<LocalitySynchronizationDto>> GetSynchronizationAsync(LocalityListingFilter filter, CancellationToken cancellationToken)
+        {
+            return _localityQuery.GetSynchronization(filter, cancellationToken);
         }
 
         protected override Locality CreateEntity(LocalitySaveDto dto)

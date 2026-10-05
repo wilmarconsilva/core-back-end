@@ -17,9 +17,9 @@ namespace Domain.Documents.Entities
 
         public DateTime LastUpdateDateTime { get; private set; }
 
-        public long UserId { get; private set; }
+        public long SellerId { get; private set; }
 
-        public User? User { get; private set; }
+        public User? Seller { get; private set; }
 
         public long CustomerId { get; private set; }
 
@@ -89,8 +89,8 @@ namespace Domain.Documents.Entities
 
         private void SetUserId(long userId)
         {
-            ValueValidatorUtility.ValidateValue(userId, nameof(UserId));
-            UserId = userId;
+            ValueValidatorUtility.ValidateValue(userId, nameof(SellerId));
+            SellerId = userId;
         }
 
         private void SetCustomerId(long customerId)
