@@ -9,6 +9,8 @@ namespace Application.Documents.DataTransferObjects
 
         public required long UserId { get; set; }
 
+        public required DateTime CreationDateTime { get; set; }
+
         public required EntityReferenceDto Customer { get; set; }
 
         public string? Observations { get; set; }

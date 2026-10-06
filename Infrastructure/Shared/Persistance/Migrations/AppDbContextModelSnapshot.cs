@@ -95,9 +95,9 @@ namespace Infrastructure.Shared.Persistance.Migrations
                         .HasColumnType("text")
                         .HasColumnName("observations");
 
-                    b.Property<long>("UserId")
+                    b.Property<long>("SellerId")
                         .HasColumnType("bigint")
-                        .HasColumnName("user_id");
+                        .HasColumnName("seller_id");
 
                     b.Property<decimal>("ValueSubtotal")
                         .HasPrecision(18, 2)
@@ -113,7 +113,7 @@ namespace Infrastructure.Shared.Persistance.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("SellerId");
 
                     b.ToTable("budgets", (string)null);
                 });
@@ -192,9 +192,9 @@ namespace Infrastructure.Shared.Persistance.Migrations
                         .HasColumnType("text")
                         .HasColumnName("observations");
 
-                    b.Property<long>("UserId")
+                    b.Property<long>("SellerId")
                         .HasColumnType("bigint")
-                        .HasColumnName("user_id");
+                        .HasColumnName("seller_id");
 
                     b.Property<decimal>("ValueSubtotal")
                         .HasPrecision(18, 2)
@@ -212,7 +212,7 @@ namespace Infrastructure.Shared.Persistance.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("SellerId");
 
                     b.ToTable("orders", (string)null);
                 });
@@ -505,9 +505,9 @@ namespace Infrastructure.Shared.Persistance.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Persons.Users.Entities.User", "User")
+                    b.HasOne("Domain.Persons.Users.Entities.User", "Seller")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("SellerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -599,7 +599,7 @@ namespace Infrastructure.Shared.Persistance.Migrations
                     b.Navigation("Payment")
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Seller");
                 });
 
             modelBuilder.Entity("Domain.Documents.Budgets.Entities.BudgetProduct", b =>
@@ -632,9 +632,9 @@ namespace Infrastructure.Shared.Persistance.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Persons.Users.Entities.User", "User")
+                    b.HasOne("Domain.Persons.Users.Entities.User", "Seller")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("SellerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -728,7 +728,7 @@ namespace Infrastructure.Shared.Persistance.Migrations
                     b.Navigation("Payment")
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Seller");
                 });
 
             modelBuilder.Entity("Domain.Documents.Orders.Entities.OrderProduct", b =>

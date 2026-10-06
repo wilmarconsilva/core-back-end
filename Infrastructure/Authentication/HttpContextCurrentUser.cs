@@ -3,7 +3,7 @@ using System.Security.Claims;
 using Application.Authentication.Interfaces;
 using Microsoft.AspNetCore.Http;
 
-namespace Infrastructure.Security;
+namespace Infrastructure.Authentication;
 
 public sealed class HttpContextCurrentUser : IHttpContextCurrentUser
 {

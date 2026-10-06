@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Domain.Persons.Customers.Entities;
 using Application.Persons.Customers.DataTransferObjects;
 using Application.Persons.Customers.DataTransferObjects.Listings;
+using Application.Persons.Customers.DataTransferObjects.Synchronizations;
 using Infrastructure.Shared.Persistance;
 using Infrastructure.Shared;
 using Infrastructure.Shared.Queries;
@@ -18,15 +19,7 @@ namespace Infrastructure.Persons.Customers.Queries
 
         public async Task<List<CustomerListing>> GetAll(CustomerListingFilter filter, CancellationToken cancellationToken)
         {
-            IQueryable<Customer> query = _query;
-
-            if (filter.Id.HasValue)
-                query = query.Where(customer => customer.Id == filter.Id.Value);
-
-            if (filter.Name != null)
-                query = query.WhereContains(customer => customer.Name, filter.Name);
-
-            return await ApplyPaging(query, filter)
+            return await ApplyPaging(ApplyFilter(filter), filter)
                 .Select(customer => new CustomerListing
                 {
                     Id = customer.Id,
@@ -37,6 +30,48 @@ namespace Infrastructure.Persons.Customers.Queries
                             .FirstOrDefault() ?? string.Empty,
                 })
                 .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<CustomerSynchronizationDto>> GetSynchronization(CustomerListingFilter filter, CancellationToken cancellationToken)
+        {
+            return await ApplyPaging(ApplyFilter(filter), filter)
+                .Select(customer => new CustomerSynchronizationDto
+                {
+                    Id = customer.Id,
+                    Name = customer.Name,
+                    PersonType = customer.PersonType,
+                    Document = customer.Document,
+                    Email = customer.Email,
+                    StateRegistration = customer.StateRegistration,
+                    Addresses = customer.Addresses
+                        .OrderBy(address => address.Id)
+                        .Select(address => new CustomerAddressSynchronizationDto
+                        {
+                            Id = address.Id,
+                            Neighborhood = address.Neighborhood,
+                            Street = address.Street,
+                            LocalityId = address.LocalityId,
+                            LocalityDescription = address.Locality!.Description,
+                            Complement = address.Complement,
+                            PostalCode = address.PostalCode,
+                            Number = address.Number,
+                        })
+                        .ToList(),
+                })
+                .ToListAsync(cancellationToken);
+        }
+
+        private IQueryable<Customer> ApplyFilter(CustomerListingFilter filter)
+        {
+            IQueryable<Customer> query = _query;
+
+            if (filter.Id.HasValue)
+                query = query.Where(customer => customer.Id == filter.Id.Value);
+
+            if (filter.Name != null)
+                query = query.WhereContains(customer => customer.Name, filter.Name);
+
+            return query;
         }
 
         protected override IQueryable<Customer> ApplyIncludes(IQueryable<Customer> query)

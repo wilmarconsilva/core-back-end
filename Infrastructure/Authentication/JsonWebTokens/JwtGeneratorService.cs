@@ -7,7 +7,7 @@ using Domain.Persons.Users.Entities;
 using Application.Authentication;
 using Application.Authentication.Services.Interfaces;
 
-namespace Infrastructure.Security.JsonWebTokens
+namespace Infrastructure.Authentication.JsonWebTokens
 {
     public class JwtGeneratorService : IJwtGeneratorService
     {

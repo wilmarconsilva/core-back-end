@@ -1,5 +1,6 @@
 using Application.Territories.Localities.DataTransferObjects;
 using Application.Territories.Localities.DataTransferObjects.Listings;
+using Application.Territories.Localities.DataTransferObjects.Synchronizations;
 using Application.Territories.Localities.Services.Interfaces;
 using Domain.Shared.Persistance.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +26,17 @@ namespace REST.Territories.Controllers
             {
                 List<LocalityListing> listings = await _service.GetAllAsync(filter, cancellationToken);
                 return Ok(listings);
+            }, cancellationToken);
+        }
+
+        /// <summary>Localidades com a sigla do estado para o snapshot offline do front-end.</summary>
+        [HttpGet("synchronization")]
+        public async Task<ActionResult<List<LocalitySynchronizationDto>>> GetSynchronization([FromQuery] LocalityListingFilter filter, CancellationToken cancellationToken)
+        {
+            return await ProcessRequestAsync<List<LocalitySynchronizationDto>>(async () =>
+            {
+                List<LocalitySynchronizationDto> localities = await _service.GetSynchronizationAsync(filter, cancellationToken);
+                return Ok(localities);
             }, cancellationToken);
         }
 

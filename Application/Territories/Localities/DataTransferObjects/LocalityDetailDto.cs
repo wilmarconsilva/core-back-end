@@ -1,4 +1,5 @@
 using Application.Shared.DataTransferObjects.Entities;
+using Application.Territories.States.DataTransferObjects;
 
 namespace Application.Territories.Localities.DataTransferObjects
 {
@@ -9,6 +10,6 @@ namespace Application.Territories.Localities.DataTransferObjects
 
         public required string Description { get; set; }
 
-        public EntityReferenceDto? State { get; set; }
+        public required StateReferenceDto State { get; set; }
     }
 }

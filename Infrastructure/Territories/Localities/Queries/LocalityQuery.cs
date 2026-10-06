@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Domain.Territories.Localities.Entities;
 using Application.Territories.Localities.DataTransferObjects;
 using Application.Territories.Localities.DataTransferObjects.Listings;
+using Application.Territories.Localities.DataTransferObjects.Synchronizations;
 using Infrastructure.Shared.Persistance;
 using Infrastructure.Shared;
 using Infrastructure.Shared.Queries;
@@ -23,6 +24,31 @@ namespace Infrastructure.Territories.Localities.Queries
 
         public Task<List<LocalityListing>> GetAll(LocalityListingFilter filter, CancellationToken cancellationToken)
         {
+            return ApplyPaging(ApplyFilter(filter), filter)
+                .Select(l => new LocalityListing
+                {
+                    Id = l.Id,
+                    Description = l.Description,
+                    StateId = l.StateId,
+                })
+                .ToListAsync(cancellationToken);
+        }
+
+        public Task<List<LocalitySynchronizationDto>> GetSynchronization(LocalityListingFilter filter, CancellationToken cancellationToken)
+        {
+            return ApplyPaging(ApplyFilter(filter), filter)
+                .Select(l => new LocalitySynchronizationDto
+                {
+                    Id = l.Id,
+                    Description = l.Description,
+                    StateId = l.StateId!.Value,
+                    StateAcronym = l.State!.Acronym,
+                })
+                .ToListAsync(cancellationToken);
+        }
+
+        private IQueryable<Locality> ApplyFilter(LocalityListingFilter filter)
+        {
             IQueryable<Locality> query = _query;
 
             if (filter.Id.HasValue)
@@ -34,14 +60,7 @@ namespace Infrastructure.Territories.Localities.Queries
             if (filter.StateId.HasValue)
                 query = query.Where(l => l.StateId == filter.StateId.Value);
 
-            return ApplyPaging(query, filter)
-                .Select(l => new LocalityListing
-                {
-                    Id = l.Id,
-                    Description = l.Description,
-                    StateId = l.StateId,
-                })
-                .ToListAsync(cancellationToken);
+            return query;
         }
     }
 }
