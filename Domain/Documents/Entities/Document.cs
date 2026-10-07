@@ -72,7 +72,7 @@ namespace Domain.Documents.Entities
             PDF = pdf;
 
             if (products == null || !products.Any())
-                throw new BusinessRuleException($"O Orçamento: {this.Description} deve possuir ao menos um produto.");
+                throw new BusinessRuleException($"O documento: {this.Description} deve possuir ao menos um produto.");
 
             EntityCollectionUtility.Sync(_products, products, Id);
 
@@ -114,6 +114,10 @@ namespace Domain.Documents.Entities
         private void SetValueTotal()
         {
             decimal valueTotal = ValueSubtotal - Payment.DiscountValue;
+
+            if (valueTotal < 0)
+                throw new BusinessRuleException("O valor do desconto não pode ser maior que o subtotal do documento.");
+
             ValueValidatorUtility.ValidateValue(valueTotal, nameof(ValueTotal));
             ValueTotal = valueTotal;
         }

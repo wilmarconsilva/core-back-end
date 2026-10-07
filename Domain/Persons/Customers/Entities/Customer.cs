@@ -89,7 +89,10 @@ namespace Domain.Persons.Customers.Entities
         private void SetEmail(string? email)
         {
             if (email is null)
+            {
+                _email = null;
                 return;
+            }
 
             ValueValidatorUtility.ValidateEmail(email, "E-mail");
 

@@ -7,7 +7,7 @@ namespace Application.Documents.DataTransferObjects
     {
         public override long Id { get; set; }
 
-        public required long UserId { get; set; }
+        public required long SellerId { get; set; }
 
         public required DateTime CreationDateTime { get; set; }
 

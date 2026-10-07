@@ -1,4 +1,5 @@
 using Domain.Documents.ValueObjects.Payments.Installments;
+using Domain.Shared.Utilities;
 
 namespace Domain.Documents.ValueObjects.Payments
 {
@@ -12,6 +13,8 @@ namespace Domain.Documents.ValueObjects.Payments
 
         protected Payment(decimal discountValue, Installment? installment)
         {
+            ValueValidatorUtility.ValidateNotNegative(discountValue, "O valor do desconto");
+
             DiscountValue = discountValue;
             Installment = installment;
 

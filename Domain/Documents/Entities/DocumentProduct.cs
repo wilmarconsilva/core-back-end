@@ -61,13 +61,13 @@ namespace Domain.Documents.Entities
 
         private void SetValues(decimal quantity, decimal valueUnit, decimal valueTotal)
         {
-            ValueValidatorUtility.ValidateValue(quantity, nameof(Quantity));
+            ValueValidatorUtility.ValidatePositive(quantity, nameof(Quantity));
             Quantity = quantity;
 
-            ValueValidatorUtility.ValidateValue(valueUnit, nameof(ValueUnit));
+            ValueValidatorUtility.ValidatePositive(valueUnit, nameof(ValueUnit));
             ValueUnit = valueUnit;
 
-            ValueValidatorUtility.ValidateValue(valueTotal, nameof(ValueTotal));
+            ValueValidatorUtility.ValidatePositive(valueTotal, nameof(ValueTotal));
             ValueTotal = valueTotal;
 
             if ((quantity * valueUnit) != valueTotal)
