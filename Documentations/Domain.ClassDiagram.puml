@@ -1,0 +1,345 @@
+@startuml Domain.ClassDiagram
+title Core - Camada de Domínio (Entidades, objetos de valor e interfaces)
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam packageStyle rectangle
+hide empty members
+
+' =====================================================================
+' SHARED
+' =====================================================================
+package "Shared" {
+    abstract class Entity {
+        + Id : long
+        + {abstract} Description : string
+    }
+
+    abstract class EntityWithoutDescription {
+        + Description : string
+        # {abstract} GetDescription() : string
+    }
+
+    interface ICopyable<in TEntity : Entity> {
+        + Copy(source : TEntity) : void
+    }
+
+    interface IEntityChild {
+        + SetFatherEntityId(id : long) : void
+    }
+}
+
+' =====================================================================
+' PERSONS
+' =====================================================================
+package "Persons" {
+    enum PersonType {
+        Natural = 1
+        Legal = 2
+    }
+
+    enum DocumentType {
+        CPF = 1
+        CNPJ = 2
+    }
+
+    abstract class Person {
+        - _name : string
+        + Name : string
+        + Description : string
+        # SetName(name : string) : void
+    }
+
+    class Customer extends Person {
+        - _document : string
+        - _email : string?
+        - _addresses : List<CustomerAddress>
+        + PersonType : PersonType
+        + Document : string
+        + DocumentType : DocumentType
+        + Email : string?
+        + StateRegistration : string?
+        + Addresses : IReadOnlyCollection<CustomerAddress>
+        + Customer(name, personType, document, email, stateRegistration, addresses)
+        + SetPersonType(personType : PersonType) : void
+        + SetAddresses(addresses : IReadOnlyCollection<CustomerAddress>) : void
+        + Fill(name, personType, document, email, stateRegistration, addresses) : void
+    }
+
+    class CustomerAddress {
+        - _localityId : long
+        - _customerId : long
+        - _neighborhood : string
+        - _street : string
+        + LocalityId : long
+        + CustomerId : long
+        + Locality : Locality?
+        + Neighborhood : string
+        + Street : string
+        + Complement : string?
+        + PostalCode : string?
+        + Number : string?
+        + Copy(customerAddress : CustomerAddress) : void
+        + SetFatherEntityId(id : long) : void
+        # GetDescription() : string
+    }
+
+    class User extends Person {
+        - _email : string
+        - _passwordHash : string
+        + Email : string
+        + PasswordHash : string
+        + SignatureImage : byte[]?
+        + User(name, email, passwordHash, signatureImage)
+        + Fill(name, email, passwordHash, signatureImage) : void
+    }
+}
+
+' =====================================================================
+' AUTHENTICATION
+' =====================================================================
+package "Authtentication" {
+    class RefreshToken {
+        - _tokenHash : string
+        - _userId : long
+        + UserId : long
+        + User : User?
+        + TokenHash : string
+        + CreatedDateTime : DateTime
+        + ExpirationDateTime : DateTime
+        + RevokedDateTime : DateTime?
+        + ReplacedByTokenHash : string?
+        + IsExpired : bool
+        + IsRevoked : bool
+        + RefreshToken(userId, tokenHash, expirationDateTime)
+        + Rotate(replacedByTokenHash : string) : void
+        + Revoke() : void
+        # GetDescription() : string
+    }
+}
+
+' =====================================================================
+' TERRITORIES
+' =====================================================================
+package "Territories" {
+    abstract class Territory {
+        - _acronym : string
+        + Acronym : string
+        # Territory(acronym : string)
+    }
+
+    class Country extends Territory {
+        - _description : string
+        + Description : string
+        + Country(acronym : string)
+        + SetDescription(description : string) : void
+    }
+
+    class State extends Territory {
+        - _description : string
+        + CountryId : long?
+        + Country : Country?
+        + Description : string
+        + State(acronym : string)
+    }
+
+    class Locality {
+        - _description : string
+        + StateId : long?
+        + State : State?
+        + Description : string
+        + Locality(description : string, stateId : long?)
+        + Fill(description : string, stateId : long?) : void
+    }
+}
+
+' =====================================================================
+' PRODUCTS
+' =====================================================================
+package "Products" {
+    enum MeasureUnit {
+        Meters = 1
+        MetersSquared = 2
+        MetersCubed = 3
+        Kilograms = 4
+    }
+
+    class Product {
+        - _description : string
+        - _measureUnit : MeasureUnit
+        + Description : string
+        + MeasureUnit : MeasureUnit
+        + Product(description : string, measureUnit : MeasureUnit)
+        + Fill(description : string, measureUnit : MeasureUnit) : void
+    }
+}
+
+' =====================================================================
+' DOCUMENTS
+' =====================================================================
+package "Documents" {
+
+    interface IDocument {
+        + CustomerId : long
+        + ValueSubtotal : decimal
+        + ValueTotal : decimal
+        + Observations : string?
+        + CreationDateTime : DateTime
+        + PDF : byte[]?
+    }
+
+    abstract class "Document<TProduct, TPayment>" as Document {
+        - _payment : TPayment
+        - _products : List<TProduct>
+        + CreationDateTime : DateTime
+        + LastUpdateDateTime : DateTime
+        + SellerId : long
+        + Seller : User?
+        + CustomerId : long
+        + Customer : Customer?
+        + ValueSubtotal : decimal
+        + ValueTotal : decimal
+        + Payment : TPayment
+        + Observations : string?
+        + CustomerSignatureImage : byte[]?
+        + PDF : byte[]?
+        + Products : IReadOnlyCollection<TProduct>
+        + Fill(userId, customerId, payment, observations, customerSignatureImage, pdf, products) : void
+        # GetDescription() : string
+    }
+
+    abstract class DocumentProduct {
+        + DocumentId : long
+        + ProductId : long
+        + Product : Product?
+        + Quantity : decimal
+        + ValueUnit : decimal
+        + ValueTotal : decimal
+        + Copy(product : DocumentProduct) : void
+        + SetFatherEntityId(id : long) : void
+        # GetDescription() : string
+    }
+
+    class Budget {
+    }
+
+    class BudgetProduct extends DocumentProduct {
+        + BudgetProduct(productId, quantity, valueUnit, valueTotal)
+    }
+
+    class Order {
+        + BudgetId : long?
+        + Budget : Budget?
+        + Order(..., products : IReadOnlyCollection<OrderProduct>, budgetId : long?)
+    }
+
+    class OrderProduct extends DocumentProduct {
+        + OrderProduct(productId, quantity, valueUnit, valueTotal)
+    }
+
+    package "ValueObjects" {
+        enum PaymentMethod {
+            DebitCard = 1
+            CreditCard = 2
+            Money = 3
+            Deposit = 4
+            Slip = 5
+            Check = 6
+            PIX = 7
+        }
+
+        abstract class Payment <<Value Object>> {
+            + DiscountValue : decimal
+            + HasInstallment : bool
+            + Installment : Installment?
+            # Payment(discountValue : decimal, installment : Installment?)
+        }
+
+        class BudgetPayment <<Value Object>> extends Payment {
+            + Method : PaymentMethod?
+            + BudgetPayment(method : PaymentMethod?, discountValue, installment)
+        }
+
+        class OrderPayment <<Value Object>> extends Payment {
+            + Method : PaymentMethod
+            + OrderPayment(method : PaymentMethod, discountValue, installment)
+        }
+
+        class Installment <<Value Object>> {
+            + Value : decimal
+            + Quantity : int
+            + HasDownPayment : bool
+            + DownPayment : DownPayment?
+            + Installment(quantity : int, downPayment : DownPayment?)
+            + SetValue(valueTotal : decimal) : void
+        }
+
+        class DownPayment <<Value Object>> {
+            + Value : decimal
+            + Percentage : decimal
+            + Method : PaymentMethod
+            + DownPayment(value, percentage, method)
+            + ValidatePercentage(valueTotal : decimal) : bool
+            + ValidateValue(valueTotal : decimal) : bool
+        }
+    }
+}
+
+' =====================================================================
+' RELACIONAMENTOS
+' =====================================================================
+
+' --- Herança de Entity (Shared) ---
+Entity <|-- EntityWithoutDescription
+Entity <|-- Person
+Entity <|-- Territory
+Entity <|-- Locality
+Entity <|-- Product
+
+' --- Herança de EntityWithoutDescription (Shared) ---
+EntityWithoutDescription <|-- CustomerAddress
+EntityWithoutDescription <|-- RefreshToken
+EntityWithoutDescription <|-- Document
+EntityWithoutDescription <|-- DocumentProduct
+
+' --- Implementação de interfaces (Shared / Documents) ---
+ICopyable    <|.. CustomerAddress
+ICopyable    <|.. DocumentProduct
+IEntityChild <|.. CustomerAddress
+IEntityChild <|.. DocumentProduct
+IDocument    <|.. Document
+
+' --- Especialização dos generics de Document (bind) ---
+Budget -|> Document : <<bind>>\n<BudgetProduct, BudgetPayment>
+Order  -|> Document : <<bind>>\n<OrderProduct, OrderPayment>
+
+' --- Documents ---
+Document "1" *-- "1..*" DocumentProduct : Products
+Document "1" *-- "1" Payment : Payment
+Document "*" --> "1" User : Seller
+Document "*" --> "1" Customer : Customer
+DocumentProduct "*" --> "1" Product : Product
+Order "*" --> "0..1" Budget : Budget
+Payment "1" *-- "0..1" Installment : Installment
+Installment "1" *-- "0..1" DownPayment : DownPayment
+BudgetPayment ..> PaymentMethod
+OrderPayment ..> PaymentMethod
+DownPayment ..> PaymentMethod
+
+' --- Persons ---
+Customer "1" *-- "1..*" CustomerAddress : Addresses
+CustomerAddress "*" --> "1" Locality : Locality
+Customer ..> PersonType
+Customer ..> DocumentType
+
+' --- Authentication ---
+RefreshToken "*" --> "1" User : User
+
+' --- Territories ---
+Locality "*" --> "0..1" State : State
+State "*" --> "0..1" Country : Country
+
+' --- Products ---
+Product ..> MeasureUnit
+
+@enduml
