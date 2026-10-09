@@ -62,7 +62,8 @@ namespace Application.Shared.Services
         {
             await ValidateIds(ids, cancellationToken);
 
-            await EntitiesCanBeDeleted(ids);
+            if (!await EntitiesCanBeDeleted(ids))
+                throw new BusinessRuleException("Os registros informados não podem ser excluídos.");
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 

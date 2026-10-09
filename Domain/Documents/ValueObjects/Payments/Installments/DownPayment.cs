@@ -18,8 +18,8 @@ namespace Domain.Documents.ValueObjects.Payments.Installments
 
         public DownPayment(decimal value, decimal percentage, PaymentMethod method)
         {
-            ValueValidatorUtility.ValidateValue(value, "O valor da entrada");
-            ValueValidatorUtility.ValidateValue(percentage, "A porcentagem da entrada");
+            ValueValidatorUtility.ValidatePositive(value, "O valor da entrada");
+            ValueValidatorUtility.ValidatePositive(percentage, "A porcentagem da entrada");
             ValueValidatorUtility.ValidateEnum(method, "O método de pagamento da entrada");
 
             Value = value;
@@ -29,7 +29,7 @@ namespace Domain.Documents.ValueObjects.Payments.Installments
 
         public bool ValidatePercentage(decimal valueTotal)
         {
-            return (valueTotal * (Percentage / 100)) == Value;
+            return Math.Round(valueTotal * (Percentage / 100), 2) == Value;
         }
 
         public bool ValidateValue(decimal valueTotal)

@@ -64,6 +64,10 @@ Regra prática de dependências:
 | `Application`    | `Domain`                                |
 | `Infrastructure` | `Domain`, `Application`                  |
 | `Presentation`   | `Application`, `Infrastructure`, `Domain` (apenas na composição de DI) |
+| `Tests/Domain.UnitTests`      | `Domain`                     |
+| `Tests/Application.UnitTests` | `Application` (+ `Domain` transitivo) |
+
+Os projetos de teste ficam na pasta `Tests/` (solution folder `Tests`) e cada um referencia apenas a camada que testa (ver §12).
 
 A **inversão de dependência** é o que permite `Infrastructure` implementar contratos definidos em `Domain`/`Application` sem que o núcleo saiba disso. Toda a ligação concreta acontece em um só lugar: as *extensions* de DI na camada de apresentação (ver §9).
 
@@ -147,6 +151,16 @@ public class Payment
 ### 2.4 Validação de domínio
 
 `Domain/Utilities/Entities/Validator.cs` é um utilitário `internal static` com guard clauses genéricas (`ValidateValue`, `ValidateEnum`, `ValidateEmail`, `ValidateCpfCnpj`, ...). Ele reforça invariantes **dentro** do domínio e lança `BusinessRuleException` com mensagem em português. É o único ponto de validação da solução — não há validação de entrada na apresentação (ver §8.3).
+
+Escolha da guard clause numérica:
+
+| Guard clause          | Rejeita            | Usar para                                                                 |
+| --------------------- | ------------------ | ------------------------------------------------------------------------- |
+| `ValidateValue`       | zero               | Identificadores/FKs (`ProductId`, `CustomerId`, ...)                       |
+| `ValidatePositive`    | zero e negativos   | Quantidades, valores monetários e percentuais obrigatórios (ex.: `Quantity`, `ValueUnit`, `ValueTotal` do produto, parcelas e entrada) |
+| `ValidateNotNegative` | negativos          | Valores opcionais que podem ser zero (ex.: `DiscountValue`)                |
+
+Nenhuma quantidade, valor monetário ou percentual pode ser negativo: ao criar uma propriedade desse tipo, valide-a com `ValidatePositive` ou `ValidateNotNegative`, nunca apenas com `ValidateValue`.
 
 ### 2.5 Exceções de domínio
 
@@ -396,6 +410,7 @@ Ao criar um novo recurso CRUD (ex.: `Foo`), siga o mesmo caminho das features ex
 2. **Application** — DTOs (`FooSaveDto`, `FooDetailDto`, `FooListing`, `FooListingFilter`); `IFooService : ICrudService<...>` + `FooService : CrudService<...>`; `IFooQuery` + Profile de AutoMapper.
 3. **Infrastructure** — `FooMapping : EntityMapping<Foo>`; `FooQuery : DetailDtoQuery<Foo, FooDetailDto>`; `FooRepository : RepositoryCrud<Foo>` (se houver contrato específico); *migration*.
 4. **Presentation** — `FoosController : CrudController<...>` (implementa `GetAll`); registrar Service/Query/Repository na extension de DI.
+5. **Testes** — `FooTests` em `Tests/Domain.UnitTests` (invariantes da entidade) e `FooServiceTests` em `Tests/Application.UnitTests` (CRUD do service); `dotnet test` verde antes do PR (ver §12).
 
 Convenções gerais:
 
@@ -405,12 +420,44 @@ Convenções gerais:
 - **Mensagens de negócio em português**, lançadas como `BusinessRuleException`/`NotFoundException`.
 - **Encapsulamento**: mudanças de estado só via métodos de negócio da entidade; setters permanecem privados.
 - **Leitura via Query (`AsNoTracking` + projeção); escrita via Repository + UoW.**
+- **Nenhuma regra de negócio ou CRUD sem teste unitário correspondente.**
 
 ---
 
-## 12. Resumo dos padrões aplicados
+## 12. Testes unitários
 
-### 12.1 Padrões GoF (Gang of Four)
+**Regra:** toda nova regra de negócio ou CRUD — e toda alteração de uma regra existente — **deve** vir acompanhada de testes unitários no mesmo PR. Toda correção de bug inclui um teste que falha antes da correção e passa depois dela.
+
+### 12.1 Onde testar
+
+| Projeto                       | O que testar                                                                 |
+| ----------------------------- | ---------------------------------------------------------------------------- |
+| `Tests/Domain.UnitTests`      | Invariantes de entidades, value objects e `ValueValidatorUtility`/`EntityCollectionUtility` (`internal`, expostos via `InternalsVisibleTo`) |
+| `Tests/Application.UnitTests` | Fluxo dos services: orquestração do UoW, `NotFoundException`/`BusinessRuleException`, montagem DTO → entidade, efeitos colaterais (ex.: e-mail) e Profiles de leitura do AutoMapper |
+
+**Fora do escopo unitário:** Queries e Repositories (dependem de recursos do PostgreSQL como `ILike` e `= ANY(@ids)`; o provider InMemory daria falsos positivos). Eles ficam para testes de integração com PostgreSQL real.
+
+### 12.2 Stack e convenções
+
+- **xUnit v3 + NSubstitute + Shouldly**, executados pelo Microsoft.Testing.Platform (`global.json`). Cobertura: `dotnet test --coverage --coverage-output-format cobertura`.
+- Nomes no formato `Metodo_Cenario_ResultadoEsperado` (inglês); mensagens verificadas nos asserts em português (vêm do domínio).
+- Pastas espelhando a origem (ex.: `Domain/Documents/Entities/Document.cs` → `Tests/Domain.UnitTests/Documents/Entities/DocumentTests.cs`).
+- **Builders** em `Builders/` criam objetos válidos por padrão; o teste altera só o dado relevante ao cenário. Os builders de entidade (`Tests/Domain.UnitTests/Builders`) são compartilhados com `Application.UnitTests` como arquivos linkados — não duplique.
+- Para simular um agregado já persistido, crie-o normalmente e atribua os `Id`s depois (como o ORM faria); filhos com `Id > 0` passados ao construtor são rejeitados por `EntityCollectionUtility.Sync`.
+- **AutoMapper real** via `MapperFixture` (mesmos Profiles da aplicação); Repository, Query, UoW e serviços externos sempre mockados — sem banco.
+- Use `TestContext.Current.CancellationToken` nas chamadas assíncronas.
+
+### 12.3 Cobertura mínima esperada
+
+- **Entidade/VO:** o caminho feliz e cada `BusinessRuleException` que ela pode lançar.
+- **Service:** create, update, delete e get-by-id, incluindo os casos de not-found e de bloqueio (ex.: `EntitiesCanBeDeleted` retornando `false`).
+- **Profile de leitura (Entity → DetailDto):** incluí-lo no teste `DetailProfile_AllDestinationMembers_AreMapped`.
+
+---
+
+## 13. Resumo dos padrões aplicados
+
+### 13.1 Padrões GoF (Gang of Four)
 
 Padrões clássicos do catálogo GoF efetivamente presentes no código:
 
@@ -424,7 +471,7 @@ Padrões clássicos do catálogo GoF efetivamente presentes no código:
 | **Strategy**                  | Comportamental | Implementações intercambiáveis atrás de interfaces resolvidas por DI (`IEmailService`→`SmtpEmailService`, `IPasswordHasherService`, `IJwtTokenGenerator`) |
 | **Chain of Responsibility**   | Comportamental | Pipeline de *middleware* do ASP.NET (`Program.cs`); tratamento de exceção em `Controller` que encadeia tipos e cai no `InnerException` como próximo elo |
 
-### 12.2 Padrões arquiteturais e de aplicação (Enterprise / PoEAA)
+### 13.2 Padrões arquiteturais e de aplicação (Enterprise / PoEAA)
 
 Padrões que não são do catálogo GoF, mas estruturam a solução:
 
@@ -442,7 +489,7 @@ Padrões que não são do catálogo GoF, mas estruturam a solução:
 | DTO                           | `DataTransferObjects` + AutoMapper `Profile`s                    |
 | Marker Interface              | `IRepository<TEntity>` (interface vazia usada como restrição/tipo base) |
 
-### 12.3 Padrões ainda não utilizados — diretriz para uso futuro
+### 13.3 Padrões ainda não utilizados — diretriz para uso futuro
 
 Os padrões abaixo **não existem hoje** na base de código — de qualquer catálogo (GoF, DDD, PoEAA/Enterprise ou resiliência/cloud). Ficam documentados aqui apenas como referência de *quando* (e só quando) a necessidade real aparecer; não devem ser aplicados por antecipação (YAGNI) — introduzir um padrão sem o gatilho concreto é complexidade acidental. Use esta tabela para reconhecer o sintoma e escolher o padrão certo antes de implementar.
 

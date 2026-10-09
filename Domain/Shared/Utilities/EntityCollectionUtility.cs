@@ -23,7 +23,7 @@ namespace Domain.Shared.Utilities
                     if (existing != null)
                         existing.Copy(entity);
                     else
-                        throw new Exceptions.BusinessRuleException($"O registro de: {nameof(TEntity)} com o código: {entity.Id} não foi encontrado.");
+                        throw new Exceptions.BusinessRuleException($"O registro de: {typeof(TEntity).Name} com o código: {entity.Id} não foi encontrado.");
                 }
                 else
                 {

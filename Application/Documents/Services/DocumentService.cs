@@ -130,7 +130,7 @@ namespace Application.Documents.Services
 
             EmailAttachmentDto attachment = new(GetDocumentFileName(entity), entity.PDF!, "application/pdf");
             string action = entitiesIdsToBeUpdated.Contains(entity.Id) ? "atualizado" : "criado";
-            EmailMessageDto email = new(customer.Email!, $"{_documentTypeInfo.Title} {action} com sucesso!", $"Seu {_documentTypeInfo.Title.ToLower()} de c�digo: {entity.Id} foi {action} com sucesso e encontra-se em anexo.", [attachment]);
+            EmailMessageDto email = new(customer.Email!, $"{_documentTypeInfo.Title} {action} com sucesso!", $"Seu {_documentTypeInfo.Title.ToLower()} de código: {entity.Id} foi {action} com sucesso e encontra-se em anexo.", [attachment]);
             await emailService.SendAsync(email, CancellationToken.None);
         }
     }

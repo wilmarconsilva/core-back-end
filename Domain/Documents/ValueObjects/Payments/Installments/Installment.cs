@@ -20,7 +20,7 @@ namespace Domain.Documents.ValueObjects.Payments.Installments
 
         public Installment(int quantity, DownPayment? downPayment)
         {
-            ValueValidatorUtility.ValidateValue(quantity, $"A quantidade de parcelas");
+            ValueValidatorUtility.ValidatePositive(quantity, "A quantidade de parcelas");
 
             Quantity = quantity;
             DownPayment = downPayment;
@@ -33,7 +33,7 @@ namespace Domain.Documents.ValueObjects.Payments.Installments
         {
             decimal valueWithoutDownPayment = valueTotal - (DownPayment?.Value ?? 0);
 
-            decimal value = valueWithoutDownPayment / Quantity;
+            decimal value = Math.Round(valueWithoutDownPayment / Quantity, 2);
             ValueValidatorUtility.ValidateValue(value, "O valor da(s) parcela(s)");
             Value = value;
 
@@ -43,7 +43,10 @@ namespace Domain.Documents.ValueObjects.Payments.Installments
         private bool ValidateInstallmentValueQuantity(decimal valueTotal)
         {
             decimal downPaymentValue = DownPayment?.Value ?? 0;
-            return (Value * Quantity) == (valueTotal - downPaymentValue);
+
+            // O valor da parcela é arredondado em centavos, então a soma pode diferir do saldo em até um centavo por parcela.
+            decimal tolerance = Quantity * 0.01m;
+            return Math.Abs((Value * Quantity) - (valueTotal - downPaymentValue)) < tolerance;
         }
 
         private bool ValidateDownPaymentPercentage(decimal valueTotal)
