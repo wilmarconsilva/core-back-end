@@ -320,7 +320,6 @@ namespace Infrastructure.Shared.Persistance.Migrations
                         .HasColumnName("locality_id");
 
                     b.Property<string>("Neighborhood")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("neighborhood");
 
@@ -333,7 +332,6 @@ namespace Infrastructure.Shared.Persistance.Migrations
                         .HasColumnName("postal_code");
 
                     b.Property<string>("Street")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("street");
 

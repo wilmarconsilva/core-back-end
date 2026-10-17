@@ -12,21 +12,19 @@ namespace Domain.Persons.Customers.Entities
 
         private long _localityId;
         private long _customerId;
-        private string _neighborhood = null!;
-        private string _street = null!;
 
         #endregion Fields
 
         #region Constructors
 
-        public CustomerAddress(long localityId, long customerId, string neighborhood, string street, string? complement, string? postalCode, string? number)
+        public CustomerAddress(long localityId, long customerId, string? neighborhood, string? street, string? complement, string? postalCode, string? number)
         {
             SetCustomerId(customerId);
 
             Fill(localityId, neighborhood, street, complement, postalCode, number);
         }
 
-        public CustomerAddress(long localityId, string neighborhood, string street, string? complement, string? postalCode, string? number)
+        public CustomerAddress(long localityId, string? neighborhood, string? street, string? complement, string? postalCode, string? number)
         {
             Fill(localityId, neighborhood, street, complement, postalCode, number);
         }
@@ -44,14 +42,14 @@ namespace Domain.Persons.Customers.Entities
 
         public long CustomerId { get => _customerId; set => SetCustomerId(value); }
 
-        public string Neighborhood { get => _neighborhood; set => SetNeighborhood(value); }
+        public string? Neighborhood { get; set; }
 
-        public string Street { get => _street; set => SetStreet(value); }
+        public string? Street { get; set; }
 
         public string? Complement { get; set; }
 
         public string? PostalCode { get; set; }
-        
+
         public string? Number { get; set; }
 
         #region Public methods
@@ -67,12 +65,13 @@ namespace Domain.Persons.Customers.Entities
 
         protected override string GetDescription()
         {
-            StringBuilder description = new StringBuilder($"{Neighborhood}, {Street}");
+            StringBuilder description = new StringBuilder(string.Join(", ", new[] { Neighborhood, Street }.Where(part => !string.IsNullOrWhiteSpace(part))));
 
             if (!string.IsNullOrWhiteSpace(Number))
-                description.Append($" - {Number}");
+                description.Append(description.Length > 0 ? $" - {Number}" : Number);
 
-            description.Append('.');
+            if (description.Length > 0)
+                description.Append('.');
 
             if (!string.IsNullOrWhiteSpace(Complement))
                 description.Append($" {Complement}.");
@@ -80,18 +79,18 @@ namespace Domain.Persons.Customers.Entities
             if (!string.IsNullOrWhiteSpace(PostalCode))
                 description.Append($" {PostalCode}.");
 
-            return description.ToString();
+            return description.ToString().TrimStart();
         }
 
         #endregion Protected methods
 
         #region Private methods
 
-        private void Fill(long localityId, string neighborhood, string street, string? complement, string? postalCode, string? number)
+        private void Fill(long localityId, string? neighborhood, string? street, string? complement, string? postalCode, string? number)
         {
             SetLocalityId(localityId);
-            SetNeighborhood(neighborhood);
-            SetStreet(street);
+            Neighborhood = neighborhood;
+            Street = street;
             Complement = complement;
             PostalCode = postalCode;
             Number = number;
@@ -109,20 +108,6 @@ namespace Domain.Persons.Customers.Entities
             ValueValidatorUtility.ValidateValue(customerId, nameof(customerId));
 
             _customerId = customerId;
-        }
-
-        private void SetNeighborhood(string neighborhood)
-        {
-            ValueValidatorUtility.ValidateValue(neighborhood, nameof(Neighborhood));
-
-            _neighborhood = neighborhood;
-        }
-
-        private void SetStreet(string street)
-        {
-            ValueValidatorUtility.ValidateValue(street, nameof(Street));
-
-            _street = street;
         }
 
         #endregion Private methods

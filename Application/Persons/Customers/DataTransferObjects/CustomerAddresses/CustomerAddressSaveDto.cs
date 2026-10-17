@@ -4,9 +4,9 @@ namespace Application.Persons.Customers.DataTransferObjects.CustomerAddresses
 {
     public class CustomerAddressSaveDto : EntitySaveDto
     {
-        public required string Neighborhood { get; set; }
+        public string? Neighborhood { get; set; }
 
-        public required string Street { get; set; }
+        public string? Street { get; set; }
 
         public required long LocalityId { get; set; }
 

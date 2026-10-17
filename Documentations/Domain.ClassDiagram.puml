@@ -69,13 +69,11 @@ package "Persons" {
     class CustomerAddress {
         - _localityId : long
         - _customerId : long
-        - _neighborhood : string
-        - _street : string
         + LocalityId : long
         + CustomerId : long
         + Locality : Locality?
-        + Neighborhood : string
-        + Street : string
+        + Neighborhood : string?
+        + Street : string?
         + Complement : string?
         + PostalCode : string?
         + Number : string?

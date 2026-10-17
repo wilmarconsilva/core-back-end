@@ -4,9 +4,9 @@ namespace Application.Persons.Customers.DataTransferObjects.Synchronizations
     {
         public required long Id { get; init; }
 
-        public required string Neighborhood { get; init; }
+        public string? Neighborhood { get; init; }
 
-        public required string Street { get; init; }
+        public string? Street { get; init; }
 
         public required long LocalityId { get; init; }
 

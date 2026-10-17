@@ -6,12 +6,17 @@ namespace Domain.UnitTests.Persons.Customers.Entities
     public class CustomerAddressTests
     {
         [Theory]
-        [InlineData(null, null, null, "Centro, Rua A.")]
-        [InlineData("100", null, null, "Centro, Rua A - 100.")]
-        [InlineData("100", "Apto 2", "80000-000", "Centro, Rua A - 100. Apto 2. 80000-000.")]
-        public void Description_OptionalFields_ComposesDescription(string? number, string? complement, string? postalCode, string expected)
+        [InlineData("Centro", "Rua A", null, null, null, "Centro, Rua A.")]
+        [InlineData("Centro", "Rua A", "100", null, null, "Centro, Rua A - 100.")]
+        [InlineData("Centro", "Rua A", "100", "Apto 2", "80000-000", "Centro, Rua A - 100. Apto 2. 80000-000.")]
+        [InlineData(null, "Rua A", "100", null, null, "Rua A - 100.")]
+        [InlineData("Centro", null, null, null, null, "Centro.")]
+        [InlineData(null, null, "100", null, null, "100.")]
+        [InlineData(null, null, null, "Apto 2", "80000-000", "Apto 2. 80000-000.")]
+        [InlineData(null, null, null, null, null, "")]
+        public void Description_OptionalFields_ComposesDescription(string? neighborhood, string? street, string? number, string? complement, string? postalCode, string expected)
         {
-            CustomerAddress address = new(1, "Centro", "Rua A", complement, postalCode, number);
+            CustomerAddress address = new(1, neighborhood, street, complement, postalCode, number);
 
             address.Description.ShouldBe(expected);
         }
@@ -23,15 +28,13 @@ namespace Domain.UnitTests.Persons.Customers.Entities
         }
 
         [Fact]
-        public void Constructor_EmptyNeighborhood_ThrowsBusinessRuleException()
+        public void Constructor_WithoutNeighborhoodAndStreet_CreatesAddress()
         {
-            Should.Throw<BusinessRuleException>(() => new CustomerAddress(1, "", "Rua A", null, null, null));
-        }
+            CustomerAddress address = new(1, null, null, null, null, null);
 
-        [Fact]
-        public void Constructor_EmptyStreet_ThrowsBusinessRuleException()
-        {
-            Should.Throw<BusinessRuleException>(() => new CustomerAddress(1, "Centro", "", null, null, null));
+            address.LocalityId.ShouldBe(1);
+            address.Neighborhood.ShouldBeNull();
+            address.Street.ShouldBeNull();
         }
 
         [Fact]

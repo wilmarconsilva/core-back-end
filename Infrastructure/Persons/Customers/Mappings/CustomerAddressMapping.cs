@@ -26,12 +26,10 @@ namespace Infrastructure.Persons.Customers.Mappings
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(c => c.Neighborhood)
-                .HasColumnName("neighborhood")
-                .IsRequired();
+                .HasColumnName("neighborhood");
 
             builder.Property(c => c.Street)
-                .HasColumnName("street")
-                .IsRequired();
+                .HasColumnName("street");
 
             builder.Property(c => c.Complement)
                 .HasColumnName("complement");
