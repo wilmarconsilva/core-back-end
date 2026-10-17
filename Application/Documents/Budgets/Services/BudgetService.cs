@@ -7,8 +7,8 @@ using Application.Documents.Services;
 using AutoMapper;
 using Domain.Documents.Budgets.Entities;
 using Domain.Documents.Budgets.Repositories.Interfaces;
-using Domain.Documents.Budgets.ValueObjects;
 using Domain.Documents.Entities;
+using Domain.Documents.ValueObjects.Payments;
 using Domain.Persons.Customers.Repositories.Interfaces;
 using Domain.Shared.Persistance.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,7 +46,7 @@ namespace Application.Documents.Budgets.Services
         {
             IReadOnlyCollection<BudgetProduct> products = _mapper.Map<IReadOnlyCollection<BudgetProduct>>(dto.Products);
 
-            BudgetPayment payment = CreateBudgetPayment(dto);
+            Payment payment = CreatePayment(dto.Payment);
 
             return new Budget(_currentUser.UserId, dto.CreationDateTime, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, dto.PDF, products);
         }
@@ -55,7 +55,7 @@ namespace Application.Documents.Budgets.Services
         {
             IReadOnlyCollection<BudgetProduct> products = _mapper.Map<IReadOnlyCollection<BudgetProduct>>(dto.Products);
 
-            BudgetPayment payment = CreateBudgetPayment(dto);
+            Payment payment = CreatePayment(dto.Payment);
 
             entity.Fill(_currentUser.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, dto.PDF, products);
         }
@@ -63,11 +63,6 @@ namespace Application.Documents.Budgets.Services
         protected override Task<bool> EntitiesCanBeDeleted(IEnumerable<long> ids)
         {
             return Task.FromResult(true);
-        }
-
-        private static BudgetPayment CreateBudgetPayment(BudgetSaveDto dto)
-        {
-            return new BudgetPayment(dto.Payment.Method, dto.Payment.DiscountValue, CreateInstallment(dto.Payment.Installment));
         }
     }
 }

@@ -6,9 +6,9 @@ using Application.Documents.Orders.Services.Interfaces;
 using Application.Documents.Services;
 using AutoMapper;
 using Domain.Documents.Entities;
+using Domain.Documents.ValueObjects.Payments;
 using Domain.Documents.Orders.Entities;
 using Domain.Documents.Orders.Repositories.Interfaces;
-using Domain.Documents.Orders.ValueObjects;
 using Domain.Persons.Customers.Repositories.Interfaces;
 using Domain.Shared.Persistance.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,7 +48,7 @@ namespace Application.Documents.Orders.Services
         {
             IReadOnlyCollection<OrderProduct> products = _mapper.Map<IReadOnlyCollection<OrderProduct>>(dto.Products);
 
-            OrderPayment payment = CreateOrderPayment(dto);
+            Payment payment = CreatePayment(dto.Payment);
 
             return new Order(_currentUser.UserId, dto.CreationDateTime, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, dto.PDF, products, dto.BudgetId);
         }
@@ -57,7 +57,7 @@ namespace Application.Documents.Orders.Services
         {
             List<OrderProduct> products = _mapper.Map<List<OrderProduct>>(dto.Products);
 
-            OrderPayment payment = CreateOrderPayment(dto);
+            Payment payment = CreatePayment(dto.Payment);
 
             entity.Fill(_currentUser.UserId, dto.CustomerId, payment, dto.Observations, dto.CustomerSignatureImage, dto.PDF, products);
         }
@@ -65,11 +65,6 @@ namespace Application.Documents.Orders.Services
         protected override Task<bool> EntitiesCanBeDeleted(IEnumerable<long> ids)
         {
             return Task.FromResult(true);
-        }
-
-        private static OrderPayment CreateOrderPayment(OrderSaveDto dto)
-        {
-            return new OrderPayment(dto.Payment.Method, dto.Payment.DiscountValue, CreateInstallment(dto.Payment.Installment));
         }
     }
 }

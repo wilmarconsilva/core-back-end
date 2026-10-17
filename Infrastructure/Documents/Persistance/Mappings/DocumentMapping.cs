@@ -1,5 +1,4 @@
 using Domain.Documents.Entities;
-using Domain.Documents.ValueObjects.Payments;
 using Infrastructure.Shared.Persistance.Mappings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -15,10 +14,9 @@ namespace Infrastructure.Documents.Persistance.Mappings
     ///       └── Installment (VO aninhado - Owned Type dentro de Owned Type)
     ///           └── DownPayment (VO aninhado - Owned Type dentro de Owned Type dentro de Owned Type)
     /// </summary>
-    public abstract class DocumentMapping<TEntity, TProduct, TPayment> : EntityMapping<TEntity>
-        where TEntity : Document<TProduct, TPayment>
+    public abstract class DocumentMapping<TEntity, TProduct> : EntityMapping<TEntity>
+        where TEntity : Document<TProduct>
         where TProduct : DocumentProduct
-        where TPayment : Payment
     {
         public override void Configure(EntityTypeBuilder<TEntity> builder)
         {
@@ -27,6 +25,9 @@ namespace Infrastructure.Documents.Persistance.Mappings
             // NÍVEL 1: Mapeando Payment como Owned Type (VO)
             builder.OwnsOne(d => d.Payment, payment =>
             {
+                payment.Property(p => p.Method)
+                    .HasColumnName("payment_method");
+
                 payment.Property(p => p.DiscountValue)
                     .HasColumnName("payment_discount_value")
                     .HasPrecision(18, 2)

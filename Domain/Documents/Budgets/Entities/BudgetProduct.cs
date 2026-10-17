@@ -9,8 +9,8 @@ namespace Domain.Documents.Budgets.Entities
         /// </summary>
         public BudgetProduct() { }
 
-        public BudgetProduct(long productId, decimal quantity, decimal valueUnit, decimal valueTotal)
-            : base(productId, quantity, valueUnit, valueTotal)
+        public BudgetProduct(long productId, decimal quantity, decimal valueUnit)
+            : base(productId, quantity, valueUnit)
         {
         }
     }

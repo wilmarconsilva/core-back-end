@@ -1,6 +1,7 @@
 using Application.Authentication.Interfaces;
 using Application.Documents.DataTransferObjects;
 using Application.Documents.DataTransferObjects.DocumentsProducts;
+using Application.Documents.DataTransferObjects.Payments;
 using Application.Documents.DataTransferObjects.Payments.Installments;
 using Application.Email.DataTransferObjects;
 using Application.Email.Services.Interfaces;
@@ -10,6 +11,7 @@ using Application.Shared.Queries.Interfaces;
 using Application.Shared.Services;
 using Domain.Documents.Entities;
 using Domain.Documents.Interfaces;
+using Domain.Documents.ValueObjects.Payments;
 using Domain.Documents.ValueObjects.Payments.Installments;
 using Domain.Persons.Customers.Entities;
 using Domain.Persons.Customers.Repositories.Interfaces;
@@ -59,12 +61,9 @@ namespace Application.Documents.Services
 
         protected string GetDocumentFileName(TEntity entity) => $"{_documentTypeInfo.FileName}-{entity.Id}.pdf";
 
-        protected static Installment? CreateInstallment(InstallmentSaveDto? dto)
+        protected static Payment CreatePayment(PaymentSaveDto dto)
         {
-            if (dto == null)
-                return null;
-
-            return new Installment(dto.Quantity, CreateDownPayment(dto.DownPayment));
+            return new Payment(dto.Method, dto.DiscountValue, CreateInstallment(dto.Installment));
         }
 
         protected override async Task SaveAsync(List<TEntity> entities, CancellationToken cancellationToken)
@@ -80,6 +79,14 @@ namespace Application.Documents.Services
             }
             else
                 await base.SaveAsync(entities, cancellationToken);
+        }
+
+        private static Installment? CreateInstallment(InstallmentSaveDto? dto)
+        {
+            if (dto == null)
+                return null;
+
+            return new Installment(dto.Quantity, CreateDownPayment(dto.DownPayment));
         }
 
         private static DownPayment? CreateDownPayment(DownPaymentSaveDto? dto)

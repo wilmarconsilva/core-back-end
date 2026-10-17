@@ -3,14 +3,13 @@ using Application.Documents.Budgets.DataTransferObjects.Listings;
 using Application.Documents.Budgets.Queries.Interfaces;
 using AutoMapper;
 using Domain.Documents.Budgets.Entities;
-using Domain.Documents.Budgets.ValueObjects;
 using Infrastructure.Documents.Queries;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Shared.Persistance;
 
 namespace Infrastructure.Documents.Budgets.Queries
 {
-    public class BudgetQuery : DocumentQuery<Budget, BudgetDetailDto, BudgetProduct, BudgetPayment, BudgetListing, BudgetListingFilter>, IBudgetQuery
+    public class BudgetQuery : DocumentQuery<Budget, BudgetDetailDto, BudgetProduct, BudgetListing, BudgetListingFilter>, IBudgetQuery
     {
         public BudgetQuery(AppDbContext context, IMapper mapper) : base(context, mapper)
         {

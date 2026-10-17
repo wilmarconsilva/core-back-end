@@ -186,8 +186,8 @@ package "Documents" {
         + PDF : byte[]?
     }
 
-    abstract class "Document<TProduct, TPayment>" as Document {
-        - _payment : TPayment
+    abstract class "Document<TProduct>" as Document {
+        - _payment : Payment
         - _products : List<TProduct>
         + CreationDateTime : DateTime
         + LastUpdateDateTime : DateTime
@@ -197,7 +197,7 @@ package "Documents" {
         + Customer : Customer?
         + ValueSubtotal : decimal
         + ValueTotal : decimal
-        + Payment : TPayment
+        + Payment : Payment
         + Observations : string?
         + CustomerSignatureImage : byte[]?
         + PDF : byte[]?
@@ -222,7 +222,7 @@ package "Documents" {
     }
 
     class BudgetProduct extends DocumentProduct {
-        + BudgetProduct(productId, quantity, valueUnit, valueTotal)
+        + BudgetProduct(productId, quantity, valueUnit)
     }
 
     class Order {
@@ -232,7 +232,7 @@ package "Documents" {
     }
 
     class OrderProduct extends DocumentProduct {
-        + OrderProduct(productId, quantity, valueUnit, valueTotal)
+        + OrderProduct(productId, quantity, valueUnit)
     }
 
     package "ValueObjects" {
@@ -246,21 +246,12 @@ package "Documents" {
             PIX = 7
         }
 
-        abstract class Payment <<Value Object>> {
+        class Payment <<Value Object>> {
+            + Method : PaymentMethod?
             + DiscountValue : decimal
             + HasInstallment : bool
             + Installment : Installment?
-            # Payment(discountValue : decimal, installment : Installment?)
-        }
-
-        class BudgetPayment <<Value Object>> extends Payment {
-            + Method : PaymentMethod?
-            + BudgetPayment(method : PaymentMethod?, discountValue, installment)
-        }
-
-        class OrderPayment <<Value Object>> extends Payment {
-            + Method : PaymentMethod
-            + OrderPayment(method : PaymentMethod, discountValue, installment)
+            + Payment(method : PaymentMethod?, discountValue : decimal, installment : Installment?)
         }
 
         class Installment <<Value Object>> {
@@ -308,8 +299,8 @@ IEntityChild <|.. DocumentProduct
 IDocument    <|.. Document
 
 ' --- Especialização dos generics de Document (bind) ---
-Budget -|> Document : <<bind>>\n<BudgetProduct, BudgetPayment>
-Order  -|> Document : <<bind>>\n<OrderProduct, OrderPayment>
+Budget -|> Document : <<bind>>\n<BudgetProduct>
+Order  -|> Document : <<bind>>\n<OrderProduct>
 
 ' --- Documents ---
 Document "1" *-- "1..*" DocumentProduct : Products
@@ -320,8 +311,7 @@ DocumentProduct "*" --> "1" Product : Product
 Order "*" --> "0..1" Budget : Budget
 Payment "1" *-- "0..1" Installment : Installment
 Installment "1" *-- "0..1" DownPayment : DownPayment
-BudgetPayment ..> PaymentMethod
-OrderPayment ..> PaymentMethod
+Payment ..> PaymentMethod
 DownPayment ..> PaymentMethod
 
 ' --- Persons ---

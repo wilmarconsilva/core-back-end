@@ -46,7 +46,7 @@ namespace Domain.UnitTests.Documents.Entities
         public void Constructor_SeveralProducts_CalculatesSubtotalAndTotal()
         {
             Budget budget = DocumentBuilder.Budget(
-                payment: DocumentBuilder.BudgetPayment(discountValue: 10),
+                payment: DocumentBuilder.Payment(discountValue: 10),
                 products: [DocumentBuilder.BudgetProduct(quantity: 2, valueUnit: 50), DocumentBuilder.BudgetProduct(productId: 11, quantity: 1, valueUnit: 30)]);
 
             budget.ValueSubtotal.ShouldBe(130);
@@ -56,13 +56,13 @@ namespace Domain.UnitTests.Documents.Entities
         [Fact]
         public void Constructor_DiscountEqualToSubtotal_ThrowsBusinessRuleException()
         {
-            Should.Throw<BusinessRuleException>(() => DocumentBuilder.Order(payment: DocumentBuilder.OrderPayment(discountValue: 100)));
+            Should.Throw<BusinessRuleException>(() => DocumentBuilder.Order(payment: DocumentBuilder.Payment(discountValue: 100)));
         }
 
         [Fact]
         public void Constructor_DiscountGreaterThanSubtotal_ThrowsBusinessRuleException()
         {
-            BusinessRuleException exception = Should.Throw<BusinessRuleException>(() => DocumentBuilder.Order(payment: DocumentBuilder.OrderPayment(discountValue: 150)));
+            BusinessRuleException exception = Should.Throw<BusinessRuleException>(() => DocumentBuilder.Order(payment: DocumentBuilder.Payment(discountValue: 150)));
 
             exception.Message.ShouldBe("O valor do desconto não pode ser maior que o subtotal do documento.");
         }
@@ -71,13 +71,13 @@ namespace Domain.UnitTests.Documents.Entities
         public void Constructor_NegativeProductValues_ThrowsBusinessRuleException()
         {
             // Quantidade e valor unitário negativos dariam um subtotal positivo (-2 × -50 = 100) se fossem aceitos.
-            Should.Throw<BusinessRuleException>(() => DocumentBuilder.Order(products: [new OrderProduct(10, -2, -50, 100)]));
+            Should.Throw<BusinessRuleException>(() => DocumentBuilder.Order(products: [new OrderProduct(10, -2, -50)]));
         }
 
         [Fact]
         public void Constructor_WithInstallment_CalculatesInstallmentValueOverTotal()
         {
-            Order order = DocumentBuilder.Order(payment: DocumentBuilder.OrderPayment(discountValue: 20, installment: new Installment(2, null)));
+            Order order = DocumentBuilder.Order(payment: DocumentBuilder.Payment(discountValue: 20, installment: new Installment(2, null)));
 
             order.Payment.Installment!.Value.ShouldBe(40);
         }
@@ -88,7 +88,7 @@ namespace Domain.UnitTests.Documents.Entities
             Order order = DocumentBuilder.Order(products: [DocumentBuilder.OrderProduct(productId: 10), DocumentBuilder.OrderProduct(productId: 11)]);
             SimulatePersisted(order);
 
-            order.Fill(DocumentBuilder.SellerId, DocumentBuilder.CustomerId, DocumentBuilder.OrderPayment(), null, null, null,
+            order.Fill(DocumentBuilder.SellerId, DocumentBuilder.CustomerId, DocumentBuilder.Payment(), null, null, null,
                 [DocumentBuilder.OrderProduct(productId: 10, quantity: 5, valueUnit: 10, id: 1), DocumentBuilder.OrderProduct(productId: 12, quantity: 1, valueUnit: 15)]);
 
             order.Products.Count.ShouldBe(2);
@@ -104,7 +104,7 @@ namespace Domain.UnitTests.Documents.Entities
         {
             Budget budget = DocumentBuilder.Budget();
 
-            budget.Fill(DocumentBuilder.SellerId, DocumentBuilder.CustomerId, DocumentBuilder.BudgetPayment(), null, null, null, [DocumentBuilder.BudgetProduct()]);
+            budget.Fill(DocumentBuilder.SellerId, DocumentBuilder.CustomerId, DocumentBuilder.Payment(), null, null, null, [DocumentBuilder.BudgetProduct()]);
 
             budget.CreationDateTime.ShouldBe(DocumentBuilder.CreationDateTime);
         }

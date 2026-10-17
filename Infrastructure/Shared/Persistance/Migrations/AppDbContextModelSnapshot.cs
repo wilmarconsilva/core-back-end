@@ -509,7 +509,7 @@ namespace Infrastructure.Shared.Persistance.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.OwnsOne("Domain.Documents.Budgets.ValueObjects.BudgetPayment", "Payment", b1 =>
+                    b.OwnsOne("Domain.Documents.ValueObjects.Payments.Payment", "Payment", b1 =>
                         {
                             b1.Property<long>("BudgetId")
                                 .HasColumnType("bigint");
@@ -536,7 +536,7 @@ namespace Infrastructure.Shared.Persistance.Migrations
 
                             b1.OwnsOne("Domain.Documents.ValueObjects.Payments.Installments.Installment", "Installment", b2 =>
                                 {
-                                    b2.Property<long>("BudgetPaymentBudgetId")
+                                    b2.Property<long>("PaymentBudgetId")
                                         .HasColumnType("bigint");
 
                                     b2.Property<bool>("HasDownPayment")
@@ -552,16 +552,16 @@ namespace Infrastructure.Shared.Persistance.Migrations
                                         .HasColumnType("numeric(18,2)")
                                         .HasColumnName("payment_installment_value");
 
-                                    b2.HasKey("BudgetPaymentBudgetId");
+                                    b2.HasKey("PaymentBudgetId");
 
                                     b2.ToTable("budgets");
 
                                     b2.WithOwner()
-                                        .HasForeignKey("BudgetPaymentBudgetId");
+                                        .HasForeignKey("PaymentBudgetId");
 
                                     b2.OwnsOne("Domain.Documents.ValueObjects.Payments.Installments.DownPayment", "DownPayment", b3 =>
                                         {
-                                            b3.Property<long>("InstallmentBudgetPaymentBudgetId")
+                                            b3.Property<long>("InstallmentPaymentBudgetId")
                                                 .HasColumnType("bigint");
 
                                             b3.Property<int>("Method")
@@ -578,12 +578,12 @@ namespace Infrastructure.Shared.Persistance.Migrations
                                                 .HasColumnType("numeric(18,2)")
                                                 .HasColumnName("payment_installment_down_payment_value");
 
-                                            b3.HasKey("InstallmentBudgetPaymentBudgetId");
+                                            b3.HasKey("InstallmentPaymentBudgetId");
 
                                             b3.ToTable("budgets");
 
                                             b3.WithOwner()
-                                                .HasForeignKey("InstallmentBudgetPaymentBudgetId");
+                                                .HasForeignKey("InstallmentPaymentBudgetId");
                                         });
 
                                     b2.Navigation("DownPayment");
@@ -636,7 +636,7 @@ namespace Infrastructure.Shared.Persistance.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.OwnsOne("Domain.Documents.Orders.ValueObjects.OrderPayment", "Payment", b1 =>
+                    b.OwnsOne("Domain.Documents.ValueObjects.Payments.Payment", "Payment", b1 =>
                         {
                             b1.Property<long>("OrderId")
                                 .HasColumnType("bigint");
@@ -650,7 +650,7 @@ namespace Infrastructure.Shared.Persistance.Migrations
                                 .HasColumnType("boolean")
                                 .HasColumnName("payment_has_installment");
 
-                            b1.Property<int>("Method")
+                            b1.Property<int?>("Method")
                                 .HasColumnType("integer")
                                 .HasColumnName("payment_method");
 
@@ -663,7 +663,7 @@ namespace Infrastructure.Shared.Persistance.Migrations
 
                             b1.OwnsOne("Domain.Documents.ValueObjects.Payments.Installments.Installment", "Installment", b2 =>
                                 {
-                                    b2.Property<long>("OrderPaymentOrderId")
+                                    b2.Property<long>("PaymentOrderId")
                                         .HasColumnType("bigint");
 
                                     b2.Property<bool>("HasDownPayment")
@@ -679,16 +679,16 @@ namespace Infrastructure.Shared.Persistance.Migrations
                                         .HasColumnType("numeric(18,2)")
                                         .HasColumnName("payment_installment_value");
 
-                                    b2.HasKey("OrderPaymentOrderId");
+                                    b2.HasKey("PaymentOrderId");
 
                                     b2.ToTable("orders");
 
                                     b2.WithOwner()
-                                        .HasForeignKey("OrderPaymentOrderId");
+                                        .HasForeignKey("PaymentOrderId");
 
                                     b2.OwnsOne("Domain.Documents.ValueObjects.Payments.Installments.DownPayment", "DownPayment", b3 =>
                                         {
-                                            b3.Property<long>("InstallmentOrderPaymentOrderId")
+                                            b3.Property<long>("InstallmentPaymentOrderId")
                                                 .HasColumnType("bigint");
 
                                             b3.Property<int>("Method")
@@ -705,12 +705,12 @@ namespace Infrastructure.Shared.Persistance.Migrations
                                                 .HasColumnType("numeric(18,2)")
                                                 .HasColumnName("payment_installment_down_payment_value");
 
-                                            b3.HasKey("InstallmentOrderPaymentOrderId");
+                                            b3.HasKey("InstallmentPaymentOrderId");
 
                                             b3.ToTable("orders");
 
                                             b3.WithOwner()
-                                                .HasForeignKey("InstallmentOrderPaymentOrderId");
+                                                .HasForeignKey("InstallmentPaymentOrderId");
                                         });
 
                                     b2.Navigation("DownPayment");

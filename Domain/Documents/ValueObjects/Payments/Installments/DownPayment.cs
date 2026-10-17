@@ -22,7 +22,7 @@ namespace Domain.Documents.ValueObjects.Payments.Installments
             ValueValidatorUtility.ValidatePositive(percentage, "A porcentagem da entrada");
             ValueValidatorUtility.ValidateEnum(method, "O método de pagamento da entrada");
 
-            Value = value;
+            Value = Math.Round(value,2);
             Percentage = percentage;
             Method = method;
         }

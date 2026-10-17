@@ -2,14 +2,12 @@
 using Application.Shared.DataTransferObjects.Entities;
 using AutoMapper;
 using Domain.Documents.Entities;
-using Domain.Documents.ValueObjects.Payments;
 
 namespace Application.Documents.Mappings
 {
-    public abstract class DocumentDetailProfile<TEntity, TDocumentProduct, TDocumentPayment, TEntityDetailDto> : Profile
-        where TEntity : Document<TDocumentProduct, TDocumentPayment>
+    public abstract class DocumentDetailProfile<TEntity, TDocumentProduct, TEntityDetailDto> : Profile
+        where TEntity : Document<TDocumentProduct>
         where TDocumentProduct : DocumentProduct
-        where TDocumentPayment : Payment
         where TEntityDetailDto : DocumentDetailDto
     {
         protected DocumentDetailProfile()

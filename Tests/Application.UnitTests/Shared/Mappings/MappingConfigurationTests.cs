@@ -68,7 +68,7 @@ namespace Application.UnitTests.Shared.Mappings
         public void BudgetProductSaveDto_InvalidValues_EnforcesDomainInvariants()
         {
             BudgetProductSaveDto dto = DocumentSaveDtoBuilder.BudgetProduct();
-            dto.ValueTotal = 99;
+            dto.ValueUnit = 0;
 
             Exception exception = Should.Throw<Exception>(() => _fixture.Mapper.Map<BudgetProduct>(dto));
 

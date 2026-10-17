@@ -1,4 +1,5 @@
 using Application.Documents.DataTransferObjects.DocumentsProducts;
+using Application.Documents.DataTransferObjects.Payments;
 using Application.Shared.DataTransferObjects.Entities;
 
 namespace Application.Documents.DataTransferObjects
@@ -13,6 +14,8 @@ namespace Application.Documents.DataTransferObjects
         public required long CustomerId { get; set; }
 
         public long? BudgetId { get; set; }
+
+        public required PaymentSaveDto Payment { get; set; }
 
         public string? Observations { get; set; }
 

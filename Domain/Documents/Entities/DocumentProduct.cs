@@ -30,21 +30,21 @@ namespace Domain.Documents.Entities
         /// </summary>
         protected DocumentProduct() { }
 
-        protected DocumentProduct(long productId, decimal quantity, decimal valueUnit, decimal valueTotal)
+        protected DocumentProduct(long productId, decimal quantity, decimal valueUnit)
         {
-            Fill(productId, quantity, valueUnit, valueTotal);
+            Fill(productId, quantity, valueUnit);
         }
 
-        protected DocumentProduct(long documentId, long productId, decimal quantity, decimal valueUnit, decimal valueTotal)
+        protected DocumentProduct(long documentId, long productId, decimal quantity, decimal valueUnit)
         {
             SetDocumentId(documentId);
 
-            Fill(productId, quantity, valueUnit, valueTotal);
+            Fill(productId, quantity, valueUnit);
         }
 
         public void Copy(DocumentProduct product)
         {
-            Fill(product.ProductId, product.Quantity, product.ValueUnit, product.ValueTotal);
+            Fill(product.ProductId, product.Quantity, product.ValueUnit);
         }
 
         public void SetFatherEntityId(long id)
@@ -52,14 +52,14 @@ namespace Domain.Documents.Entities
             SetDocumentId(id);
         }
 
-        private void Fill(long productId, decimal quantity, decimal valueUnit, decimal valueTotal)
+        private void Fill(long productId, decimal quantity, decimal valueUnit)
         {
             SetProductId(productId);
 
-            SetValues(quantity, valueUnit, valueTotal);
+            SetValues(quantity, valueUnit);
         }
 
-        private void SetValues(decimal quantity, decimal valueUnit, decimal valueTotal)
+        private void SetValues(decimal quantity, decimal valueUnit)
         {
             ValueValidatorUtility.ValidatePositive(quantity, nameof(Quantity));
             Quantity = quantity;
@@ -67,11 +67,7 @@ namespace Domain.Documents.Entities
             ValueValidatorUtility.ValidatePositive(valueUnit, nameof(ValueUnit));
             ValueUnit = valueUnit;
 
-            ValueValidatorUtility.ValidatePositive(valueTotal, nameof(ValueTotal));
-            ValueTotal = valueTotal;
-
-            if ((quantity * valueUnit) != valueTotal)
-                throw new BusinessRuleException($"O valor total do produto de código: {ProductId} não corresponde com a sua quantidade multiplicada pelo seu valor unitário.");
+            ValueTotal = quantity * valueUnit;
         }
 
         private void SetProductId(long productId)

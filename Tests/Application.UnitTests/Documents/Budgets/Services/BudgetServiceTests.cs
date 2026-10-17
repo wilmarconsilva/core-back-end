@@ -1,6 +1,7 @@
 using Application.Documents.Budgets.DataTransferObjects;
 using Application.Documents.Budgets.Queries.Interfaces;
 using Application.Documents.Budgets.Services;
+using Application.Documents.DataTransferObjects.Payments;
 using Application.Email.DataTransferObjects;
 using Application.UnitTests.Builders;
 using Application.UnitTests.Documents.Services;
@@ -45,7 +46,7 @@ namespace Application.UnitTests.Documents.Budgets.Services
         public async Task CreateAsync_ValidDto_CreatesBudgetForCurrentUser()
         {
             BudgetSaveDto dto = DocumentSaveDtoBuilder.Budget(
-                payment: new BudgetPaymentSaveDto { Method = null, DiscountValue = 10, Installment = DocumentSaveDtoBuilder.Installment(3, downPaymentValue: 27, downPaymentPercentage: 30) });
+                payment: new PaymentSaveDto { Method = null, DiscountValue = 10, Installment = DocumentSaveDtoBuilder.Installment(3, downPaymentValue: 27, downPaymentPercentage: 30) });
 
             IEnumerable<Entity> entities = await _service.CreateAsync([dto], TestContext.Current.CancellationToken);
 

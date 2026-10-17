@@ -8,22 +8,21 @@ namespace Domain.UnitTests.Documents.Entities
     public class DocumentProductTests
     {
         [Theory]
-        [InlineData(0, 2, 50, 100)]
-        [InlineData(10, 0, 50, 0)]
-        [InlineData(10, 2, 0, 0)]
-        [InlineData(10, 2, 50, 0)]
-        public void Constructor_ZeroValue_ThrowsBusinessRuleException(long productId, decimal quantity, decimal valueUnit, decimal valueTotal)
+        [InlineData(0, 2, 50)]
+        [InlineData(10, 0, 50)]
+        [InlineData(10, 2, 0)]
+        public void Constructor_ZeroValue_ThrowsBusinessRuleException(long productId, decimal quantity, decimal valueUnit)
         {
-            Should.Throw<BusinessRuleException>(() => new OrderProduct(productId, quantity, valueUnit, valueTotal));
+            Should.Throw<BusinessRuleException>(() => new OrderProduct(productId, quantity, valueUnit));
         }
 
         [Theory]
-        [InlineData(-2, -50, 100, "Quantity")]
-        [InlineData(-2, 50, -100, "Quantity")]
-        [InlineData(2, -50, -100, "ValueUnit")]
-        public void Constructor_NegativeValue_ThrowsBusinessRuleException(decimal quantity, decimal valueUnit, decimal valueTotal, string propertyName)
+        [InlineData(-2, -50, "Quantity")]
+        [InlineData(-2, 50, "Quantity")]
+        [InlineData(2, -50, "ValueUnit")]
+        public void Constructor_NegativeValue_ThrowsBusinessRuleException(decimal quantity, decimal valueUnit, string propertyName)
         {
-            BusinessRuleException exception = Should.Throw<BusinessRuleException>(() => new OrderProduct(10, quantity, valueUnit, valueTotal));
+            BusinessRuleException exception = Should.Throw<BusinessRuleException>(() => new OrderProduct(10, quantity, valueUnit));
 
             exception.Message.ShouldBe($"O campo: {propertyName} não pode ser negativo.");
         }
@@ -31,21 +30,25 @@ namespace Domain.UnitTests.Documents.Entities
         [Fact]
         public void BudgetProductConstructor_NegativeValues_ThrowsBusinessRuleException()
         {
-            Should.Throw<BusinessRuleException>(() => new BudgetProduct(10, -2, -50, 100));
+            Should.Throw<BusinessRuleException>(() => new BudgetProduct(10, -2, -50));
+        }
+
+        [Theory]
+        [InlineData(2, 50, 100)]
+        [InlineData(1.5, 10.25, 15.375)]
+        public void Constructor_ValidValues_CalculatesValueTotal(decimal quantity, decimal valueUnit, decimal expected)
+        {
+            OrderProduct product = new(10, quantity, valueUnit);
+
+            product.ValueTotal.ShouldBe(expected);
         }
 
         [Fact]
-        public void Constructor_TotalDifferentFromQuantityTimesUnit_ThrowsBusinessRuleException()
+        public void BudgetProductConstructor_ValidValues_CalculatesValueTotal()
         {
-            BusinessRuleException exception = Should.Throw<BusinessRuleException>(() => new OrderProduct(10, 2, 50, 99));
+            BudgetProduct product = new(10, 3, 20);
 
-            exception.Message.ShouldBe("O valor total do produto de código: 10 não corresponde com a sua quantidade multiplicada pelo seu valor unitário.");
-        }
-
-        [Fact]
-        public void BudgetProductConstructor_InvalidValues_ThrowsBusinessRuleException()
-        {
-            Should.Throw<BusinessRuleException>(() => new BudgetProduct(10, 2, 50, 99));
+            product.ValueTotal.ShouldBe(60);
         }
 
         [Fact]

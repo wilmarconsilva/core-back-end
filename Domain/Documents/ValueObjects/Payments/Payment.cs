@@ -1,20 +1,29 @@
+using Domain.Documents.ValueObjects.Payments.Enums;
 using Domain.Documents.ValueObjects.Payments.Installments;
 using Domain.Shared.Utilities;
 
 namespace Domain.Documents.ValueObjects.Payments
 {
-    public abstract class Payment
+    public class Payment
     {
+        public PaymentMethod? Method { get; private init; }
+
         public decimal DiscountValue { get; private init; }
 
         public bool HasInstallment { get; private init; }
 
         public Installment? Installment { get; private init; }
 
-        protected Payment(decimal discountValue, Installment? installment)
+        public Payment(PaymentMethod? method, decimal discountValue, Installment? installment)
         {
+            if (method.HasValue)
+            {
+                ValueValidatorUtility.ValidateEnum(method.Value, $"O método de pagamento");
+            }
+
             ValueValidatorUtility.ValidateNotNegative(discountValue, "O valor do desconto");
 
+            Method = method;
             DiscountValue = discountValue;
             Installment = installment;
 
@@ -25,6 +34,6 @@ namespace Domain.Documents.ValueObjects.Payments
         /// <summary>
         /// Constructor only for ORM.
         /// </summary>
-        protected Payment() { }
+        private Payment() { }
     }
 }

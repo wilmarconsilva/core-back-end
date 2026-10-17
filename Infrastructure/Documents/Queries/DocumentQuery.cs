@@ -2,18 +2,16 @@ using Application.Documents.DataTransferObjects.Listings;
 using Application.Shared.Queries.Interfaces;
 using AutoMapper;
 using Domain.Documents.Entities;
-using Domain.Documents.ValueObjects.Payments;
 using Infrastructure.Shared.Persistance;
 using Infrastructure.Shared.Queries;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Documents.Queries
 {
-    public abstract class DocumentQuery<TEntity, TEntityDetailDto, TDocumentProduct, TDocumentPayment, TListing, TFilter> : DetailDtoQuery<TEntity, TEntityDetailDto>, IEntityCrudQuery<TEntityDetailDto, TListing, TFilter>
-        where TEntity : Document<TDocumentProduct, TDocumentPayment>
+    public abstract class DocumentQuery<TEntity, TEntityDetailDto, TDocumentProduct, TListing, TFilter> : DetailDtoQuery<TEntity, TEntityDetailDto>, IEntityCrudQuery<TEntityDetailDto, TListing, TFilter>
+        where TEntity : Document<TDocumentProduct>
         where TEntityDetailDto : class
         where TDocumentProduct : DocumentProduct
-        where TDocumentPayment : Payment
         where TListing : DocumentListing, new()
         where TFilter : DocumentListingFilter
     {

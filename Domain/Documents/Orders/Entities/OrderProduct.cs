@@ -9,8 +9,8 @@ namespace Domain.Documents.Orders.Entities
         /// </summary>
         public OrderProduct() { }
 
-        public OrderProduct(long productId, decimal quantity, decimal valueUnit, decimal valueTotal)
-            : base(productId, quantity, valueUnit, valueTotal)
+        public OrderProduct(long productId, decimal quantity, decimal valueUnit)
+            : base(productId, quantity, valueUnit)
         {
         }
     }

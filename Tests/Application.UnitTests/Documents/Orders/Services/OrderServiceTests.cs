@@ -1,3 +1,4 @@
+using Application.Documents.DataTransferObjects.Payments;
 using Application.Documents.Orders.DataTransferObjects;
 using Application.Documents.Orders.Queries;
 using Application.Documents.Orders.Services;
@@ -45,7 +46,7 @@ namespace Application.UnitTests.Documents.Orders.Services
         public async Task CreateAsync_FromBudget_CreatesOrderWithBudgetId()
         {
             OrderSaveDto dto = DocumentSaveDtoBuilder.Order(
-                payment: new OrderPaymentSaveDto { Method = PaymentMethod.CreditCard, Installment = DocumentSaveDtoBuilder.Installment(2) },
+                payment: new PaymentSaveDto { Method = PaymentMethod.CreditCard, Installment = DocumentSaveDtoBuilder.Installment(2) },
                 budgetId: 9);
 
             IEnumerable<Entity> entities = await _service.CreateAsync([dto], TestContext.Current.CancellationToken);
@@ -58,9 +59,20 @@ namespace Application.UnitTests.Documents.Orders.Services
         }
 
         [Fact]
+        public async Task CreateAsync_WithoutPaymentMethod_CreatesOrderWithoutMethod()
+        {
+            OrderSaveDto dto = DocumentSaveDtoBuilder.Order(payment: new PaymentSaveDto { Method = null });
+
+            IEnumerable<Entity> entities = await _service.CreateAsync([dto], TestContext.Current.CancellationToken);
+
+            Order order = entities.ShouldHaveSingleItem().ShouldBeOfType<Order>();
+            order.Payment.Method.ShouldBeNull();
+        }
+
+        [Fact]
         public async Task CreateAsync_InvalidPaymentMethod_ThrowsBusinessRuleException()
         {
-            OrderSaveDto dto = DocumentSaveDtoBuilder.Order(payment: new OrderPaymentSaveDto { Method = (PaymentMethod)0 });
+            OrderSaveDto dto = DocumentSaveDtoBuilder.Order(payment: new PaymentSaveDto { Method = (PaymentMethod)0 });
 
             await Should.ThrowAsync<BusinessRuleException>(() => _service.CreateAsync([dto], TestContext.Current.CancellationToken));
             await _unitOfWork.DidNotReceive().BeginTransactionAsync(Arg.Any<CancellationToken>());

@@ -9,7 +9,5 @@ namespace Application.Documents.DataTransferObjects.DocumentsProducts
         public required decimal Quantity { get; set; }
 
         public required decimal ValueUnit { get; set; }
-
-        public required decimal ValueTotal { get; set; }
     }
 }

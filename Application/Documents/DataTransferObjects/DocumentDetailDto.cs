@@ -1,4 +1,5 @@
 ﻿using Application.Documents.DataTransferObjects.DocumentsProducts;
+using Application.Documents.DataTransferObjects.Payments;
 using Application.Shared.DataTransferObjects.Entities;
 
 namespace Application.Documents.DataTransferObjects
@@ -12,6 +13,8 @@ namespace Application.Documents.DataTransferObjects
         public required DateTime CreationDateTime { get; set; }
 
         public required EntityReferenceDto Customer { get; set; }
+
+        public required PaymentSaveDto Payment { get; set; }
 
         public string? Observations { get; set; }
 

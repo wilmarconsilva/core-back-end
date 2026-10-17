@@ -8,9 +8,10 @@ using Domain.Shared.Exceptions;
 
 namespace Domain.Documents.Entities
 {
-    public abstract class Document<TProduct, TPayment> : EntityWithoutDescription, IDocument where TProduct : DocumentProduct where TPayment : Payment
+    public abstract class Document<TProduct> : EntityWithoutDescription, IDocument where TProduct : DocumentProduct
     {
-        private TPayment _payment = null!;
+        private Payment _payment = null!;
+
         private readonly List<TProduct> _products = new();
 
         public DateTime CreationDateTime { get; private init; }
@@ -29,7 +30,7 @@ namespace Domain.Documents.Entities
 
         public decimal ValueTotal { get; private set; }
 
-        public TPayment Payment => _payment;
+        public Payment Payment => _payment;
 
         public string? Observations { get; set; }
 
@@ -47,7 +48,7 @@ namespace Domain.Documents.Entities
         protected Document(
             long userId,
             DateTime creationDateTime,
-            long customerId, TPayment payment,
+            long customerId, Payment payment,
             string? observations, byte[]? customerSignatureImage,
             byte[]? pdf,
             IReadOnlyCollection<TProduct> products)
@@ -59,7 +60,7 @@ namespace Domain.Documents.Entities
         public void Fill(
             long userId,
             long customerId,
-            TPayment payment,
+            Payment payment,
             string? observations,
             byte[]? customerSignatureImage,
             byte[]? pdf,
