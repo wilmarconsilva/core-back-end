@@ -1,8 +1,13 @@
-@startuml Domain.ClassDiagram
-title Core - Camada de Domínio (Entidades, objetos de valor e interfaces)
+@startuml Core - Diagrama de classes da camada de domínio em UML
+' Layout ELK em vez do Graphviz: o Graphviz com "linetype ortho" não
+' reserva espaço para rótulos de aresta (multiplicidades, <<bind>>) e as
+' linhas os atravessam. O ELK já roteia de forma ortogonal e posiciona
+' os rótulos ao lado das arestas. Requer PlantUML com ELK embutido.
+!pragma layout elk
+title Core - Diagrama de classes da camada de domínio em UML
 
 skinparam classAttributeIconSize 0
-skinparam linetype ortho
+skinparam defaultFontName Arial
 skinparam packageStyle rectangle
 hide empty members
 
@@ -299,33 +304,37 @@ IEntityChild <|.. DocumentProduct
 IDocument    <|.. Document
 
 ' --- Especialização dos generics de Document (bind) ---
-Budget -|> Document : <<bind>>\n<BudgetProduct>
-Order  -|> Document : <<bind>>\n<OrderProduct>
+Budget --|> Document : <<bind>>\n<BudgetProduct>
+Order  --|> Document : <<bind>>\n<OrderProduct>
+
+' Associações sem nome de papel: o papel já aparece como propriedade
+' da classe de origem (ex.: Document.Seller), e o rótulo na aresta
+' colidia com as linhas do layout ortogonal.
 
 ' --- Documents ---
-Document "1" *-- "1..*" DocumentProduct : Products
-Document "1" *-- "1" Payment : Payment
-Document "*" --> "1" User : Seller
-Document "*" --> "1" Customer : Customer
-DocumentProduct "*" --> "1" Product : Product
-Order "*" --> "0..1" Budget : Budget
-Payment "1" *-- "0..1" Installment : Installment
-Installment "1" *-- "0..1" DownPayment : DownPayment
+Document "1" *-- "1..*" DocumentProduct
+Document "1" *-- "1" Payment
+Document "*" --> "1" User
+Document "*" --> "1" Customer
+DocumentProduct "*" --> "1" Product
+Order "*" --> "0..1" Budget
+Payment "1" *-- "0..1" Installment
+Installment "1" *-- "0..1" DownPayment
 Payment ..> PaymentMethod
 DownPayment ..> PaymentMethod
 
 ' --- Persons ---
-Customer "1" *-- "1..*" CustomerAddress : Addresses
-CustomerAddress "*" --> "1" Locality : Locality
+Customer "1" *-- "1..*" CustomerAddress
+CustomerAddress "*" --> "1" Locality
 Customer ..> PersonType
 Customer ..> DocumentType
 
 ' --- Authentication ---
-RefreshToken "*" --> "1" User : User
+RefreshToken "*" --> "1" User
 
 ' --- Territories ---
-Locality "*" --> "0..1" State : State
-State "*" --> "0..1" Country : Country
+Locality "*" --> "0..1" State
+State "*" --> "0..1" Country
 
 ' --- Products ---
 Product ..> MeasureUnit

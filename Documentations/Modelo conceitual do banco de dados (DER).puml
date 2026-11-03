@@ -1,0 +1,170 @@
+@startchen Core - Modelo Conceitual do Banco de Dados (DER)
+left to right direction
+' Fonte explícita: sem ela o SVG não define font-family e o visualizador
+' usa outra fonte, desalinhando o texto dentro das elipses.
+skinparam defaultFontName Arial
+' =====================================================================
+' Core - Modelo Conceitual do Banco de Dados (DER - notação de Chen)
+'
+' Requer PlantUML com suporte à notação de Chen (posterior à 1.2024.3).
+'
+' Convenção de cardinalidade (Heuser / brModelo): o par (mín,máx)
+' junto a uma entidade X indica quantas ocorrências de X se associam
+' a UMA ocorrência da outra entidade do relacionamento.
+'
+' Sintaxe: entity/relationship "Rótulo exibido" as IDENTIFICADOR.
+' O identificador é o nó do diagrama e precisa ser único; o rótulo
+' pode se repetir (ex.: vários relacionamentos "Está").
+'
+' Abstrações em relação ao modelo físico (Infrastructure/**/Mappings):
+'  - FKs não são atributos: são representadas pelos relacionamentos.
+'  - budgets_products / orders_products viram o relacionamento N:N
+'    "Contém", com atributos próprios.
+'  - budgets / orders viram especialização de "Documento".
+'  - Value Object Payment > Installment > DownPayment vira atributo
+'    composto de "Documento"; flags has_* omitidas (derivam da presença).
+'  - refresh_tokens omitido: é detalhe técnico de autenticação,
+'    não conceito de negócio.
+' =====================================================================
+
+' ---------------------------------------------------------------------
+' Territórios
+' ---------------------------------------------------------------------
+entity "País" as PAIS {
+  Id <<key>>
+  Nome
+  Sigla
+}
+
+entity "Estado" as ESTADO {
+  Id <<key>>
+  Nome
+  Sigla
+}
+
+entity "Localidade" as LOCALIDADE {
+  Id <<key>>
+  Nome
+}
+
+' ---------------------------------------------------------------------
+' Pessoas
+' ---------------------------------------------------------------------
+entity "Usuário" as USUARIO {
+  Id <<key>>
+  Nome
+  Email
+  Senha
+  Assinatura
+}
+
+entity "Cliente" as CLIENTE {
+  Id <<key>>
+  Nome
+  Tipo de pessoa
+  Documento
+  Tipo de documento
+  Email
+  Inscrição estadual
+}
+
+entity "Endereço" as ENDERECO {
+  Id <<key>>
+  Logradouro
+  Número
+  Complemento
+  Bairro
+  CEP
+}
+
+' ---------------------------------------------------------------------
+' Produtos
+' ---------------------------------------------------------------------
+entity "Produto" as PRODUTO {
+  Id <<key>>
+  Descrição
+  Unidade de medida
+}
+
+' ---------------------------------------------------------------------
+' Documentos comerciais
+' ---------------------------------------------------------------------
+entity "Documento" as DOCUMENTO {
+  Id <<key>>
+  Data de criação
+  Data da última alteração
+  Observações
+  Assinatura do cliente
+  Valor subtotal
+  Valor total
+  Pagamento {
+    Forma de pagamento
+    Desconto
+    Parcelamento {
+      Quantidade de parcelas
+      Valor da parcela
+      Entrada {
+        Valor da entrada
+        Percentual da entrada
+        Forma de pagamento da entrada
+      }
+    }
+  }
+}
+
+entity "Orçamento" as ORCAMENTO {
+}
+
+entity "Pedido" as PEDIDO {
+}
+
+' Todo documento é um orçamento OU um pedido (total e disjunta)
+DOCUMENTO =>= d { ORCAMENTO, PEDIDO }
+
+' ---------------------------------------------------------------------
+' Relacionamentos
+' ---------------------------------------------------------------------
+relationship "Está" as ESTADO_ESTA_EM_PAIS {
+}
+ESTADO_ESTA_EM_PAIS -(1,1)- PAIS
+ESTADO_ESTA_EM_PAIS -(0,N)- ESTADO
+
+relationship "Está" as LOCALIDADE_ESTA_EM_ESTADO {
+}
+LOCALIDADE_ESTA_EM_ESTADO -(1,1)- ESTADO
+LOCALIDADE_ESTA_EM_ESTADO -(0,N)- LOCALIDADE
+
+relationship "Está" as ENDERECO_ESTA_EM_LOCALIDADE {
+}
+ENDERECO_ESTA_EM_LOCALIDADE -(1,1)- LOCALIDADE
+ENDERECO_ESTA_EM_LOCALIDADE -(0,N)- ENDERECO
+
+relationship "Possui" as CLIENTE_POSSUI_ENDERECO {
+}
+CLIENTE_POSSUI_ENDERECO -(1,1)- CLIENTE
+CLIENTE_POSSUI_ENDERECO -(0,N)- ENDERECO
+
+relationship "Emite" as USUARIO_EMITE_DOCUMENTO {
+}
+USUARIO_EMITE_DOCUMENTO -(1,1)- USUARIO
+USUARIO_EMITE_DOCUMENTO -(0,N)- DOCUMENTO
+
+relationship "Solicita" as CLIENTE_SOLICITA_DOCUMENTO {
+}
+CLIENTE_SOLICITA_DOCUMENTO -(1,1)- CLIENTE
+CLIENTE_SOLICITA_DOCUMENTO -(0,N)- DOCUMENTO
+
+relationship "Contém" as DOCUMENTO_CONTEM_PRODUTO {
+  Quantidade
+  Valor unitário
+  Valor total
+}
+DOCUMENTO_CONTEM_PRODUTO -(0,N)- DOCUMENTO
+DOCUMENTO_CONTEM_PRODUTO -(1,N)- PRODUTO
+
+relationship "Origina" as ORCAMENTO_ORIGINA_PEDIDO {
+}
+ORCAMENTO_ORIGINA_PEDIDO -(0,1)- ORCAMENTO
+ORCAMENTO_ORIGINA_PEDIDO -(0,N)- PEDIDO
+
+@endchen

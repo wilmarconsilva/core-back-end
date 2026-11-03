@@ -1,0 +1,228 @@
+@startuml Core - Modelo lógico do banco de dados
+' =====================================================================
+' Core - Modelo Lógico do Banco de Dados (PostgreSQL)
+'
+' Fonte: Infrastructure/**/Mappings e
+'        Infrastructure/Shared/Persistance/Migrations/AppDbContextModelSnapshot.cs
+' Ao criar uma migration que altere o schema, atualize este arquivo
+' no mesmo PR.
+'
+' Notação: Engenharia da Informação (pé de galinha).
+'   *  coluna NOT NULL          <<PK>>  chave primária (identity)
+'   <<FK>> chave estrangeira    <<UK>>  índice único
+'   Toda FK possui índice (criado pelo EF Core).
+' =====================================================================
+
+hide circle
+hide empty members
+skinparam linetype ortho
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+skinparam roundcorner 6
+skinparam class {
+    BackgroundColor White
+    BorderColor #555555
+    ArrowColor #555555
+}
+
+' =====================================================================
+' TERRITÓRIOS
+' =====================================================================
+package "Territórios" {
+    entity countries {
+        * id : bigint <<PK>>
+        --
+        * description : text
+        * acronym : varchar(4)
+    }
+
+    entity states {
+        * id : bigint <<PK>>
+        --
+        * description : text
+        * acronym : varchar(4)
+        * country_id : bigint <<FK>>
+    }
+
+    entity localities {
+        * id : bigint <<PK>>
+        --
+        * description : text
+        * state_id : bigint <<FK>>
+    }
+}
+
+' =====================================================================
+' PESSOAS
+' =====================================================================
+package "Pessoas" {
+    entity users {
+        * id : bigint <<PK>>
+        --
+        * name : text
+        * email : text <<UK>>
+        * password_hash : text
+        signature_image : bytea
+    }
+
+    entity customers {
+        * id : bigint <<PK>>
+        --
+        * name : text
+        * person_type : integer
+        * document : text
+        * document_type : integer
+        email : text
+        state_registration : text
+    }
+
+    entity customers_addresses {
+        * id : bigint <<PK>>
+        --
+        * customer_id : bigint <<FK>>
+        * locality_id : bigint <<FK>>
+        street : text
+        number : text
+        complement : text
+        neighborhood : text
+        postal_code : text
+    }
+}
+
+' =====================================================================
+' AUTENTICAÇÃO
+' =====================================================================
+package "Autenticação" {
+    entity refresh_tokens {
+        * id : bigint <<PK>>
+        --
+        * user_id : bigint <<FK>>
+        * token_hash : text <<UK>>
+        * created_date_time : timestamptz
+        * expiration_date_time : timestamptz
+        revoked_date_time : timestamptz
+        replaced_by_token_hash : text
+    }
+}
+
+' =====================================================================
+' PRODUTOS
+' =====================================================================
+package "Produtos" {
+    entity products {
+        * id : bigint <<PK>>
+        --
+        * description : text
+        * measure_unit : integer
+    }
+}
+
+' =====================================================================
+' DOCUMENTOS COMERCIAIS
+' budgets e orders têm a mesma estrutura (DocumentMapping); as colunas
+' payment_* são o Value Object Payment > Installment > DownPayment
+' gravado na própria tabela (owned type). Installment e DownPayment
+' são opcionais, por isso suas colunas aceitam NULL.
+' =====================================================================
+package "Documentos Comerciais" {
+    entity budgets {
+        * id : bigint <<PK>>
+        --
+        * seller_id : bigint <<FK>>
+        * customer_id : bigint <<FK>>
+        * value_subtotal : numeric(18,2)
+        * value_total : numeric(18,2)
+        observations : text
+        customer_signature_image : bytea
+        * creation_date_time : timestamptz
+        * last_update_date_time : timestamptz
+        .. Pagamento ..
+        payment_method : integer
+        * payment_discount_value : numeric(18,2)
+        * payment_has_installment : boolean
+        .. Parcelamento ..
+        payment_installment_value : numeric(18,2)
+        payment_installment_quantity : integer
+        payment_installment_has_down_payment : boolean
+        .. Entrada ..
+        payment_installment_down_payment_value : numeric(18,2)
+        payment_installment_down_payment_percentage : numeric(5,2)
+        payment_installment_down_payment_method : integer
+    }
+
+    entity budgets_products {
+        * id : bigint <<PK>>
+        --
+        * document_id : bigint <<FK>>
+        * product_id : bigint <<FK>>
+        * quantity : numeric(18,2)
+        * value_unit : numeric(18,2)
+        * value_total : numeric(18,2)
+    }
+
+    entity orders {
+        * id : bigint <<PK>>
+        --
+        * seller_id : bigint <<FK>>
+        * customer_id : bigint <<FK>>
+        budget_id : bigint <<FK>>
+        * value_subtotal : numeric(18,2)
+        * value_total : numeric(18,2)
+        observations : text
+        customer_signature_image : bytea
+        * creation_date_time : timestamptz
+        * last_update_date_time : timestamptz
+        .. Pagamento ..
+        payment_method : integer
+        * payment_discount_value : numeric(18,2)
+        * payment_has_installment : boolean
+        .. Parcelamento ..
+        payment_installment_value : numeric(18,2)
+        payment_installment_quantity : integer
+        payment_installment_has_down_payment : boolean
+        .. Entrada ..
+        payment_installment_down_payment_value : numeric(18,2)
+        payment_installment_down_payment_percentage : numeric(5,2)
+        payment_installment_down_payment_method : integer
+    }
+
+    entity orders_products {
+        * id : bigint <<PK>>
+        --
+        * document_id : bigint <<FK>>
+        * product_id : bigint <<FK>>
+        * quantity : numeric(18,2)
+        * value_unit : numeric(18,2)
+        * value_total : numeric(18,2)
+    }
+}
+
+' =====================================================================
+' RELACIONAMENTOS (FK)
+' =====================================================================
+
+' Territórios
+countries ||--o{ states
+states ||--o{ localities
+
+' Pessoas
+customers ||--o{ customers_addresses
+localities ||--o{ customers_addresses
+
+' Autenticação
+users ||--o{ refresh_tokens
+
+' Orçamentos
+users ||--o{ budgets
+customers ||--o{ budgets
+budgets ||--o{ budgets_products
+products ||--o{ budgets_products
+
+' Pedidos
+users ||--o{ orders
+customers ||--o{ orders
+orders ||--o{ orders_products
+products ||--o{ orders_products
+budgets |o--o{ orders
+
+@enduml
