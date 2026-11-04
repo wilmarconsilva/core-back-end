@@ -7,7 +7,7 @@ using Domain.Documents.Budgets.Repositories.Interfaces;
 using Domain.Documents.Orders.Repositories.Interfaces;
 using Domain.Products.Repositories.Interfaces;
 using Domain.Persons.Customers.Repositories.Interfaces;
-using Domain.Authtentication.Repositories.Interfaces;
+using Domain.Authentication.Repositories.Interfaces;
 using Domain.Persons.Users.Repositories.Interfaces;
 using Application.Authentication.Interfaces;
 using Application.Authentication.Services.Interfaces;

@@ -1,4 +1,4 @@
-using Domain.Authtentication.Entities;
+using Domain.Authentication.Entities;
 using Infrastructure.Shared.Persistance.Mappings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

@@ -1,7 +1,7 @@
-using Domain.Authtentication.Entities;
+using Domain.Authentication.Entities;
 using Domain.Shared.Repositories.Interfaces;
 
-namespace Domain.Authtentication.Repositories.Interfaces
+namespace Domain.Authentication.Repositories.Interfaces
 {
     public interface IRefreshTokenRepository : IRepositoryCrud<RefreshToken>
     {

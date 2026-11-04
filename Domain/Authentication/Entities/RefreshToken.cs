@@ -2,7 +2,7 @@ using Domain.Persons.Users.Entities;
 using Domain.Shared.Entities;
 using Domain.Shared.Utilities;
 
-namespace Domain.Authtentication.Entities
+namespace Domain.Authentication.Entities
 {
     public class RefreshToken : EntityWithoutDescription
     {

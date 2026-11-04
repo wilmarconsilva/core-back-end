@@ -1,5 +1,5 @@
-using Domain.Authtentication.Entities;
-using Domain.Authtentication.Repositories.Interfaces;
+using Domain.Authentication.Entities;
+using Domain.Authentication.Repositories.Interfaces;
 using Infrastructure.Shared;
 using Infrastructure.Shared.Persistance;
 using Microsoft.EntityFrameworkCore;

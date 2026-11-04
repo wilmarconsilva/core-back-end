@@ -1,4 +1,4 @@
-using Domain.Authtentication.Entities;
+using Domain.Authentication.Entities;
 using Domain.Shared.Exceptions;
 
 namespace Domain.UnitTests.Authentication.Entities
