@@ -1,0 +1,68 @@
+@startuml Diagrama de classes da gestão de pedidos
+' Camadas da Arquitetura Limpa no back-end, exemplificadas pela
+' funcionalidade de pedidos. As camadas externas (Presentation e
+' Infrastructure) ficam no topo e as internas (Application e Domain) abaixo,
+' de modo que todas as setas de dependência apontam para baixo (para dentro).
+' Requer Graphviz instalado (motor de layout padrão do PlantUML).
+top to bottom direction
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam nodesep 40
+skinparam ranksep 50
+hide empty members
+hide circle
+
+package "Presentation" #FFFFFF {
+  class OrdersController
+}
+
+package "Infrastructure" #FFFFFF {
+  class OrderQuery
+  class OrderRepository
+  abstract class DocumentRepository <<abstract>>
+}
+
+package "Application" #FFFFFF {
+  interface IOrderService <<interface>>
+  class OrderService
+  abstract class DocumentService <<abstract>>
+  interface IOrderQuery <<interface>>
+}
+
+package "Domain" #FFFFFF {
+  interface ICustomerRepository <<interface>>
+  interface IOrderRepository <<interface>>
+  class Order
+  abstract class "Document<TProduct>" as Document <<abstract>>
+  class OrderProduct
+  class Payment <<value object>>
+}
+
+' Ordem vertical das camadas (ligações invisíveis)
+OrdersController -[hidden]down-> OrderQuery
+DocumentService -[hidden]down-> ICustomerRepository
+IOrderQuery -[hidden]down-> IOrderRepository
+
+' Presentation -> Application
+OrdersController -down-> IOrderService
+
+' Application
+OrderService .up.|> IOrderService
+OrderService -left-|> DocumentService
+OrderService -down-> IOrderQuery
+OrderService -down-> IOrderRepository
+OrderService -down-> ICustomerRepository
+
+' Infrastructure -> Application / Domain
+OrderQuery .down.|> IOrderQuery
+OrderRepository -right-|> DocumentRepository
+OrderRepository .down.|> IOrderRepository
+
+' Domain
+IOrderRepository .down.> Order
+Order -left-|> Document
+Order *-right- "*" OrderProduct
+Document *-down- "1" Payment
+@enduml

@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Documents
 {
-    public abstract class DocumentoRepository<IDocument, IDocumentProduct> : RepositoryCrud<IDocument>
+    public abstract class DocumentRepository<IDocument, IDocumentProduct> : RepositoryCrud<IDocument>
         where IDocument : Document<IDocumentProduct>
         where IDocumentProduct : DocumentProduct
     {
-        protected DocumentoRepository(AppDbContext context) : base(context)
+        protected DocumentRepository(AppDbContext context) : base(context)
         {
         }
 

@@ -4,7 +4,7 @@ using Infrastructure.Shared.Persistance;
 
 namespace Infrastructure.Documents.Orders
 {
-    public class OrderRepository : DocumentoRepository<Order, OrderProduct>, IOrderRepository
+    public class OrderRepository : DocumentRepository<Order, OrderProduct>, IOrderRepository
     {
         public OrderRepository(AppDbContext context) : base(context)
         {
