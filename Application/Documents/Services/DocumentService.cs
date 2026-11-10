@@ -94,7 +94,7 @@ namespace Application.Documents.Services
             if (dto == null)
                 return null;
 
-            return new DownPayment(dto.Value, dto.Percentage, dto.Method);
+            return new DownPayment(dto.Value, dto.Method);
         }
 
         private async Task SaveAsync(List<TEntity> entities, List<Customer> customers, CancellationToken cancellationToken)

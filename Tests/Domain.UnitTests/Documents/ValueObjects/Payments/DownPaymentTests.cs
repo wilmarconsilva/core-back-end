@@ -7,25 +7,42 @@ namespace Domain.UnitTests.Documents.ValueObjects.Payments
     public class DownPaymentTests
     {
         [Theory]
-        [InlineData(0, 10, PaymentMethod.PIX)]
-        [InlineData(10, 0, PaymentMethod.PIX)]
-        [InlineData(10, 10, (PaymentMethod)0)]
-        [InlineData(-10, 10, PaymentMethod.PIX)]
-        [InlineData(10, -10, PaymentMethod.PIX)]
-        public void Constructor_InvalidValue_ThrowsBusinessRuleException(decimal value, decimal percentage, PaymentMethod method)
+        [InlineData(0, PaymentMethod.PIX)]
+        [InlineData(10, (PaymentMethod)0)]
+        [InlineData(-10, PaymentMethod.PIX)]
+        public void Constructor_InvalidValue_ThrowsBusinessRuleException(decimal value, PaymentMethod method)
         {
-            Should.Throw<BusinessRuleException>(() => new DownPayment(value, percentage, method));
+            Should.Throw<BusinessRuleException>(() => new DownPayment(value, method));
+        }
+
+        [Fact]
+        public void Constructor_ValueWithMoreThanTwoDecimals_RoundsToCents()
+        {
+            DownPayment downPayment = new(10.555m, PaymentMethod.PIX);
+
+            downPayment.Value.ShouldBe(10.56m);
         }
 
         [Theory]
-        [InlineData(10, 10, 100, true)]
-        [InlineData(10, 10, 99.99, true)]
-        [InlineData(15, 10, 100, false)]
-        public void ValidatePercentage_ComparesRoundedPercentageOfTotal(decimal value, decimal percentage, decimal valueTotal, bool expected)
+        [InlineData(10, 100, 10)]
+        [InlineData(15000, 26000, 57.69)]
+        [InlineData(1, 3, 33.33)]
+        [InlineData(2, 3, 66.67)]
+        public void SetPercentage_ValidTotal_DerivesRoundedPercentageFromValue(decimal value, decimal valueTotal, decimal expected)
         {
-            DownPayment downPayment = new(value, percentage, PaymentMethod.PIX);
+            DownPayment downPayment = new(value, PaymentMethod.PIX);
 
-            downPayment.ValidatePercentage(valueTotal).ShouldBe(expected);
+            downPayment.SetPercentage(valueTotal);
+
+            downPayment.Percentage.ShouldBe(expected);
+        }
+
+        [Fact]
+        public void SetPercentage_ZeroTotal_ThrowsBusinessRuleException()
+        {
+            DownPayment downPayment = new(10, PaymentMethod.PIX);
+
+            Should.Throw<BusinessRuleException>(() => downPayment.SetPercentage(0));
         }
 
         [Theory]
@@ -33,7 +50,7 @@ namespace Domain.UnitTests.Documents.ValueObjects.Payments
         [InlineData(100, false)]
         public void ValidateValue_ReturnsWhetherValueIsLessThanTotal(decimal value, bool expected)
         {
-            DownPayment downPayment = new(value, 10, PaymentMethod.PIX);
+            DownPayment downPayment = new(value, PaymentMethod.PIX);
 
             downPayment.ValidateValue(100).ShouldBe(expected);
         }

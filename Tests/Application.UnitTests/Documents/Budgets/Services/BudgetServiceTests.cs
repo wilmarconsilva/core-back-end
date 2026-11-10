@@ -46,7 +46,7 @@ namespace Application.UnitTests.Documents.Budgets.Services
         public async Task CreateAsync_ValidDto_CreatesBudgetForCurrentUser()
         {
             BudgetSaveDto dto = DocumentSaveDtoBuilder.Budget(
-                payment: new PaymentSaveDto { Method = null, DiscountValue = 10, Installment = DocumentSaveDtoBuilder.Installment(3, downPaymentValue: 27, downPaymentPercentage: 30) });
+                payment: new PaymentSaveDto { Method = null, DiscountValue = 10, Installment = DocumentSaveDtoBuilder.Installment(3, downPaymentValue: 27) });
 
             IEnumerable<Entity> entities = await _service.CreateAsync([dto], TestContext.Current.CancellationToken);
 
@@ -59,6 +59,7 @@ namespace Application.UnitTests.Documents.Budgets.Services
             budget.Payment.Installment!.Quantity.ShouldBe(3);
             budget.Payment.Installment.Value.ShouldBe(21);
             budget.Payment.Installment.DownPayment!.Method.ShouldBe(PaymentMethod.Money);
+            budget.Payment.Installment.DownPayment.Percentage.ShouldBe(30);
             budget.Products.ShouldHaveSingleItem().ProductId.ShouldBe(10);
         }
 

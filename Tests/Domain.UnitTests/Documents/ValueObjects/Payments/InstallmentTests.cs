@@ -23,7 +23,7 @@ namespace Domain.UnitTests.Documents.ValueObjects.Payments
         [Fact]
         public void Constructor_WithDownPayment_FlagsDownPayment()
         {
-            Installment installment = new(2, new DownPayment(10, 10, PaymentMethod.PIX));
+            Installment installment = new(2, new DownPayment(10, PaymentMethod.PIX));
 
             installment.HasDownPayment.ShouldBeTrue();
         }
@@ -41,7 +41,7 @@ namespace Domain.UnitTests.Documents.ValueObjects.Payments
         [Fact]
         public void SetValue_WithDownPayment_DividesRemainingByQuantity()
         {
-            Installment installment = new(4, new DownPayment(20, 20, PaymentMethod.Money));
+            Installment installment = new(4, new DownPayment(20, PaymentMethod.Money));
 
             installment.SetValue(100);
 
@@ -64,7 +64,7 @@ namespace Domain.UnitTests.Documents.ValueObjects.Payments
         [Fact]
         public void SetValue_DownPaymentEqualToTotal_ThrowsBusinessRuleException()
         {
-            Installment installment = new(2, new DownPayment(100, 100, PaymentMethod.PIX));
+            Installment installment = new(2, new DownPayment(100, PaymentMethod.PIX));
 
             Should.Throw<BusinessRuleException>(() => installment.SetValue(100));
         }
@@ -72,7 +72,7 @@ namespace Domain.UnitTests.Documents.ValueObjects.Payments
         [Fact]
         public void SetValue_DownPaymentGreaterThanTotal_ThrowsBusinessRuleException()
         {
-            Installment installment = new(2, new DownPayment(150, 150, PaymentMethod.PIX));
+            Installment installment = new(2, new DownPayment(150, PaymentMethod.PIX));
 
             BusinessRuleException exception = Should.Throw<BusinessRuleException>(() => installment.SetValue(100));
 
@@ -80,13 +80,15 @@ namespace Domain.UnitTests.Documents.ValueObjects.Payments
         }
 
         [Fact]
-        public void SetValue_DownPaymentPercentageMismatch_ThrowsBusinessRuleException()
+        public void SetValue_WithDownPayment_DerivesPercentageFromValue()
         {
-            Installment installment = new(2, new DownPayment(30, 20, PaymentMethod.PIX));
+            Installment installment = new(1, new DownPayment(15000, PaymentMethod.PIX));
 
-            BusinessRuleException exception = Should.Throw<BusinessRuleException>(() => installment.SetValue(100));
+            installment.SetValue(26000);
 
-            exception.Message.ShouldBe("O valor da entrada não corresponde a porcentagem da entrada em relação ao valor total do documento.");
+            installment.Value.ShouldBe(11000);
+            installment.DownPayment!.Value.ShouldBe(15000);
+            installment.DownPayment.Percentage.ShouldBe(57.69m);
         }
     }
 }

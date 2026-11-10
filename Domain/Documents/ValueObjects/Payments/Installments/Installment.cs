@@ -31,13 +31,22 @@ namespace Domain.Documents.ValueObjects.Payments.Installments
 
         public void SetValue(decimal valueTotal)
         {
+            if (DownPayment != null)
+            {
+                if (!DownPayment.ValidateValue(valueTotal))
+                    throw new BusinessRuleException("O valor da entrada não pode ser igual ou maior que o valor total do documento.");
+
+                DownPayment.SetPercentage(valueTotal);
+            }
+
             decimal valueWithoutDownPayment = valueTotal - (DownPayment?.Value ?? 0);
 
             decimal value = Math.Round(valueWithoutDownPayment / Quantity, 2);
             ValueValidatorUtility.ValidateValue(value, "O valor da(s) parcela(s)");
             Value = value;
 
-            Validate(valueTotal);
+            if (!ValidateInstallmentValueQuantity(valueTotal))
+                throw new BusinessRuleException("O valor total da(s) parcela(s) não corresponde ao valor total do documento descontando o valor da entrada.");
         }
 
         private bool ValidateInstallmentValueQuantity(decimal valueTotal)
@@ -47,34 +56,6 @@ namespace Domain.Documents.ValueObjects.Payments.Installments
             // O valor da parcela é arredondado em centavos, então a soma pode diferir do saldo em até um centavo por parcela.
             decimal tolerance = Quantity * 0.01m;
             return Math.Abs((Value * Quantity) - (valueTotal - downPaymentValue)) < tolerance;
-        }
-
-        private bool ValidateDownPaymentPercentage(decimal valueTotal)
-        {
-            if (DownPayment == null)
-                return true;
-
-            return DownPayment.ValidatePercentage(valueTotal);
-        }
-
-        private bool ValidateDownPaymentValue(decimal valueTotal)
-        {
-            if (DownPayment == null)
-                return true;
-
-            return DownPayment.ValidateValue(valueTotal);
-        }
-
-        private void Validate(decimal valueTotal)
-        {
-            if (!ValidateDownPaymentPercentage(valueTotal))
-                throw new BusinessRuleException("O valor da entrada não corresponde a porcentagem da entrada em relação ao valor total do documento.");
-
-            if (!ValidateDownPaymentValue(valueTotal))
-                throw new BusinessRuleException("O valor da entrada não pode ser igual ou maior que o valor total do documento.");
-
-            if (!ValidateInstallmentValueQuantity(valueTotal))
-                throw new BusinessRuleException("O valor total da(s) parcela(s) não corresponde ao valor total do documento descontando o valor da entrada.");
         }
     }
 }

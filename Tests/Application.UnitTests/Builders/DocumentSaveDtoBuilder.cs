@@ -48,10 +48,10 @@ namespace Application.UnitTests.Builders
             };
         }
 
-        public static InstallmentSaveDto Installment(int quantity, decimal? downPaymentValue = null, decimal? downPaymentPercentage = null)
+        public static InstallmentSaveDto Installment(int quantity, decimal? downPaymentValue = null)
         {
             DownPaymentSaveDto? downPayment = downPaymentValue.HasValue
-                ? new DownPaymentSaveDto { Value = downPaymentValue.Value, Percentage = downPaymentPercentage!.Value, Method = PaymentMethod.Money }
+                ? new DownPaymentSaveDto { Value = downPaymentValue.Value, Method = PaymentMethod.Money }
                 : null;
 
             return new InstallmentSaveDto { Quantity = quantity, DownPayment = downPayment };

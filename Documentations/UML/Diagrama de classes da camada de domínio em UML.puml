@@ -272,8 +272,8 @@ package "Documents" {
             + Value : decimal
             + Percentage : decimal
             + Method : PaymentMethod
-            + DownPayment(value, percentage, method)
-            + ValidatePercentage(valueTotal : decimal) : bool
+            + DownPayment(value, method)
+            + SetPercentage(valueTotal : decimal)
             + ValidateValue(valueTotal : decimal) : bool
         }
     }

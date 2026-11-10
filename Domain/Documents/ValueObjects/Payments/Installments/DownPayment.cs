@@ -7,7 +7,11 @@ namespace Domain.Documents.ValueObjects.Payments.Installments
     {
         public decimal Value { get; private init; }
 
-        public decimal Percentage { get; private init; }
+        /// <summary>
+        /// Percentual da entrada em relação ao valor total do documento, derivado de <see cref="Value"/>
+        /// (fonte da verdade) e arredondado em 2 casas decimais. Calculado em <see cref="SetPercentage"/>.
+        /// </summary>
+        public decimal Percentage { get; private set; }
 
         public PaymentMethod Method { get; private init; }
 
@@ -16,20 +20,20 @@ namespace Domain.Documents.ValueObjects.Payments.Installments
         /// </summary>
         private DownPayment() { }
 
-        public DownPayment(decimal value, decimal percentage, PaymentMethod method)
+        public DownPayment(decimal value, PaymentMethod method)
         {
             ValueValidatorUtility.ValidatePositive(value, "O valor da entrada");
-            ValueValidatorUtility.ValidatePositive(percentage, "A porcentagem da entrada");
             ValueValidatorUtility.ValidateEnum(method, "O método de pagamento da entrada");
 
-            Value = Math.Round(value,2);
-            Percentage = percentage;
+            Value = Math.Round(value, 2);
             Method = method;
         }
 
-        public bool ValidatePercentage(decimal valueTotal)
+        public void SetPercentage(decimal valueTotal)
         {
-            return Math.Round(valueTotal * (Percentage / 100), 2) == Value;
+            ValueValidatorUtility.ValidatePositive(valueTotal, "O valor total do documento");
+
+            Percentage = Math.Round(Value / valueTotal * 100, 2);
         }
 
         public bool ValidateValue(decimal valueTotal)
